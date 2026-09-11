@@ -1,0 +1,121 @@
+﻿
+@using PortalGRFP.Entities.Common.AlmacenVirtual
+
+@{
+    ViewBag.Title = "Alta de Almacenes";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Mantenimiento</a></li>
+    <li class="breadcrumb-item"><a>Almacen Virtual</a></li>
+}
+
+<div class="card" style="width:100%">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-3">
+                <label class="control-label col-md-12">Almacén Virtual</label>
+                <input type="Text" class="form-control" id="txtNombre" name="txtNombre" placeholder="Nombre Almacen" />
+            </div>
+            <div class="col-md-3">
+                <label class="control-label col-md-12">Cadena / Sucursal</label>
+                <input type="Text" class="form-control" id="txtCadena" name="txtCadena" placeholder="Cadena / Sucursal" />
+            </div>
+            <div class="col-md-3">
+                <label class="control-label col-md-12">&ensp;</label>
+                <input type="button" onclick="AlamcenLoad(2)" value="Guardar" class="btn btn-success">
+            </div>
+            
+        </div>
+        <div class="container mt-3"><ul class="list-group" id="detalle"></ul></div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        var cadena = "";
+        function llenaDtable(dataSet) {
+            var tblpedidosCargados = $('#tblRespuesta').DataTable({
+                data: dataSet,
+                "destroy": true,
+                "processing": true,
+                columns: [
+                    { data: "Id", title: "Id" },
+                    { data: "Nombre", title: "Nombre" },
+                    { data: "CadenaAsociada", title: "Cadena / Sucursal " },
+                ],
+                "language": {
+                    "zeroRecords": "Ningun dato disponible en esta tabla",
+                    "info": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "infoEmpty": "No hay registros disponibles",
+                    "infoFiltered": "(Filtro de _MAX_  registros)",
+                    "sSearch": "Buscar",
+                    "paginate": {
+                        "previous": "Anterior",
+                        "next": "Siguiente",
+                    },
+                },
+                select: true,
+                buttons: false
+            });
+        }
+
+        
+        function AlamcenLoad(opcion) {
+            var txtNombre = $("#txtNombre").val();
+            var txtCadena = $("#txtCadena").val();
+            var valida = "Captura el Valor del (";
+
+            if (txtNombre == "")
+                valida += "Almacén Virtual,";
+            if (txtCadena == "")
+                valida += "Cadena / Sucursal";
+
+            valida = valida.replace(/(^,)|(,$)/g, "")+")";
+
+            if (opcion > 1 && (txtNombre == "" || txtCadena == "")) {
+                swal("Campos obligatorios", valida, "warning");
+                return false;
+            } else {
+
+                var dta = '';
+                if (opcion == 1)
+                    dta = '{opcion:"' + opcion + '"}';
+                else
+                    dta = '{opcion:"' + opcion + '", Nombre:"' + txtNombre + '", Cadena:"' + txtCadena + '"}';
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("AlmacenLoad", "AlmacenVirtual")",
+                    data: dta,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+
+                    success: function (response) {
+                        if (response.Success) {
+                            if (opcion != 1)
+                                swal(response.Message, '', "success");
+                            var tbl = '<li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">Catálogo de Almacén</li><li class="list-group-item"><table id="tblRespuesta" class="display expand" width="100%"></table></li>';
+                            $("#detalle").html(tbl);
+                            llenaDtable(response.tblalmacen);
+                            $("#txtNombre").val("");
+                            $("#txtCadena").val("");
+                        } else {
+                            swal(response.Message, '', "warning");
+                        }
+
+                    },
+                    error: function (e) {
+                        hideLoading();
+                        swal("¡Error inesperado en la carga!", '', "error");
+                    }
+
+                })
+            }
+        }
+
+        $(document).ready(function () {
+            AlamcenLoad(1, "", "");
+        });
+
+
+    </script>
+}

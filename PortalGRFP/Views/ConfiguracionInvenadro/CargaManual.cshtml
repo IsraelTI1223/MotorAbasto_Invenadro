@@ -1,0 +1,280 @@
+﻿@using PortalGRFP.Entities.Common
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Generales</a></li>
+    <li class="breadcrumb-item"><a>Invenadro</a></li>
+}
+<div class="container-fluid">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a href='@Url.Action("Index", "ConfiguracionInvenadro")' class="btn btn-secondary">Invenadro General</a>
+        <a href='@Url.Action("CargaManual", "ConfiguracionInvenadro")' class="btn btn-secondary active">Carga Manual</a>
+
+    </div>
+    <div class="card">
+        <div class="card-header">
+            @using (Html.BeginForm("BorrarInvenadro", "ConfiguracionInvenadro", FormMethod.Post, new { role = "form", id = "frmManInvenadro" }))
+            {
+                <div class="row">
+                    <div class="col-md-4">
+                        Seleccione Marca/Sucursales
+                        <select id="MarcaSuc" name="MarcaSuc" multiple="multiple" class="form-control col-md-10">
+                            @{
+                                var Marcassuc = TempData["MarcasSucTMP"] as List<Combo4>;
+                                var numeroGrupos = (from sg in Marcassuc select sg.Filtro).ToList().Distinct();
+
+                                foreach (var item in numeroGrupos)
+                                {
+                                    var opciones = (from t in Marcassuc where t.Filtro == item select new ComboGenerico { Id = t.Id, Valor = t.Valor }).ToList();
+
+                                    <optgroup label="@item" class="group-1 font-weight-bold">
+
+                                        @foreach (var it in opciones)
+                                        {
+                                            <option value="@it.Id">@it.Valor</option>
+                                        }
+                                    </optgroup>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        Acción a Ejecutar
+                        <div class="form-inline">
+                            <div class="form-check" style="padding-right:15px">
+                                <label class="form-check-label" for="chkBorrar">Borrar</label>
+                                <input type="checkbox" name="chkBorrar" id="chkBorrar" class="form-check-input" checked />
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label" for="chkcargar">Cargar archivo</label>
+                                <input type="checkbox" name="chkcargar" id="chkcargar" class="form-check-input" />
+                            </div>
+                            <button type="button" id="btnExcel" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" data-toggle="modal" data-target="#modalExcel" data-placement="top" title="Carga de Invenadro" style="display:none">
+                                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-cloud-upload" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z" />
+                                    <path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z" />
+                                </svg> Carga de Invenadro
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button id="btnBorrar" type="submit" class="btn btn-danger">Procesar</button>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="card-body">
+            <table id="tblbitacora" class="display compact cell-border" width="100%"></table>
+
+            <table id="tblLog" class="display compact cell-border" width="100%"></table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalExcel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form id="frmExcel" enctype="multipart/form-data" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalExcel-label">CARGAR UN EXCEL</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="fileExcel2" name="fileExcel2" multiple data-show-upload="false">
+                        <label id="lblFileName2" class="custom-file-label" for="customFile">Seleccionar archivo</label>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancelar" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="EnviarExcel">Iniciar Carga</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+            'use strict';
+
+            $('#MarcaSuc').multiselect({
+                nonSelectedText: 'Seleccione una opción',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                enableClickableOptGroups: true,
+                enableCollapsibleOptGroups: true,
+                maxHeight: 400,
+                buttonWidth: '350px',
+                buttonTextAlignment: 'left',
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Marcas Seleccionados"
+            });
+
+            $('#chkBorrar').on("click", function () {
+                if ($(this).is(":checked")) {
+                    $('#chkcargar').prop("checked", false);
+                    $("#btnExcel").css("display", "none");
+                    $("#btnBorrar").css("display", "block");
+                }
+                $('#chkBorrar').prop("checked", true);
+            });
+
+            $('#chkcargar').on("click", function () {
+                if ($(this).is(":checked")) {
+                    $("#btnExcel").css("display", "block");
+                    $('#chkBorrar').prop("checked", false);
+                    $("#btnBorrar").css("display", "none");
+                } else {
+                    $("#btnExcel").css("display", "none");
+                    $('#chkBorrar').prop("checked", true);
+                    $('#chkcargar').prop("checked", false);
+                }
+            });
+
+               var $lblFileName2 = $('#lblFileName2');
+
+            $('#fileExcel2').bind('change', function(e) {
+                $lblFileName2.text((e.target.files.length > 0) ? e.target.files[0].name : 'Seleccionar archivo');
+            });
+
+            $("#btnCancelar").click(function () {
+                $("#frmExcel").trigger("reset");
+                $lblFileName2.text("Seleccionar archivo");
+            });
+
+            $("#EnviarExcel").click(function () {
+                var formulario = document.getElementById('frmExcel');
+
+                var formData = new FormData(formulario);
+                formData.append("Farmacias", $('#MarcaSuc').val());
+                var archivo = $("#fileExcel2").val();
+                if (archivo != "") {
+                    showLoading();
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("CargaInvenadro", "ConfiguracionInvenadro")',
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success: function (response) {
+                            hideLoading();
+                            if (response.Success) {
+                                $("#modalExcel").modal('hide');
+                                swal('', response.Message, "success").then((value) => {
+                                    Consulta();
+                                });
+                            } else {
+                                swal('', response.Message, "error");
+                            }
+                        },
+                        error: function (e) {
+                            hideLoading();
+                            swal('',"¡Error inesperado en la carga!",  "error");
+                        }
+
+                    });
+                } else {
+                    swal("¡No se ha seleccionado un archivo!", '', "error");
+                }
+            });
+
+
+            function Consulta() {
+             showLoading();
+              $.ajax({
+                  type: "Post",
+                  url: "@Url.Action("SalidaInvenadro", "ConfiguracionInvenadro")",
+                  dataType: "json",
+                  success: function (response) {
+                         $('#tblbitacora').DataTable({
+                              data: response.Bitacora,
+                              "destroy": true,
+                              "processing": true,
+                              dom: 'Bfrtip',
+                              columns: [
+                                  { data: "Fecha", title: 'Fecha' },
+                                  { data: "SKU", title: 'Total Registros' },
+                                  { data: "Optimo", title: "Total óptimo" }
+                              ],
+                             select: true
+                         });
+
+                          $('#tblLog').DataTable({
+                              data: response.Log,
+                              "destroy": true,
+                              "processing": true,
+                              dom: 'Bfrtip',
+                              columns: [
+                                  { data: "Sucursal", title: 'Sucursal' },
+                                  { data: "SKU", title: 'Total Registros' },
+                                  { data: "Descripcion", title: 'Descripción' },
+                                  { data: "Optimo", title: "Total óptimo" },
+                                  { data: "Error", title: "Motivo del rechazo en la carga" }
+                              ],
+                              select: true,
+                              scrollCollapse: false,
+                              info: true,
+                              paging: true,
+                              //responsive: true,
+                              searching: true
+                          });
+
+                  }
+              });
+                hideLoading();
+            }
+
+
+
+            $("#frmManInvenadro").on("submit", function (event) {
+                event.preventDefault();
+
+                var msuc = $("#MarcaSuc").val();
+                if (msuc == "") {
+                    swal("", '¡No se ha seleccionado una sucursal!', "error");
+                } else
+                {
+                swal({
+                    title: 'Se eliminara la información',
+                    text: "¿Desea continuar?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        var formulario = $("#frmManInvenadro").serializeArray()
+                            .filter(function (elem) {
+                                return $.trim(elem.value);
+                            });
+
+                        showLoading();
+                        $.ajax({
+                            type: $("#frmManInvenadro").attr('method'),
+                            url: $("#frmManInvenadro").attr('action'),
+                            data: formulario,
+                            success: function (response) {
+                                hideLoading();
+                                //$("#frmManInvenadro").trigger("reset");
+                                swal("Los registros se han eliminado puede proceder a la carga del layout", '', "success");
+                            },
+                            error: function (response) {
+                                swal("Error de conexión", '', "warning");
+                            }
+                        });
+                    }
+                });
+                }
+            });
+        });
+    </script>
+}
+

@@ -1,0 +1,344 @@
+﻿@using PortalGRFP.Entities.Common
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Generales</a></li>
+    <li class="breadcrumb-item"><a>Invenadro</a></li>
+}
+<div class="container">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a href='@Url.Action("Index", "ConfiguracionInvenadro")' class="btn btn-secondary">Invenadro General</a>
+        <a href='@Url.Action("Exclusiones", "ConfiguracionInvenadro")' id="btnPestañaExcluidos" class="btn btn-secondary">Excluidos</a>
+        <a href='@Url.Action("ResumenInvenadro", "ConfiguracionInvenadro")' id="btnResumen" class="btn btn-secondary active">Resumen Invenadro</a>
+        <a href='@Url.Action("BalanceoCDRs", "ConfiguracionInvenadro")' id="btnPestañaCDR " class="btn btn-secondary">Balanceo</a>
+    </div>
+
+    <div class="card" style="width:100%">
+
+        <div class="container-fluid">
+            <br />
+            <div class="row align-items-end">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="label-primary">Estatus: <span style="color:gray"></span></label>
+                        <select class="form-control" id="cmMotivo" name="cmMotivo" data-mdb-filter="true" multiple>
+                            @if (TempData["Motivos"] != null)
+                            {
+                                foreach (var item in TempData["Motivos"] as List<ComboGenerico>)
+                                {
+                                    <option value="@item.IDstring"> @item.Valor</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <button class="btn btn-sm pd-x-15 btn-primary mg-l-6" type="button" id="btnConsulta" onclick="GetEstatus();">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <button title="Exportar Excel" class="btn btn-success" id="btnExportarExcel" style="margin-top: 25px;">
+                            Exportar Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br>
+    </div>
+
+    <div class="card" style="width:100%">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card-body" id="fullTbl2">
+                    <div class="table-responsive">
+                        <table id="tblEstatus" class="table table-striped table-bordered">
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <dialog id="modal" class="col-md-6">
+        <div class="modal-content">
+            <div class="card" style="width:100%">
+                <div class="container-fluid">
+                    <div class="row align-items-end">
+                        <div class="col-sm-12 pb-1">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <br />
+                                    <label class="label-primary">Cargar Archivo <span style="color:gray"></span></label>
+                                    <br />
+                                    <input type="file" id="archivoExcel" name="ExcelAutorizar" class="form-control" accept=".xlsx,.xls" />
+                                </div>
+                                <div class="col-md-3">
+                                    <br />
+                                    <button id="btnGuardar" style="margin-top:17%" type="button" class="btn btn-primary mb-3">Autorizar</button>
+                                </div>
+                                <div class="col-md-3">
+                                    <br />
+                                    <button id="btnCancelar" style="margin-top:17%" type="button" class="btn btn-danger mb-3" onclick="CerrarModal()">Cancelar</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <input type="hidden" id="oFlag">
+                                <input type="hidden" id="oEx">
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+</div>
+
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css">
+
+
+
+<script>
+
+    let modal;
+
+    $(document).ready(function () {
+
+        modal = document.getElementById("modal");
+
+
+        $('#cmMotivo').multiselect({
+            nonSelectedText: 'Lista de Estatus',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '250px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todos",
+            nSelectedText: "Estatus Seleccionados",
+            allSelectedText: "Todos Seleccionadas",
+            enableCaseInsensitiveFiltering: true,
+            nSelectedText: "Estatus Seleccionadas"
+        });
+
+        $("#btnExportarExcel").hide();
+
+    });
+
+    $("#btnExportarExcel").on("click", function () {
+
+        showLoading();
+
+        var estatus = $("#cmMotivo").val();
+        console.log(estatus);
+
+        // limpiar cookie
+        document.cookie = "download=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
+        var url = "@Url.Action("DescargarDetalleResumen", "ConfiguracionInvenadro")"+ "?Estatus=" + encodeURIComponent(estatus);
+
+        window.location.href = url;
+
+        var check = setInterval(function () {
+            if (document.cookie.indexOf("download=true") !== -1) {
+                clearInterval(check);
+                hideLoading();
+            }
+        }, 500);
+
+    });
+
+    function GetEstatus() {
+        showLoading();
+
+        var estatus = $("#cmMotivo").val();
+
+        console.log(estatus);
+
+        $.ajax({
+          url: "@Url.Action("GetTablaEstatus", "ConfiguracionInvenadro")",
+          type: "POST",
+          dataType: "json",
+          data: {
+              Estatus: estatus
+          },
+            success: function (response) {
+                console.log(response.Result);
+              hideLoading();
+              if (response.Success) {
+                  $("#btnExportarExcel").show();
+                  $('#tblEstatus').DataTable({
+                      data: response.Result,
+                      destroy: true,
+                      processing: true,
+                      deferRender: true,
+                      autoWidth: false,
+                      pageLength: 10,
+                      scrollCollapse: true,
+                      searching: true,
+                      ordering: true,
+                      dom: 'Bfrtip',
+                      columns: [
+                          { data: "EstatusProducto", title: "Estatus Producto" },
+                          { data: "Motivo", title: "Motivo" },
+                          { data: "FarmaciasSKU", title: "#Farmacias-SKU" },
+                          { data: "Piezas", title: "#Piezas" },
+                          {
+                              data: "MontoInvenadro",
+                              title: "$ Monto del Invenadro",
+                              "render": function (dataItem) {
+                                  if (dataItem)
+                                      return "$" + dataItem;
+                                  else
+                                      return "$" + dataItem;
+                              }
+                          },
+                          { data: "oFlag", title: "oFlag", visible: false },
+                          { data: "oEx", title: "oEx", visible: false },
+                          {
+                              "orderable": false,
+                              title: "Exportar",
+                              "render": function (data, type, row) {
+
+                                  if (row.oFlag)
+                                      return `<button type='button' class='btn btn-primary btn-sm' onclick="DescargarDetalle('${row.oFlag}', '${row.oEx}', '${row.Motivo}')"> Exportar</button>`;
+                                  else
+                                      return "";
+                              }
+                          },
+                          {
+                              "orderable": false,
+                              title: "Subir Archivo",
+                              "render": function (data, type, row) {
+
+                                  if (row.oFlag === "N  " || row.oFlag === "AM" )
+                                      return "";
+                                  else
+                                      return `<button type='button' class='btn btn-primary btn-sm' onclick="AbrirModal('${row.oFlag}', '${row.oEx}')"> Autorizar</button>`;
+                              }
+                          }
+                      ]
+                  });
+              } else {
+                  swal("Sin resultados", "", "warning");
+              }
+          },
+          error: function () {
+              hideLoading();
+              swal("Error al consultar Estatus", "", "error");
+          }
+        });
+
+    }
+
+    function DescargarDetalle(oFlag, oEx,Motivo) {
+
+        console.log(oFlag, oEx);
+
+        showLoading();
+
+        // limpiar cookie
+        document.cookie = "download=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
+        var url = "@Url.Action("DescargarDetalleTabla", "ConfiguracionInvenadro")" + "?oFlag=" + encodeURIComponent(oFlag) + "&oEx=" + encodeURIComponent(oEx) + "&Motivo=" + encodeURIComponent(Motivo);
+
+        window.location.href = url;
+
+        var check = setInterval(function () {
+            if (document.cookie.indexOf("download=true") !== -1) {
+                clearInterval(check);
+                hideLoading();
+            }
+        }, 500);
+
+    }
+
+    function AbrirModal(oFlag, oEx) {
+
+        $('#oFlag').val(oFlag);
+        $('#oEx').val(oEx);
+
+        modal.showModal();
+    }
+
+    function CerrarModal() {
+
+        $('#oFlag').val("");
+        $('#oEx').val("");
+        $('#archivoExcel').val("");
+
+        modal.close();
+    }
+
+    $('#btnGuardar').click(function () {
+
+        showLoading();
+
+        var archivo = $('#archivoExcel')[0].files[0];
+
+        let oFlag = $('#oFlag').val();
+        let oEx = $('#oEx').val();
+
+
+        if (!archivo) {
+            CerrarModal();
+            swal("Carga un Archivo", "", "warning");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("ExcelAutorizar", archivo); // mismo nombre del parámetro
+        formData.append("oFlag", $('#oFlag').val());
+        formData.append("oEx", $('#oEx').val());
+
+        modal.close();
+
+        $.ajax({
+            url: '@Url.Action("AutorizarArchivo", "ConfiguracionInvenadro")',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            enctype: 'multipart/form-data',
+            success: function (response) {
+                hideLoading();
+
+                if (response.Success) {
+                    swal("Archivo cargado correctamente", "", "success")
+                        .then(function () {
+                            location.reload();
+                        });
+                } else {
+                    swal("Error", response.Message, "error");
+                }
+            },
+            error: function () {
+                hideLoading();
+                swal("Error al procesar el archivo", "", "error");
+            }
+        });
+
+    });
+
+
+</script>
+

@@ -1,0 +1,9 @@
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
+packages/*/tools/
+packages/
+PortalGRFP/assets/fonts/ibm-plex-sans/complete/woff/IBMPlexSans-Text.woff
+PortalGRFP/PrivateSettings.config

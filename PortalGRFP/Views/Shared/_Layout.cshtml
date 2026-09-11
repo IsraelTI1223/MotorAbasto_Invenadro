@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="~/assets/img/Farma_icon_tab.png">
+
+    <title>Motor Aabsto</title>
+
+    <!-- vendor css -->
+    @*<link href="~/Content/bootstrap-datetimepicker.css" rel="stylesheet" />*@
+    @*<link href="~/Content/bootstrap.min.css" rel="stylesheet" />*@
+    <link href="~/lib/fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet" />
+    <link href="~/lib/ionicons/css/ionicons.min.css" rel="stylesheet">
+    <link href="~/lib/typicons.font/typicons.css" rel="stylesheet">
+    <link href="~/lib/prismjs/themes/prism-vs.css" rel="stylesheet">
+    <link href="~/lib/ion-rangeslider/css/ion.rangeSlider.min.css" rel="stylesheet">
+    <link href="~/lib/datatables.net-dt/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="~/lib/datatables.net-responsive-dt/css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="~/lib/select2/css/select2.min.css" rel="stylesheet">
+    <link href="~/Content/themes/base/jquery-ui.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css" rel="stylesheet" />
+    <!-- DashForge CSS -->
+    <link rel="stylesheet" href="~/assets/css/dashforge.css">
+    <link href="~/assets/css/dashforge.demo.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/assets/css/dashforge.dashboard.css">
+    <link rel="stylesheet" href="~/Content/spinner.css" />
+    <link rel="stylesheet" href="~/Content/ImageZoom.css" />
+    <link rel="stylesheet" href="~/Content/bootstrap-multiselect.css" type="text/css" />
+
+
+
+
+</head>
+<body class="page-profile">
+    <div class="spinner" style="display:none">
+        <div class="center-div d-flex justify-content-center">
+            <div class="row">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    @{Html.RenderAction("Index", "Menu");}
+    <br />
+
+
+    <div class="content">
+        <div class="container pd-x-0 pd-lg-x-10 pd-xl-x-0">
+            <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-style1 mg-b-0">
+                            @RenderSection("Breadcrumbs", false)
+                        </ol>
+                    </nav>
+                    <br />
+                    <h4 class="mg-b-0 tx-spacing--1">@ViewBag.Title</h4>
+                </div>
+                <div class="d-none d-md-block">
+                    @RenderSection("Actions", false)
+                    @*<button class="btn btn-sm pd-x-15 btn-white btn-uppercase"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mail wd-10 mg-r-5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> Email</button>
+                        <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-printer wd-10 mg-r-5"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> Print</button>*@
+                </div>
+            </div>
+            <div class="row">
+                @RenderBody()
+            </div><!-- row -->
+        </div><!-- container -->
+    </div><!-- content -->
+
+    <footer class="footer">
+        <div>
+            <span>&copy; 2021 Portal GRFP v1.0.0. </span>
+            <span>Created by <a href="#">Integration TI GRFP</a></span>
+        </div>
+        <div>
+            <nav class="nav">
+                <a href="#" class="nav-link">Licenses</a>
+                <a href="#" class="nav-link">Change Log</a>
+                <a href="#" class="nav-link">Get Help</a>
+            </nav>
+        </div>
+    </footer>
+
+
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/feather-icons/feather.min.js"></script>
+    <script src="~/lib/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+    <script src="~/lib/prismjs/prism.js"></script>
+    <script src="~/lib/jqueryui/jquery-ui.min.js"></script>
+    <script src="~/assets/js/dashforge.js"></script>
+    <script src="~/assets/js/dashforge.sampledata.js"></script>
+    <script src="~/lib/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/lib/datatables.net-dt/js/dataTables.dataTables.min.js"></script>
+    <script src="~/lib/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/lib/datatables.net-responsive-dt/js/responsive.dataTables.min.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.print.min.js"></script>
+    <!-- append theme customizer -->
+    <script src="~/lib/js-cookie/js.cookie.js"></script>
+    <script src="~/assets/js/dashforge.settings.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <script src="~/Scripts/App/Components/spinner.js"></script>
+    <script src="~/Scripts/App/Components/imageZoom.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap-multiselect.js"></script>
+
+
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>

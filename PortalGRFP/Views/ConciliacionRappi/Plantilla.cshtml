@@ -1,0 +1,127 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/edcbe65315.js" crossorigin="anonymous"></script>
+    <link href="~/Content/EstilosMotor.css" rel="stylesheet" />
+    <title>View</title>
+</head>
+<body>
+    <div class="container">
+        <hr />
+        <div class="row bg-success text-white clearfix">
+            <div class="col-md-1 center-block">
+                <span class="circle center-block" style="position:absolute;margin-top:-25px; margin-left:-20px">
+                    <i class="fas fa-user fa-3x" style="padding-left:20px;padding-top:15px"></i>
+                </span>
+            </div>
+            <div class="col-sm-11">
+                Consulta la sincronización de la información para la compra
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6"></div>
+            <div class="col-sm-3 alert alert-success"> <i class="fas fa-check-circle"></i> &nbsp;&nbsp;Sincronización completa</div>
+            <div class="col-sm-3 alert alert-warning"><i class="fas fa-exclamation-triangle float-left"></i> &nbsp;&nbsp;Incidencia en sincronización</div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5">
+                <ul class="list-group">
+                    <li class="list-group-item" role="alert"> Ventas</li>
+                    <li class="list-group-item" role="alert"> Negados de Farmacia</li>
+                    <li class="list-group-item" role="alert"> Invenadro</li>
+                    <li class="list-group-item" role="alert"> Inventarios</li>
+                    <li class="list-group-item" role="alert"> Lista de precios de proveedores</li>
+                    <li class="list-group-item" role="alert"> Tránsito de OC</li>
+                    <li class="list-group-item" role="alert"> Árticulos Nuevos</li>
+                    <li class="list-group-item" role="alert"> Sucursales Nuevas</li>
+                </ul>
+            </div>
+            <div class="col-md-5">
+                <ul class="list-group">
+                    <li class="list-group-item list-group-item-warning" role="alert">
+                        <i class="fas fa-exclamation-triangle float-left"></i> &nbsp;&nbsp;98%
+                        &nbsp;&nbsp;2021/01/20
+                        <button class="btn btn-sm btn-primary  btn-xs float-right" data-toggle="modal" data-target="#exampleModal">Ver detalle</button>
+                    </li>
+                    <li class="list-group-item list-group-item-success" role="alert">
+                        <i class="fas fa-check-circle"></i> &nbsp;&nbsp;100%
+                        &nbsp;&nbsp;2021/01/20
+                        <button class="btn btn-sm btn-primary  btn-xs float-right" data-toggle="modal" data-target="#exampleModal">Ver detalle</button>
+                    </li>
+                    <li class="list-group-item list-group-item-warning" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i> &nbsp;&nbsp;98%
+                        &nbsp;&nbsp;2021/01/20
+                        <button class="btn btn-sm btn-primary  btn-xs float-right" data-toggle="modal" data-target="#exampleModal">Ver detalle</button>
+                    </li>
+                    <li class="list-group-item list-group-item-success" role="alert">
+                        <i class="fas fa-check-circle"></i>&nbsp;&nbsp;100%
+                        &nbsp;&nbsp;2021/01/20
+                        <button class="btn btn-sm btn-primary  btn-xs float-right" data-toggle="modal" data-target="#exampleModal">Ver detalle</button>
+                    </li>
+                    <li class="list-group-item list-group-item-success" role="alert">
+                        <i class="fas fa-check-circle"></i>&nbsp;&nbsp;100%
+                        &nbsp;&nbsp;2021/01/20
+                        <button class="btn btn-sm btn-primary  btn-xs float-right" data-toggle="modal" data-target="#exampleModal">Ver detalle</button>
+                    </li>
+                    <li class="list-group-item list-group-item-success" role="alert">
+                        <i class="fas fa-check-circle"></i>&nbsp;&nbsp;100%
+                        &nbsp;&nbsp;2021/01/20
+                        <button class="btn btn-sm btn-primary  btn-xs float-right" data-toggle="modal" data-target="#exampleModal">Ver detalle</button>
+                    </li>
+                    <li class="list-group-item list-group-item-success" role="alert">
+                        <i class="fas fa-check-circle"></i>&nbsp;&nbsp;100%
+                        &nbsp;&nbsp;2021/01/20
+                        <button class="btn btn-sm btn-primary  btn-xs float-right" data-toggle="modal" data-target="#exampleModal">Ver detalle</button>
+                    </li>
+                    <li class="list-group-item list-group-item-success" role="alert">
+                        <i class="fas fa-check-circle"></i>&nbsp;&nbsp;100%
+                        &nbsp;&nbsp;2021/01/20
+                        <button class="btn btn-sm btn-primary  float-right" data-toggle="modal" data-target="#exampleModal">Ver detalle</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-6"></div>
+            <div class="col-sm-3 "></div>
+            <div class="col-sm-3 "><button class="btn btn-primary  btn-xs float-right">Salir</button></div>
+        </div>
+
+    </div>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

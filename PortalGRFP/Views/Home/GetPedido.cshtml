@@ -1,0 +1,83 @@
+﻿
+@{
+    ViewBag.Title = "GetPedido";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<PortalGRFP.Models.PedidoDetalle> PedDet = ViewBag.pedido;
+    PortalGRFP.Models.PedidoDetalle PedDist = ViewBag.distinct;
+}
+
+    <div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                    <li class="breadcrumb-item"><a href="#">Logistic Module</a></li>
+                    <li class="breadcrumb-item">Assortment Tracking</li>
+                    <li class="breadcrumb-item active" aria-current="page">Detail Tracking</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-none d-md-block">
+            @*<button class="btn btn-sm pd-x-15 btn-white btn-uppercase"><i data-feather="save" class="wd-10 mg-r-5"></i> Save</button>
+            <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="upload" class="wd-10 mg-r-5"></i> Export</button>*@
+            <!--<button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="share-2" class="wd-10 mg-r-5"></i> Share</button>-->
+            <!--<button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i data-feather="sliders" class="wd-10 mg-r-5"></i> Settings</button>-->
+        </div>
+    </div>
+
+@if (PedDet != null)
+{
+    <div data-label="Detalle Pedido" class="df-example demo-table">
+        <center><h5>Folio: @PedDist.folioPedido &nbsp;&nbsp; Sucursal: @PedDist.codigoSucursal &nbsp;&nbsp; Marca: @PedDist.MARCA  &nbsp;&nbsp; Nombre: @PedDist.NOM_SUC</h5></center>
+        <table id="example1" class="table">
+            <thead>
+                <tr>
+                    <th class="wd-9p">Material</th>
+                    <th class="wd-9p">Descripcion</th>
+                    <th class="wd-9p">Cantidad Pedida</th>
+                    <th class="wd-9p">#Entrega SAP</th>
+                    <th class="wd-9p">Folio Factura</th>
+                    <th class="wd-9p">Fecha Factura</th>
+                    <th class="wd-9p">Cantidad Factura</th>
+                    <th class="wd-9p">Fecha Farmacia</th>
+                    <th class="wd-9p">Cantidad Farmacia </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in PedDet)
+                {
+                <tr>
+                    <td>@a.material</td>
+                    <td>@a.descripcion</td>
+                    <td>@a.cantidad</td>
+                    <td>@a.no_entrega_sap</td>
+                    <td>@a.folioFacturaFinal</td>
+                    <td>@a.fechaFactura</td>
+                    <td>@a.cantidad_facturada</td>
+                    <td>@a.fecha_rec_suc</td>
+                    <td>@a.cantidad_rcbo</td>
+                </tr>
+
+                }
+            </tbody>
+        </table>
+    </div><!-- df-example -->
+}
+    @section scripts {
+        <script>
+            $(function () {
+                'use strict'
+
+                $('#example1').DataTable({
+                    language: {
+                        searchPlaceholder: 'Buscar...',
+                        sSearch: '',
+                        lengthMenu: '_MENU_ Folios/pagina',
+                    }
+                });
+
+                // Select2
+                $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity });
+
+            });</script>
+    }
+

@@ -1,0 +1,201 @@
+﻿@using PortalGRFP.Entities.Common
+
+@{
+    ViewBag.Title = "Reporte Proveedores";
+}
+
+<h2>Reporte Proveedores</h2>
+
+<div class="card" style="width:100%">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="cbProveedor">Seleccionar Proveedor:</label>
+                <select class="form-control" id="cbProveedor" required>
+                    <!--<option value="0">Seleccione Proveedor</option>-->
+                    <option disabled selected>Seleccione Proveedor:</option>
+                    @foreach (var item in TempData["ListProv"] as List<ComboGenerico>)
+                    {
+                        <option value="@item.Id">@item.Valor</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="cbAgencia">Seleccionar Agencia:</label><br />
+                                                                   <select class="form-control" id="cbAgencia" min="1" required>
+                                                                       <option disabled selected>Seleccione Agencia </option>
+                                                                   </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <table id="tbProv" class="display compact cell-border" width="100%"></table>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+
+               'use strict';
+            $('#tbProv').DataTable({
+                @*"ajax": {
+                    "url": "@Url.Action("GetProveedorAgenciaProd", "Reportes")",
+                    "dataSrc": "",
+                },*@
+                "destroy": true,
+                "processing": true,
+                dom: 'Bfrtip',
+                columns: [
+                    { data: "Sku", title: 'Sku', visible:false },
+                    { data: "DescripcionCorta", title: "Descripción Corta" },
+                    { data: "Existencia", title: "Existencia" },
+                    { data: "Costo", title: "Costo" },
+                    { data: "Controlado", title: "Controlado" },
+                    { data: "Refrigerado", title: "Refrigerado" },
+                    { data: "PMP", title: "PMP" },
+                    { data: "Empaque", title: "Empaque" }
+                ],
+                select: true,
+                scrollCollapse: true,
+                info: false,
+                paging: true,
+                responsive: true,
+                searching: true
+            });
+
+            $("#tbProv tbody").on('click', 'tr', function () {
+
+                var rowData = $(this).children("td").map(function () {
+                    return $(this).text();
+                }).get();
+
+            });
+
+
+            $("#cbProveedor").on("change", function () {
+
+
+                var data = new FormData();
+
+                data.append("idProv", $("#cbProveedor").val());
+
+                GetAgencias(data);
+            });
+
+
+            function GetAgencias(data) {
+
+
+                showLoading();
+                $('#cbAgencia').empty();
+                $.ajax({
+                    type: "POST",
+                    url: "/Reportes/GetAgencias",
+                    data: data,
+                    dataType: "json",
+                    processData: false,  // tell jQuery not to process the data
+                    contentType: false,
+                    success: function (response) {
+                        hideLoading();
+                        var agencias = "";
+                        for (var i = 0; i < response.data.length; i++) {
+                            agencias = agencias + '<option value=' + response.data[i].Id + '>' + response.data[i].Valor + '</option>';
+                        }
+
+                        agencias = agencias + '<option disabled selected>Seleccione una Agencia </option>'
+
+                        $("#cbAgencia").append(agencias);
+
+
+
+                    },
+                    error: function (response) {
+
+                    }
+                });
+
+            }
+
+
+
+            $("#cbAgencia").on("change", function () {
+
+
+                //var data = new FormData();
+
+                //data.append("idProv", $("#cbProveedor").val());
+                //data.append("idAgencia", $("#cbAgencia").val());
+
+
+                GetListAgenciaProd(parseInt($("#cbProveedor").val(),10), parseInt($("#cbAgencia").val(),10));
+
+
+
+            });
+
+            function GetListAgenciaProd(prov,agencia) {
+                showLoading();
+                $.ajax({
+                    url: "@Url.Action("GetProveedorAgenciaProd", "Reportes")",
+
+                    dataType: "json",
+                    data: { idprov: prov, idagencia: agencia },
+                    success: function (data) {
+                        console.log(data)
+
+
+                        hideLoading();
+                        $('#tbProv').DataTable({
+                            data: data,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "Sku", title: 'Sku' },
+                                { data: "DescripcionCorta", title: "Descripción Corta" },
+                                { data: "Existencia", title: "Existencia" },
+                                { data: "Costo", title: "Costo" },
+                                { data: "Controlado", title: "Controlado" },
+                                { data: "Refrigerado", title: "Refrigerado" },
+                                { data: "PMP", title: "PMP" },
+                                { data: "Empaque", title: "Empaque" }
+                            ],
+                            select: true,
+                            scrollCollapse: true,
+                            info: false,
+                            paging: true,
+                            responsive: true,
+                            searching: true
+                        });
+                        if (data.length == 0){
+                        swal("No se encontraron productos", '', "warning");
+                        }
+
+                    },
+                    error: function (response) {
+
+                        hideLoading();
+                        swal("rror al consultar la agencia", '', "error").then((value) => {
+                            location.reload();
+                        });
+                    }
+                });
+
+            }
+
+
+
+
+
+
+
+        });
+
+
+
+    </script>
+}

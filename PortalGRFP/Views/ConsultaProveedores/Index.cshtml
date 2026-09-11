@@ -1,0 +1,48 @@
+﻿@using PortalGRFP.Entities.Common
+@{
+
+    ViewBag.Title = "Consulta Proveedores";
+}
+
+<br>
+<br>
+
+<form method="post" class="form-group col-md-12">
+
+    <div class="form-row">
+
+        <div class="form-group col-md-3">
+
+
+
+            <label for="ddlProv">Proveedor </label>
+            <select id="ddlProv" class="form-control" name="id_proveedor">
+                <option selected>Selecciona...</option>
+                @foreach (var item in TempData["Proveedor"] as List<ComboProveedor>)
+                {
+                    <option value="@item.id_proveedor">@item.Nombre</option>
+                }
+            </select>
+        </div>
+
+
+
+        <div class="form-group col-md-3">
+            <label for="ddlAgencia">Agencia </label>
+            <select id="ddlAgencia" class="form-control" name="Id">
+            </select>
+        </div>
+
+
+
+    </div>
+
+    <button type="submit" class="btn btn-primary">Consultar</button>
+
+</form>
+
+
+@section scripts{
+    <script type="text/javascript" src="~/Scripts/App/Views/ProveedorAgenciaReporte.js"></script>
+ 
+    }

@@ -1,0 +1,249 @@
+﻿@model PortalGRFP.Entities.Common.SugeridoFiltros
+@using PortalGRFP.Entities.Common
+
+@{
+    ViewBag.Title = "";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Reportes</a></li>
+    <li class="breadcrumb-item"><a>Negado Aceptado y Rechazado</a></li>
+}
+
+
+@using (Html.BeginForm("GetDTCuenta", "ReporteNeg2Ped", FormMethod.Post, new { role = "form", id = "frmReporte" }))
+{
+    <div class="row">
+        <div class="col-md-3">
+            Grupo:
+            <div class="form-inline">
+                
+                    <select id="Grupo" name="Grupo" multiple="multiple" class="form-control">
+                        @foreach (var item in TempData["GrupoTMP"] as List<ComboGenerico>)
+                        {
+                            <option value="@item.Id">@item.Valor</option>
+                        }
+                    </select>
+                
+            </div>
+        </div>
+        <div class="col-md-3">
+            Sucursales:             
+                    <select id="Sucursal" name="Sucursal" multiple="multiple" class="form-control" disabled>
+                        <option value="0">Seleccione una Sucursal</option>
+                    </select>
+        </div>
+        <div class="col-md-3">
+            Selecciona fecha inicio:
+            <div class="form-inline">
+                <div class="col-md-2">
+                    <input type="date" id="txtFini" name="txtFini" class="form-control" placeholder="Fecha inicio" required />
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            Selecciona fecha fin:
+            <div class="form-inline">
+                <div class="col-md-2">
+                    <input type="date" id="txtFfin" name="txtFfin" class="form-control" placeholder="Fecha fin" required />
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <br />
+
+    <div class="col-md-3">
+        <input type="submit" value="Consultar" class="btn btn-primary" />
+    </div>
+}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body" id="contenedor_tb">
+            <row>
+                <table id="tbReporte" class="display compact cell-border" width="100%"></table>
+            </row>
+        </div>
+    </div>
+    <input type="hidden" id="idSugerido" />
+</div>
+@section scripts{
+    <script>
+        $("#contenedor_tb").hide();
+
+        $(document).ready(function () {
+            'use strict';
+
+            $('#Grupo').multiselect({
+                nonSelectedText: 'Seleccione un grupo',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '150px',
+                buttonTextAlignment: 'left',
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Grupos Seleccionados"
+            });
+
+            $('#Sucursal').multiselect({
+                nonSelectedText: 'Seleccione una Sucursal',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '250px',
+                //dropUp: true,
+                selectAllText: "Marcar Todas",
+                allSelectedText: "Todas Seleccionadas",
+                nSelectedText: "Sucursales Seleccionados"
+            });
+
+            $("#Grupo").on("change", function () {
+                var datos = new FormData();
+                datos.append("idGrupo", $(this).val());
+                GetFarmacias(datos);
+            });
+
+             function GetFarmacias(datos) {
+                showLoading();
+                $('#Sucursal').empty();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetSucursal", "ReporteNeg2Ped")",
+                    data: datos,
+                    dataType: "json",
+                    processData: false,  // tell jQuery not to process the data
+                    contentType: false,
+                    success: function (response) {
+                        hideLoading();
+                        var sucursales = '';
+                        for (var i = 0; i < response.length; i++) {
+                            sucursales = sucursales + '<option value=' + response[i].Id + '>' + response[i].Valor + '</option>';
+                        }
+
+                        $('#Sucursal').append(sucursales);
+
+                        $('#Sucursal').multiselect('rebuild');
+
+                        document.getElementById("Sucursal").disabled = false;
+
+                    },
+                    error: function (response) {
+                    }
+                });
+            }
+
+            $("#frmReporte").on("submit", function (event) {
+                event.preventDefault();                
+                
+                function formatDate(date) {
+                    var d = new Date(date),
+                        month = '' + (d.getMonth() + 1),
+                        day = '' + d.getDate(),
+                        year = d.getFullYear();
+
+                    if (month.length < 2)
+                        month = '0' + month;
+                    if (day.length < 2)
+                        day = '0' + day;
+
+                    return [year, month, day].join('-');
+                }
+                
+                var fecha = Date();
+                var factual = formatDate(fecha);
+                console.log(factual)
+
+                
+
+                var form = $("#frmReporte").serializeArray()
+                    .filter(function (elem) {
+                        return $.trim(elem.value);
+                    });
+
+                showLoading();
+                console.log(form)
+                
+
+                if ($("#Sucursal").val() == null || $("#Grupo").val() == null) {
+                    alert("Seleccionar Todos los filtros");
+                    return;
+                }
+
+                if ($("#txtFini").val() > $("#txtFfin").val()) {
+                    //alert("La fecha inicio no puede ser mayor que fecha fin");
+                    swal("La fecha inicio no puede ser mayor que fecha fin", '', "warning");
+                    hideLoading();
+                    return;
+                }
+
+                if ($("#txtFfin").val() > factual) {
+                    //alert("La fecha inicio no puede ser mayor que fecha fin");
+                    swal("La fecha fin es mayor al dia actual", '', "warning");
+                    hideLoading();
+                    return;
+                }
+
+                
+
+                getDTCuenta(form)
+
+            });
+
+            function getDTCuenta(form) {
+                showLoading();
+                $('#cbIncidencias').empty();
+                $.ajax({
+                    type: "POST",
+                    url: "/ReporteNeg2Ped/GetDTCuenta",
+                    dataType: "json",
+                    data: form,
+                    success: function (data) {
+                        $("#contenedor_tb").show();
+                        hideLoading();
+
+                        console.log(data)
+
+                        hideLoading();
+
+                        $('#tbReporte').DataTable({
+                            data: data.Result,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "FechaCarga", title: 'FechaCarga' },
+                                { data: "FechaValidacion", title: "FechaValidacion" },
+                                { data: "MotivoNegado", title: "MotivoNegado" },
+                                { data: "IdSucursal", title: "IdSucursal" },
+                                { data: "NumSucursal", title: "NumSucursal" },
+                                { data: "Nombre", title: "Nombre" },
+                                { data: "SKU", title: "SKU" },
+                                { data: "DESCRIPCION", title: "DESCRIPCION" },
+                                { data: "CantidadAceptada", title: "CantidadAceptada" },
+                                { data: "CantidadNegada", title: "CantidadNegada" },
+                                { data: "Incidencia", title: "Incidencia" }
+                            ],
+                            select: true,
+                            scrollCollapse: true,
+                            info: false,
+                            paging: true,
+                            responsive: true,
+                            searching: true
+                        });
+                        if (data.length == 0) {
+                            swal("No se encontraron incidencias", '', "warning");
+                        }
+                    },
+                    error: function (response) {
+                        hideLoading();
+                        swal("¡Error inesperado " + response, '', "error");
+
+
+                    }
+                });
+            }
+
+        });
+    </script>
+}

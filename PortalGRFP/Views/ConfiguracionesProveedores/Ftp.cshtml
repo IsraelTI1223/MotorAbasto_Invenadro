@@ -1,0 +1,618 @@
+﻿@model  PortalGRFP.Entities.Response.ResponseList<PortalGRFP.Entities.Common.ProveedoresAgenciaFTP>
+
+
+@using PortalGRFP.Entities.Common
+
+@{
+    ViewBag.Title = "";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>CINFIGURACIÓN / PROVEEDORES </a></li>
+    <li class="breadcrumb-item"><a>Detalles del proveedor - Agencia</a></li>
+}
+
+
+
+<div class="container-fluid">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a href='@Url.Action("EditarProveedores")' class="btn btn-secondary ">Generarl Proveedores</a>
+        <a href='@Url.Action("Agencias")' class="btn btn-secondary ">Agencias</a>
+        <a href='@Url.Action("Ftp")' class="btn btn-secondary active">FTP</a>
+        <a href='@Url.Action("Exclusiones")' class="btn btn-secondary ">Exclusiones</a>
+    </div>
+    <form id="frmInsert" method="post" class="form-group col-md-12">
+
+        <div class="form-row">
+
+
+            <div class="form-group col-md-3">
+                <label for="ddlProv">Proveedor </label>
+                <select id="ddlProv" min="1" class="form-control" name="Id_Proveedor" required>
+                    <option selected>Seleccionar...</option>
+                    @foreach (var item in TempData["Proveedor"] as List<ComboGenericoProv>)
+                    {
+                        <option value="@item.PROVEEDOR_ID">@item.Nombre</option>
+                    }
+                </select>
+                <br /><span id="spanTxtProv" style="color: red;display: none">Proveedor es obligatorio</span>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label for="ddlAgencia">Agencia </label>
+                <select id="ddlAgencia" class="form-control" name="Id_Agencia">
+                    <option selected>Seleccionar...</option>
+                </select>
+                <br /><span id="spanTxtAgencia" style="color: red;display: none">Agencia es obligatorio</span>
+            </div>
+
+            <div class="form-group col-md-2">
+                <input type="checkbox" id="chkFTPActivo" onchange="habilitarbe(this.checked);" name="FTP_Activo" value="SI" checked>
+                <label for="chkFTPActivo">FTP </label>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label for="ddlRSocial">Marca </label>
+                <select id="ddlRSocial" class="form-control" name="Id_RazonSocial">
+                    <option selected>Seleccionar...</option>
+                </select>
+                <br /><span id="spanTxtRSocial" style="color: red;display: none">Razon Social es obligatorio</span>
+            </div>
+
+        </div>
+
+        <div class="form-row">
+
+            <div class="form-group col-md-3">
+                <label for="ddlProv">Tipo de Formato </label>
+                <select id="ddlProv" min="1" class="form-control" name="Tipo_Formato" required>
+                    <option selected>Seleccionar...</option>
+                    @foreach (var item in TempData["Formato"] as List<ComboGenerico>)
+                    {
+                        <option value="@item.Id">@item.Valor</option>
+                    }
+                </select>
+                <br /><span id="spanTxtTipoForm" style="color: red;display: none">Tipo Formato es obligatorio</span>
+            </div>
+
+
+            <div class="form-group col-md-4">
+                <label for="inputColonia">URL </label>
+                <input type="text" class="form-control" id="inputColonia" name="URL" placeholder="URL" required>
+            </div>
+
+
+            <div class="form-group col-md-4">
+                <label for="inputColonia">Directorio </label>
+                <input type="text" class="form-control" id="inputColonia" name="Directorio" placeholder="Directorio" required>
+            </div>
+
+        </div>
+
+        <div class="form-row">
+
+            <div class="form-group col-md-4">
+                <label for="inputColonia">Directorio de respaldo</label>
+                <input type="text" class="form-control" id="inputColonia" name="Directorio_Respaldo" placeholder="Directorio de respaldo" required>
+            </div>
+
+            <div class="form-group col-md-2">
+                <input type="checkbox" id="check" onchange="habilitarbe(this.checked);" value="SI" name="Copia_Respaldo" checked>
+                <label for="inputCopia"> Copia de respaldo </label>
+
+            </div>
+
+            <div class="form-group col-md-2">
+                <input type="checkbox" id="check" onchange="habilitarbe(this.checked);" name="Elimina_Origen" value="SI" checked>
+                <label for="inputEorigen"> Eliminar Origen </label>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label for="ddlProv">Frecuencia: </label>
+                <select id="ddlProv" min="1" class="form-control" name="Frecuencia" onchange="carg(this);" required>
+                    <option selected>Seleccionar...</option>
+                    @foreach (var item in TempData["Frecuencia"] as List<ComboGenerico>)
+                    {
+                        <option value="@item.Id">@item.Valor</option>
+                    }
+                </select>
+                <br /><span id="spanTxtFrecuencia" style="color: red;display: none">Frecuencia es obligatorio</span>
+            </div>
+
+            <div class="form-group col-md-2">
+                <label for="txtTiempoFrec">Tiempo de Frecuencia </label>
+                <div>
+                    <input type="number" min="1" max="100" class="form-control" id="txtTiempoFrec" name="Tiempo_Frecuencia_N" style="width:50% !important;" required>
+                    <select id="ddlTiempoFrec" class="form-control" name="Tiempo_Frecuencia_T" style="width:50% !important;" required>
+                        <option value="HR">Hora(s)</option>
+                        <option value="MN">Minutos(s)</option>
+                        <option value="SS">Segundos(s)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label for="inputColonia">Fecha proxima a ejecutarse </label>
+                <input type="datetime-local" class="form-control" id="Fecha_Proxima_Ejecucion" name="Fecha_Proxima_Ejecucion" placeholder="" required>
+            </div>
+
+            <div class="form-group col-md-2">
+                <label for="inputColonia">Hora Inicio </label>
+                <input type="time" class="form-control" id="HoraI" name="Hora_Ini" placeholder="Directorio de respaldo" required>
+            </div>
+
+            <div class="form-group col-md-2">
+                <label for="inputColonia">Hora Fin </label>
+                <input type="time" class="form-control" id="HoraF" name="Hora_Fin" placeholder="Directorio de respaldo" required>
+            </div>
+
+            <div class="form-group col-md-2">
+                <label for="inputColonia">Ultima ejecución </label>
+                <input type="datetime-local" class="form-control" id="UltimaE" name="Ultima_Ejecucion" readonly>
+            </div>
+        </div>
+
+        <div class="form-row">
+
+            <div class="form-group col-md-4">
+                <label for="inputColonia">Usuario FTP</label>
+                <input type="text" class="form-control" id="inputColonia" name="Usuario_FTP" placeholder="Usuario FTP" required>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="inputColonia">Clave FTP</label>
+                <input type="password" class="form-control" id="inputColonia" name="Clave_FTP" placeholder="Usuario FTP">
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="inputColonia">Nomenclatura archivo</label>
+                <input type="text" class="form-control" id="inputColonia" name="Nomenclatura_Archivo" placeholder="Nomenclatura archivo" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-4">
+            </div>
+
+            <div class="form-group col-md-4">
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="ddlExtensionFormato">Extensión del formato </label>
+                <select id="ddlExtensionFormato" class="form-control" name="Extension_Formato" required>
+                    <option value="">(Sin extension)</option>
+                    <option value="txt">txt</option>
+                    <option value="doc">doc</option>
+                    <option value="bin">bin</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Agregar</button>
+
+    </form>
+
+
+
+
+
+
+    <form>
+        <br>
+        <br>
+
+        <hr>
+        <hr>
+
+
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="DTProv">
+                        <thead class="thead-primary">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">PROVEEDOR</th>
+                                <th scope="col">AGENCIA</th>
+                                <th scope="col">TIPO FORMATO</th>
+                                <th scope="col">NOMENCLATURA ARCHIVO</th>
+                                <th scope="col">URL</th>
+                                <th scope="col">DIRECTORIO</th>
+                                <th scope="col">DIRECTORIO RESPALDO</th>
+                                <th scope="col">FRECUENCIA</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var d in Model.Result)
+                            {
+                                <tr>
+
+                                    <td>
+
+                                        @d.Id
+                                    </td>
+                                    <td>
+                                        @d.Proveedor
+                                    </td>
+                                    <td>
+                                        @d.Agencia
+                                    </td>
+
+                                    <td>
+                                        @d.Tipo_Formato
+                                    </td>
+
+                                    <td>
+                                        @d.Nomenclatura_Archivo
+                                    </td>
+                                    <td>
+                                        @d.URL
+                                    </td>
+                                    <td>
+                                        @d.Directorio
+                                    </td>
+                                    <td>
+                                        @d.Directorio_Respaldo
+                                    </td>
+                                    <td>
+                                        @d.Frecuencia
+                                    </td>
+
+                                    <td>
+
+                                        <a href='@Url.Action("ModificarFTP",new { Id = d.Id})' class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" title="Modificar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder" viewBox="0 0 16 16">
+                                                <path d="M.54 3.87L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707z" />
+                                            </svg>
+                                        </a>
+
+
+                                        <a href='@Url.Action("Eliminar",new { Id = d.Id})' class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" onclick="return  DeleteConfirm()" title="Borrar Proveedor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                                            </svg>
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+    </form>
+</div>
+<script type="text/javascript" src="~/Scripts/App/Views/ProveedorAgencia.js"></script>
+<script>
+
+    function prueba() {
+        $("#frmInsert").serializeArray().forEach(function (item) {
+
+            console.log(item);
+        });
+
+    }
+
+
+
+    $(document).ready(function () {
+
+        getDateNow();
+
+        $(function () {
+            'use strict'
+
+            $('#DTProv').dataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+                    searchPlaceholder: "Buscar",
+                    sSearch: '',
+                    lengthMenu: '_MENU_ filas / paginas'
+                }
+            });
+        });
+
+
+
+
+        $("#frmInsert").submit(function (e) {
+            e.preventDefault();
+
+
+            //if (confirm("Vas guardar información, ¿Seguro de continuar?")) {
+
+
+            //      showLoading();
+
+            var formData = new FormData();
+
+            var Id_Proveedor, Id_Agencia, Id_RazonSocial, Tipo_Formato, Frecuencia;
+
+            $("#frmInsert").serializeArray().forEach(function (item) {
+                console.log(item.name + " " + item.value);
+
+                if (item.name == "Id_Proveedor") {
+                    formData.append("Id_Proveedor", item.value);
+
+                    Id_Proveedor = item.value;
+                }
+                if (item.name == "Id_Agencia") {
+                    formData.append("Id_Agencia", item.value);
+
+                    Id_Agencia = item.value;
+                }
+                // NUEVOS CAMPOS +
+                if (item.name == "FTP_Activo") {
+                    formData.append("FTP_Activo", item.value);
+                }
+                if (item.name == "Id_RazonSocial") {
+                    formData.append("Id_RazonSocial", item.value);
+
+                    Id_RazonSocial = item.value;
+                }
+                if (item.name == "Tiempo_Frecuencia_N") {
+                    formData.append("Numero_Frecuencia", item.value);
+                }
+                if (item.name == "Tiempo_Frecuencia_T") {
+                    formData.append("Lapso_Frecuencia", item.value);
+                }
+                if (item.name == "Extension_Formato") {
+                    formData.append("Extension_Formato", item.value);
+                }
+                // NUEVOS CAMPOS -
+                if (item.name == "Tipo_Formato") {
+                    formData.append("Tipo_Formato", item.value);
+
+                    Tipo_Formato = item.value;
+                }
+                if (item.name == "URL") {
+                    formData.append("URL", item.value);
+                }
+                if (item.name == "Directorio") {
+                    formData.append("Directorio", item.value);
+                }
+                if (item.name == "Directorio_Respaldo") {
+                    formData.append("Directorio_Respaldo", item.value);
+                }
+                if (item.name == "Copia_Respaldo") {
+                    formData.append("Copia_Respaldo", item.value);
+                }
+                if (item.name == "Elimina_Origen") {
+                    formData.append("Elimina_Origen", item.value);
+                }
+                if (item.name == "Frecuencia") {
+                    formData.append("Frecuencia", item.value);
+
+                    Frecuencia = item.value;
+
+                }
+                if (item.name == "Tiempo_Frecuencia") {
+                    formData.append("Tiempo_Frecuencia", item.value);
+                }
+                if (item.name == "Fecha_Proxima_Ejecucion") {
+                    formData.append("Fecha_Proxima_Ejecucion", item.value);
+                }
+                if (item.name == "Hora_Ini") {
+                    formData.append("Hora_Ini", item.value);
+                }
+                if (item.name == "Hora_Fin") {
+                    formData.append("Hora_Fin", item.value);
+                }
+                if (item.name == "Usuario_FTP") {
+                    formData.append("Usuario_FTP", item.value);
+                }
+                if (item.name == "Clave_FTP") {
+                    formData.append("Clave_FTP", item.value);
+                }
+                if (item.name == "Nomenclatura_Archivo") {
+                    formData.append("Nomenclatura_Archivo", item.value);
+                }
+
+            });
+
+
+            console.log(Id_Proveedor + " " + Id_Agencia + " " + Id_RazonSocial + " " + Tipo_Formato + " " + Frecuencia);
+
+            if (Id_Proveedor == 'Seleccionar...') {
+                $('#spanTxtProv').show();
+                return;
+            } else {
+                $('#spanTxtProv').hide();
+            }
+            if (Id_Agencia == 'Seleccionar...' || Id_Agencia == '' || Id_Agencia == undefined) {
+                $('#spanTxtAgencia').show();
+                return;
+            } else {
+                $('#spanTxtAgencia').hide();
+            }
+            if (Id_RazonSocial == 'Seleccionar...' || Id_Agencia == '' || Id_Agencia == undefined) {
+                $('#spanTxtRSocial').show();
+                return;
+            } else {
+                $('#spanTxtRSocial').hide();
+            }
+            if (Tipo_Formato == 'Seleccionar...') {
+                $('#spanTxtTipoForm').show();
+                return;
+            } else {
+                $('#spanTxtTipoForm').hide();
+            }
+            if (Frecuencia == 'Seleccionar...') {
+                $('#spanTxtFrecuencia').show();
+                return;
+            } else {
+                $('#spanTxtFrecuencia').hide();
+            }
+
+
+            // formData.append("Id", 0);
+            //// formData.append("Id_Proveedor", $("input[name = 'Id_Proveedor']").val());
+            // formData.append("Id_Agencia", 1);
+            // formData.append("Tipo_Formato", "");
+            // formData.append("URL", "");
+            // formData.append("Directorio", "");
+            // formData.append("Directorio_Respaldo", "");
+            // formData.append("Copia_Respaldo", "");
+            // formData.append("Elimina_Origen", "");
+            // formData.append("Frecuencia", "");
+            // formData.append("Tiempo_Frecuencia", "");
+            // formData.append("Fecha_Proxima_Ejecucion", "");
+            // formData.append("Hora_Ini", "");
+            // formData.append("Hora_Fin", "");
+            // formData.append("Usuario_FTP", "");
+            // formData.append("Clave_FTP", "");
+            // formData.append("Nomenclatura_Archivo", "");
+            // formData.append("o_usr", "");
+
+            if (confirm("Vas guardar información, ¿Seguro de continuar?")) {
+
+
+                showLoading();
+
+
+                $.ajax({
+                    url: "/ConfiguracionesProveedores/Ftp",
+                    type: 'POST',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+
+                    success: function (response) {
+                        hideLoading();
+
+                        if (response == 'ok') {
+
+                            swal('Exito al Guardar', '', "success").then((value) => {
+                                window.location.reload();
+                            });
+                        } else {
+                            swal('Error al Guardar', '', "error");
+                        }
+                    },
+                    error: function (e) {
+                        hideLoading();
+                        swal('Error al guardar', '', "error");
+                    }
+                });
+
+            }
+
+        });
+
+
+
+    })
+
+
+
+    function getDateNow() {
+
+
+
+
+        //console.log(Date.now());
+        // $('#Fecha_Proxima_Ejecucion[type="datetime"]').setNow(true);
+
+        var f = new Date();
+
+        //console.log(f.getFullYear() + "-0" + (f.getMonth() + 1) + "-0" + f.getDate());
+
+        //return f.getFullYear() + "-0" + (f.getMonth() + 1) + "-0" + f.getDate();
+        //var x = document.getElementById("Fecha_Proxima_Ejecucion").min;
+
+        //console.log(new Date(f.getTime() - f.getTimezoneOffset() * 60000).toISOString().substring(0, 19));
+
+
+        //document.getElementById("Fecha_Proxima_Ejecucion").min = f.getFullYear() + (f.getMonth() + 1)  + f.getDate();
+
+        //document.getElementById("Fecha_Proxima_Ejecucion").min = new Date(f.getTime() - f.getTimezoneOffset() * 60000).toISOString().substring(0, 19);
+
+
+        //const now = (new Date().toLocaleString("sv-SE") + '').replace(' ', 'T');
+        //console.log(now);
+
+        //document.getElementById("Fecha_Proxima_Ejecucion").min = now;
+        //document.getElementById("Fecha_Proxima_Ejecucion").min = "2021-03-08T16:04:00";
+
+        var mes;
+        var year;
+        var dia;
+
+
+        if ((f.getMonth() + 1) < 10) {
+            mes = "0" + (f.getMonth() + 1)
+        } else {
+            mes = (f.getMonth() + 1)
+
+        }
+        if (f.getDate() < 10) {
+            dia = "0" + f.getDate();
+        } else {
+            dia = f.getDate();
+        }
+        year = f.getFullYear();
+
+        //console.log(year + "-" + mes + "-" + dia + "T00:00:00")
+
+        document.getElementById("Fecha_Proxima_Ejecucion").min = year + "-" + mes + "-" + dia + "T00:00:00";
+
+
+
+    }
+
+    function carg(elemento) {
+        d = elemento.value;
+
+        if (d == "2") {
+            document.getElementById("txtTiempoFrec").disabled = false;
+            document.getElementById("ddlTiempoFrec").disabled = false;
+            document.getElementById("HoraI").disabled = false;
+            document.getElementById("HoraF").disabled = false;
+            $('#HoraI').val('');
+
+        }
+
+        else {
+            document.getElementById("txtTiempoFrec").disabled = true;
+            document.getElementById("ddlTiempoFrec").disabled = true;
+            document.getElementById("HoraI").disabled = false;
+            document.getElementById("HoraF").disabled = true;
+
+            $('#TimepoR').val("");
+            $('#HoraI').val("");
+            $('#HoraF').val("");
+        }
+    }
+
+    function DeleteConfirm() {
+        if (confirm("Quieres Eliminar el Registro"))
+            return true;
+        else
+            return false;
+    }
+
+    function myFunction() {
+
+
+
+        if (confirm("Desea guardar los datos?")) {
+
+            // $("#frmInsert").submit();
+            alert("datos guardados")
+        } else {
+            alert("Usted cancelo la acción para guardar");
+        }
+    }
+
+</script>

@@ -1,0 +1,289 @@
+﻿@using PortalGRFP.Entities.Common
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Generales</a></li>
+    <li class="breadcrumb-item"><a>Invenadro</a></li>
+}
+<div class="container-fluid">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a href='@Url.Action("Index", "ConfiguracionInvenadro")' class="btn btn-secondary active">Invenadro General</a>
+        <a href='@Url.Action("Exclusiones", "ConfiguracionInvenadro")' id="btnPestañaExcluidos" class="btn btn-secondary">Excluidos</a>        
+        <a href='@Url.Action("CargaManual", "ConfiguracionInvenadro")' id="btnPestañaCarga" class="btn btn-secondary">Carga Manual</a>
+        <a href='@Url.Action("ResumenInvenadro", "ConfiguracionInvenadro")' id="btnResumen" class="btn btn-secondary">Resumen Invenadro</a>
+        <a href='@Url.Action("BalanceoCDRs", "ConfiguracionInvenadro")' id="btnPestañaCDR" class="btn btn-secondary">Balanceo</a>
+    </div>
+    <div class="card" style="width:100%">
+        @using (Html.BeginForm("GuardarRegla", "ConfiguracionInvenadro", FormMethod.Post, new { role = "form", id = "frmRegInvenadro" }))
+        {
+            <div class="col-sm-12" style="margin-top: 1%">
+                <br />
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class=".form-check-label" for="chkLimite">1.- Aplica limite en costo de productos:</label>
+                            <input type="checkbox" name="chkLimite" id="chkLimite" class="form-check-input ml-2" />
+                            <input placeholder="0.0000" type="number" class="form-control form-control-sm col-4" name="txtMonto" id="txtMonto" disabled min="0" step="0.0001" max="2147483647" oninput="validity.valid||(value='')" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class=".col-form-label"> 2.- Piezas Productos Nuevos:  </label>
+                            <input placeholder="0" type="number" class="form-control form-control-sm col-3 d-inline" id="txtCantidad" name="txtCantidad" min="0" max="2147483647" oninput="validity.valid||(value='')" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-check-label">3.-Productos no incluidos en invenadro:</label>
+                        <div class="form-check">
+                            <input type="radio" name="rdInvenadro" id="rdPVD" value="PDV" class="form-check-input" />
+                            <label class="form-check-label" for="rdPVD">Comprar con PVD</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" name="rdInvenadro" id="rdInvenadro" value="Inv0" class="form-check-input" />
+                            <label class="form-check-label" for="rdInvenadro">Aplicar Invenadro "0"</label>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label" for="chkActivar"> 4.- Activar productos automáticamente: </label>
+                            <input type="checkbox" id="chkActivar" name="chkActivar" class="form-check-input" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label" for="chkInactivar">5.- Inactivar productos automáticamente:  </label>
+                            <input type="checkbox" id="chkInactivar" name="chkInactivar" class="form-check-input" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group ">
+                            <label class=".col-form-label"> 6.- Porcentaje coincidencia:  </label>
+                            <input placeholder="0" type="number" class="form-control form-control-sm col-3 d-inline" id="txtPorcentajeC" name="txtPorcentajeC" min="0" max="100" oninput="validity.valid||(value='')" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-check-label" for="chkOptimoAut"> <b>7.- Actualización automatica de optimo:</b></label>
+                            <input type="checkbox" name="chkOptimoAut" id="chkOptimoAut" class="form-check-input ml-2" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class=".col-form-label"><b>8.- Días PVD: </b> </label>
+                            <input placeholder="0" class="form-control form-control-sm col-3 d-inline" id="textDiasPVD" name="textDiasPVD" type="number" min="0" max="100" oninput="validity.valid||(value='')" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class=".col-form-label"><b>9.- Días proceso automatico: </b></label>
+                            <input placeholder="0" class="form-control form-control-sm col-3 d-inline" id="textDiasAutomatico" name="textDiasAutomatico" type="number" min="0" max="2147483647" oninput="validity.valid||(value='')" />
+                        </div>
+                    </div>
+
+                    </div>
+                <br />
+                <div class="row" style="justify-content:right" ;>
+                    <div class="col-md-2">
+                        <button type="submit" id="btnGuardar" class="btn btn-primary">  Guardar </button>
+                    </div>
+                </div>
+            </div>
+        }
+        <br>
+
+        
+    </div>
+</div>
+
+
+@section scripts{
+    <script>
+
+
+        $(document).ready(function () {
+
+
+            CargaInicial();
+
+        });
+
+
+        $("#frmRegInvenadro").on("submit", function (event) {
+                event.preventDefault();
+                swal({
+                    title: '',
+                    text: "¿Desea guardar los cambios?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                }).then((willDelete) => {
+                    if (willDelete != null) {
+                        if ($("#chkLimite").is(":checked") === true) {
+                            if ($("#txtMonto").val() != "") {
+
+                                var regla = $("#frmRegInvenadro").serializeArray()
+                                    .filter(function (elem) {
+                                        return $.trim(elem.value);
+                                    });
+                                regla.push({ name: "LimiteCosto", value: true });
+
+                                if ($("#rdPVD").is(":checked") === true) {
+                                    regla.push({ name: "PVD", value: true });
+                                } else {
+                                    regla.push({ name: "PVD", value: false });
+                                }
+
+                                if ($("#rdInvenadro").is(":checked") === true) {
+                                    regla.push({ name: "Inve0", value: true });
+                                } else {
+                                    regla.push({ name: "Inve0", value: false });
+                                }
+
+                                if ($("#chkActivar").is(":checked") === true) {
+                                    regla.push({ name: "Activar", value: true });
+                                } else {
+                                    regla.push({ name: "Activar", value: false });
+                                }
+
+                                if ($("#chkInactivar").is(":checked") === true) {
+                                    regla.push({ name: "Inactiva", value: true });
+                                } else {
+                                    regla.push({ name: "Inactiva", value: false });
+                                }
+                                if ($("#chkOptimoAut").is(":checked") === true) {
+                                    regla.push({ name: "Actualizacion_automatica", value: true });
+                                } else {
+                                    regla.push({ name: "Actualizacion_automatica", value: false });
+                                }
+                                showLoading();
+
+                                $.ajax({
+
+                                    type: $("#frmRegInvenadro").attr('method'),
+                                    url: $("#frmRegInvenadro").attr('action'),
+                                    data: regla,
+                                    success: function (response) {
+                                        hideLoading();
+                                        $("#frmRegInvenadro").trigger("reset");
+                                        $("#txtMonto").val(response.Result[0].Monto);
+                                        $("#txtCantidad").val(response.Result[0].PiezasProductos);
+                                        if (response.Result[0].ActivarProducto) {
+                                            $("#chkActivar").prop("checked", true);
+                                        }
+                                        if (response.Result[0].InactivarProductos) {
+                                            $("#chkInactivar").prop("checked", true);
+                                        }
+                                        if (response.Result[0].InvenadroCero) {
+                                            $("#rdInvenadro").prop("checked", true);
+                                        }
+                                        if (response.Result[0].LimiteCostoProductos) {
+                                            $("#chkLimite").prop("checked", true);
+                                            document.getElementById("txtMonto").disabled = false;
+                                        }
+                                        if (response.Result[0].PVD) {
+                                            $("#rdPVD").prop("checked", true);
+                                        }
+                                        $("#txtPorcentajeC").val(response.Result[0].PorcentajeCoincidencia);
+                                        if (response.Result[0].Actualizacion_automatica) {
+                                            $("#chkOptimoAut").prop("checked", true);
+                                        }                                        
+                                        $("#textDiasPVD").val(response.Result[0].diasPVD);
+                                        $("#textDiasAutomatico").val(response.Result[0].diasAutomatico);
+
+                                        swal("Actualizado con éxito", '', "success");
+                                        CargaInicial();
+                                    },
+                                    error: function (response) {
+                                        swal("No ha seleccionado opcion, productos no incluidos invenadro", '', "warning");
+                                    }
+                                });
+
+                            } else {
+                                $("#txtMonto").focus();
+                                swal("Monto Vacío", '', "warning");
+
+                            }
+                        }
+                    }
+                });
+            });
+
+        $("#chkLimite").on("click", function () {
+          if ($("#chkLimite").is(":checked") === true) {
+              document.getElementById("txtMonto").disabled = false;
+              $("#txtMonto").focus();
+          } else {
+              document.getElementById("txtMonto").disabled = true;
+          }
+        });
+
+
+        function CargaInicial() {
+            showLoading();
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Details", "ConfiguracionInvenadro")',
+                dataType: "json",
+                processData: false,  // tell jQuery not to process the data
+                contentType: false,
+                success: function (response) {
+                    hideLoading();
+                    $("#frmRegInvenadro").trigger("reset");
+                    $("#txtMonto").val(response.Result[0].Monto);
+                    $("#txtCantidad").val(response.Result[0].PiezasProductos);
+                    if (response.Result[0].ActivarProducto) {
+                        $("#chkActivar").prop("checked", true);
+                    }
+                    if (response.Result[0].InactivarProductos) {
+                        $("#chkInactivar").prop("checked", true);
+                    }
+                    if (response.Result[0].InvenadroCero) {
+                        $("#rdInvenadro").prop("checked", true);
+                    }
+                    if (response.Result[0].LimiteCostoProductos) {
+                        $("#chkLimite").prop("checked", true);
+                        document.getElementById("txtMonto").disabled = false;
+                    }
+                    if (response.Result[0].PVD) {
+                        $("#rdPVD").prop("checked", true);
+                    }
+                    $("#txtPorcentajeC").val(response.Result[0].PorcentajeCoincidencia);
+
+                    if (response.Result[0].Actualizacion_automatica === true) {
+                        $("#chkOptimoAut").prop("checked", true);
+                        $("#btnPestañaExcluidos").show();
+                        $("#btnPestañaCDR").show();
+                        $("#btnResumen").show();
+                        $("#btnPestañaCarga").hide();
+                        $("#SeccionCDRs").slideDown();
+                    } else {
+                        $("#chkOptimoAut").prop("checked", false);
+                        $("#btnPestañaExcluidos").hide();
+                        $("#btnPestañaCDR").hide();
+                        $("#btnResumen").hide();
+                        $("#btnPestañaCarga").show();
+                        $("#SeccionCDRs").slideUp();
+                        $("#txtPorcentajeC").prop("readonly", true);
+                    }
+                    $("#textDiasPVD").val(response.Result[0].diasPVD);
+                    $("#textDiasAutomatico").val(response.Result[0].diasAutomatico);
+
+                },
+                error: function (error) {
+                    console.error('Error al obtener datos:', error);
+                }
+            });
+         }
+
+
+    </script>
+
+} 

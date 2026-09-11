@@ -1,0 +1,185 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Generales</a></li>
+    <li class="breadcrumb-item"><a>Invenadro</a></li>
+}
+<div class="container-fluid">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a href='@Url.Action("EditarProveedores")' class="btn btn-secondary">Generarl Proveedores</a>
+        <a href='@Url.Action("Agencias")' class="btn btn-secondary">Agencias</a>
+        <a href='@Url.Action("Ftp")' class="btn btn-secondary">FTP</a>
+        <a href='@Url.Action("Exclusiones")' class="btn btn-secondary active">Exclusiones</a>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            @using (Html.BeginForm("CargaExclusiones", "ConfiguracionesProveedores", FormMethod.Post, new { role = "form", id = "frmExclusiones", enctype = "multipart/form-data" }))
+            {
+                <div class="row">
+                    <div class="col-md-4">
+                        Proveedor
+                        <input type="Text" class="form-control" id="IdProveedor" name="IdProveedor" placeholder="Buscar Proveedor" />
+                        <input type="hidden" name="hProveedor" id="hProveedor" />
+                    </div>
+                    <div class="col-md-3">
+                        Acción a Ejecutar
+                        <div class="form-inline">
+                            <div class="form-check" style="padding-right:15px">
+                                <label class="form-check-label" for="chkBorrar">Eliminar SKUS</label>
+                                <input type="checkbox" name="chkBorrar" id="chkBorrar" class="form-check-input" checked />
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label" for="chkcargar">Agregar SKUS</label>
+                                <input type="checkbox" name="chkcargar" id="chkcargar" class="form-check-input" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="fileExcel2" name="fileExcel2" multiple data-show-upload="false">
+                            <label id="lblFileName2" class="custom-file-label" for="customFile">Seleccionar archivo</label>
+                        </div>
+                       
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-primary" id="EnviarExcel">Iniciar Carga</button>
+                    </div>
+                </div>
+
+
+            }
+        </div>
+        <div class="card-body">
+            <h5>Detalle de exclusiones del Proveedor</h5><br />
+            <table id="tblbitacora" class="display compact cell-border" width="100%"></table>
+            <hr />
+            <h5>Productos no cargados</h5><br />
+            <table id="tbllog" class="display compact cell-border" width="100%"></table>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+            'use strict';
+          $("#IdProveedor").autocomplete({
+                source: function (request, response) {
+                    minLength: 2,
+                    $.ajax({
+                        url: "@Url.Action("Autocommplete", "ConfiguracionesProveedores")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: request.term },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return { label: item.Valor, value: item.Id+","+item.Valor };
+                            }))
+                        }
+                    })
+                },
+                select: function (event, ui) {
+                    $("#hProveedor").val(ui.item.value.split(',')[0]);
+                }
+          });
+
+               var $lblFileName2 = $('#lblFileName2');
+
+            $('#fileExcel2').bind('change', function(e) {
+                $lblFileName2.text((e.target.files.length > 0) ? e.target.files[0].name : 'Seleccionar archivo');
+            });
+
+            $("#EnviarExcel").click(function () {
+                var formulario = document.getElementById('frmExclusiones');
+                var formData = new FormData(formulario);
+
+                var archivo = $("#fileExcel2").val();
+
+                if (archivo != "") {
+                    showLoading();
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("CargarExclusiones", "ConfiguracionesProveedores")',
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success: function (response) {
+                            hideLoading();
+                            if (response.Success) {
+                                swal('', response.Message, "success").then((value) => {
+                                    Consulta();
+                                });
+                            } else {
+                                swal('', response.Message, "error");
+                            }
+                        },
+                        error: function (e) {
+                            hideLoading();
+                            swal('',"¡Error inesperado en la carga!",  "error");
+                        }
+
+                    });
+                } else {
+                    swal("¡No se ha seleccionado un archivo!", '', "error");
+                }
+            });
+
+
+            function Consulta() {
+             showLoading();
+              $.ajax({
+                  type: "Post",
+                  url: "@Url.Action("GetExclusiones", "ConfiguracionesProveedores")",
+                  dataType: "json",
+                  data: { "idProveedor": $("#hProveedor").val()},
+                  success: function (response) {
+                      hideLoading();
+                         $('#tblbitacora').DataTable({
+                             data: response[0].Exclusiones,
+                              "destroy": true,
+                              "processing": true,
+                              dom: 'Bfrtip',
+                              columns: [
+                                  { data: "IdProveedor", title: 'Id Proveedor' },
+                                  { data: "Proveedor", title: 'Proveedor' },
+                                  { data: "SKU", title: "SKU" },
+                                  { data: "Descripcion", title: 'Descripción' },
+                                  { data: "Laboratorio", title: "Laboratorio(MDM)" }
+                              ],
+                             select: true
+                         });
+
+                      $('#tbllog').DataTable({
+                          data: response[0].LogExclusiones,
+                          "destroy": true,
+                          "processing": true,
+                          dom: 'Bfrtip',
+                          columns: [
+                              { data: "IdProveedor", title: 'Id Proveedor' },
+                              { data: "Proveedor", title: 'Proveedor' },
+                              { data: "SKU", title: "SKU" },
+                              { data: "Descripcion", title: 'Descripción' },
+                              { data: "Laboratorio", title: "Laboratorio(MDM)" },
+                              { data: "Error", title: "Motivo del rechazo" }
+                          ],
+                          select: true
+                      });
+                  },
+                  error: function (e) {
+                      hideLoading();
+                  }
+              });
+                
+            }
+
+        });
+    </script>
+}
+
+

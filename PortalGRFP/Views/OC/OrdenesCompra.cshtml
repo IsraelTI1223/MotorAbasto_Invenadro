@@ -1,0 +1,673 @@
+﻿@using PortalGRFP.Entities.Common
+@{
+    ViewBag.Title = "Ordenes de Compra";
+}
+
+<div class="container">
+    <ul class="nav nav-tabs" id="myTab">
+        
+        <li class="nav-item"><a class="nav-link active" href="#generarOrdenes" data-toggle="tab">Generar</a></li>
+        <li class="nav-item"><a class="nav-link" href="#enviarOrdenes" data-toggle="tab">Enviar</a></li>
+    </ul>
+    <div class="tab-content my-tab">
+        <div class="tab-pane active" id="generarOrdenes">
+            <div class="card" style="width:100%">
+                <div class="card-header">
+                    <h5>Generar Ordenes de Compra</h5>
+                    <div class="row" style="margin-top:1%">
+                        <div class="col-auto" style="margin-top:2.3%">
+                            <button title="Generar Orden de Compra" class="btn btn-sm pd-x-15 btn-success btn-lg" id="btnGenerarOrdenCompra">
+                                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table id="tbSugerido" class="display compact cell-border" width="100%"></table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="tab-pane" id="enviarOrdenes">
+            <div class="card" style="width:100%">
+                <div class="card-header">
+                    <h5>
+                        Enviar Ordenes de Compra
+                    </h5>
+                    <div class="row" style="margin-top:1%">
+
+                        <div class="col-auto">
+                            <label for="cbProveedor">Seleccionar Proveedores:</label><br />
+                            <select class="form-control" id="cbProveedor" min="1" multiple required>
+                                @*@foreach (var item in TempData["ProvSugeridoAplicado"] as List<ComboGenerico>)
+                        {
+                            <option value="@item.Id">@item.Valor</option>
+
+                        }*@
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <label for="cbTiendas">Seleccionar Sucursales:</label><br />
+                            <select class="form-control" id="cbTiendas" min="1" multiple required>
+                            </select>
+                        </div>
+                        <div class="col-auto" style="margin-top:2.3%">
+                            <button title="Buscar Ordenes Compra" class="btn btn-sm pd-x-15 btn-primary btn-lg" id="btnBuscarSugeridoAplicado" onclick="getOrdenesCompra()">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="col-auto" style="margin-top:2.3%">
+                            <button title="Enviar Ordenes de Compra" class="btn btn-sm pd-x-15 btn-success btn-lg" id="btnEnviarOrdenes" onclick="EnviarOrdenesCompra()">
+                                <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="col-auto" style="margin-top:2.3%">
+                            <button title="Eliminar Orden Compra" class="btn btn-sm pd-x-15 btn-danger btn-lg" id="btnEliminarSugeridoAplicado" onclick="DeleteOrdenesCompra()">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table id="tbOrdenesCompra" class="display compact cell-border" width="100%"></table>
+                </div>
+            </div>
+            </div>
+
+        </div>
+
+
+</div>
+
+@section scripts{
+    <script>
+        $('#cbProveedor').multiselect({
+            nonSelectedText: 'Lista de Proveedores',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todos",
+            allSelectedText: "Todas Seleccionados",
+            nSelectedText: "Proveedores"
+        });
+
+        $('#cbTiendas').multiselect({
+            nonSelectedText: 'Lista de Sucursales',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todas",
+            allSelectedText: "Todas Seleccionados",
+            nSelectedText: "Sucursales"
+        });
+
+
+
+        var dtapi;
+        function getSugeridoAplicado() {
+             $.ajax({
+                     url: "@Url.Action("GetListaSugeridoAplicado", "OC")",
+                    type: "POST",
+                    dataType: "json",
+                data: { sucursales: String($("#cbTiendas").val()) },
+                    success: function (response) {
+                        hideLoading();
+
+                        console.log(response)
+
+                        //if (response.Success) {
+
+                            dtapi = null;
+                            dtapi = $('#tbSugerido').DataTable({
+                                data: response.Result,
+                                "destroy": true,
+                                "processing": true,
+                                dom: 'Bfrtip',
+                                "drawCallback": function (settings) {
+                                    // not important on first draw so not worried about dtapi being defined on table initialization
+                                    if (dtapi) {
+                                        var visibleRows = $("td.cbcell").closest("tr");
+                                        visibleRows.each(function (i, item) {
+                                            $("td.cbcell input", item).prop("checked", dtapi.rows(item).data()[0].isChecked);
+                                        });
+                                    }
+                                },
+                                columns: [
+                                    {
+                                        "data": "isChecked",
+                                        "class": "cbcell",
+                                        "orderable": false,
+                                        "title": "<input type='checkbox' />",
+                                        "render": function (dataItem) {
+                                            if (dataItem)
+                                                return "<input checked type='checkbox'/>";
+                                            else
+                                                return "<input type='checkbox'/>";
+                                        }
+                                    },
+                                    { data: "IdSugerido", title: 'Id Sugerido' },
+                                   // { data: "IdSucursal", title: "Id Sucursal" },
+                                    //{ data: "Nombre", title: "Sucursal" },
+                                    {
+                                        data: "IdProveedor", title: "Id Proveedor", visible: false },
+                                    { data: "Grupo", title: "Grupo" },
+                                    { data: "Proveedor", title: "Proveedor" },
+                                    { data: "IdGrupo", title: "IdGrupo", visible: false  },
+                                    //{ data: "pcio_Costo", title: "Total Costo" },
+                                    //{ data: "CostoCalculado", title: "Total Costo Calculado" }
+                                ],
+                                select: true,
+                                scrollCollapse: true,
+                                info: false,
+                                paging: true,
+                                responsive: true,
+                                searching: true
+                            });
+
+
+                            $("th input[type=checkbox]").on("click", function () {
+                                var isChecked = this.checked;
+                                var ld = $('#tbSugerido').DataTable().rows().data();
+                                $.each(ld, function (i, item) {
+                                    item.isChecked = isChecked;
+                                });
+                                $(".cbcell input").prop("checked", isChecked);
+                                // dtapi.data().sum();
+                            });
+
+                            $("#tbSugerido").on("click", "td input[type=checkbox]", function () {
+                                var isChecked = this.checked;
+                                var dtRow = dtapi.rows($(this).closest("tr"));
+                                dtRow.data()[0].isChecked = isChecked;
+
+                                if (!isChecked) {
+                                    $("th input[type=checkbox]").prop("checked", false);
+                                }
+                                else {
+                                    $("th input[type=checkbox]").prop("checked", true);
+                                    $.each(dtapi.data(), function (i, item) {
+                                        if (!item.isChecked) {
+                                            $("th input[type=checkbox]").prop("checked", false);
+                                            return false;
+                                        }
+                                    });
+                                }
+                            });
+
+
+
+                        //} else {
+                        //    alert("No hay Sugerido Aplicado")
+                        //}
+                    },
+                    error: function (response) {
+                    }
+                });
+        }
+        getSugeridoAplicado();
+
+
+        $("#btnBuscarSugeridoAplicado").on("click", function () {
+
+        });
+
+        $("#btnGenerarOrdenCompra").click(function () {
+
+            //var datatable = dtapi.data();
+            swal({
+                title: 'Generar Orden de Compra',
+                text: "¿Seguro Generar Orden de Compra a todo lo seleccionado?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Generar",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+
+                if (resp) {
+
+                    var dt = $('#tbSugerido').DataTable().data();
+
+                    var formData = new FormData();
+
+                    var count = 0;
+
+                    for (var i = 0; i < dt.length; i++) {
+
+                        if (dt[i].isChecked) {
+
+                            count++;
+
+                            console.log(count - 1);
+                            var idx = count - 1;
+
+                            formData.append("model[" + idx + "].IdSugerido", dt[i].IdSugerido);
+
+                            formData.append("model[" + idx + "].IdProveedor", dt[i].IdProveedor);
+                            formData.append("model[" + idx + "].IdGrupo", dt[i].IdGrupo);
+
+                        } else {
+                            console.log("check falso o indefinido");
+                        }
+                    }
+                    if (count == 0) {
+                        swal('Mensaje', 'Nada Seleccionado', "warning");
+                        return;
+                    } else {
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/OC/GenerarOrdenCompra",
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success: function (data) {
+                            hideLoading();
+
+                            if (data.Success) {
+                                swal("Proceso terminado", data.Message, "success").then((value) => {
+                                });
+                            } else {
+                                swal("Error al Generar Orden de compra", 'Intente de nuevo', "error");
+                            }
+                            getSugeridoAplicado();
+
+                        },
+                        error: function (response) {
+                            hideLoading();
+                            swal("Error inesperado al Generar OC", '', "error: " + response);
+                        }
+                    });
+
+                    }
+                }
+            });
+        });
+
+
+        //$("#btnEliminarSugeridoAplicado").click(function () {
+
+        //    //var datatable = dtapi.data();
+        //    swal({
+        //        title: 'Eliminar Sugerido Para Sucursal',
+        //        text: "¿Seguro de Eliminar el Sugerido para las Sucursales Seleccionadas?",
+        //        icon: "warning",
+        //        buttons: {
+        //            cancel: "Cancelar",
+        //            catch: {
+        //                text: "Eliminar",
+        //                value: true
+        //            }
+        //        },
+        //    }).then((resp) => {
+
+        //    });
+        //});
+
+
+
+        /*************PANEL 2********************/
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var target = $(e.target).attr("href");
+
+            if (target == '#generarOrdenes') {
+                getSugeridoAplicado();
+            } else if (target == '#enviarOrdenes')
+            {
+                getProveedoresOC();
+            }
+
+
+
+        });
+
+        function getProveedoresOC(){
+
+            $("#cbProveedor").empty();
+                $.ajax({
+                     url: "@Url.Action("GetProveedoresOC", "OC")",
+                    type: "POST",
+                    dataType: "json",
+                    success: function (response) {
+                        hideLoading();
+                        var proveedores = "";
+
+                        if (response.Success) {
+
+                            for (var i = 0; i < response.Result.length; i++) {
+                                proveedores = proveedores + '<option value=' + response.Result[i].Id + '>' + response.Result[i].Valor + '</option>';
+                            }
+                        } else {
+                            swal("Sin Ordenes de Compra",'No Hay Ordenes de Compra Pendientes de Enviar', "warning");
+                        }
+
+                        console.log(proveedores)
+
+                        $("#cbProveedor").append(proveedores);
+                        $("#cbProveedor").multiselect('rebuild');
+
+                    },
+                    error: function (response) {
+                        hideLoading();
+                    }
+                });
+        }
+
+          $("#cbProveedor").on("change", function () {
+
+             showLoading();
+            $('#cbTiendas').empty();
+                $.ajax({
+                     url: "@Url.Action("GetSucursalesXProveedor", "OC")",
+                    type: "POST",
+                    dataType: "json",
+                    data: { proveedores: String($("#cbProveedor").val()) },
+                    success: function (response) {
+                        hideLoading();
+                        var sucursales = "";
+
+                        console.log(response)
+
+                        if (response != null) {
+
+                            for (var i = 0; i < response.length; i++) {
+                                sucursales = sucursales + '<option value=' + response[i].Id + '>' + response[i].Valor + '</option>';
+                            }
+                        }
+
+                        $("#cbTiendas").append(sucursales);
+
+                        $('#cbTiendas').multiselect('rebuild');
+                    },
+                    error: function (response) {
+                    }
+                });
+          });
+
+        function getOrdenesCompra() {
+             $.ajax({
+                     url: "@Url.Action("GetListOrdenesCompra", "OC")",
+                    type: "POST",
+                    dataType: "json",
+                data: { sucursales: String($("#cbTiendas").val()) },
+                    success: function (response) {
+                        hideLoading();
+                        console.log(response)
+
+                            dtapi = null;
+                        dtapi = $('#tbOrdenesCompra').DataTable({
+                                data: response.Result,
+                                "destroy": true,
+                                "processing": true,
+                                dom: 'Bfrtip',
+                                "drawCallback": function (settings) {
+                                    // not important on first draw so not worried about dtapi being defined on table initialization
+                                    if (dtapi) {
+                                        var visibleRows = $("td.cbcell").closest("tr");
+                                        visibleRows.each(function (i, item) {
+                                            $("td.cbcell input", item).prop("checked", dtapi.rows(item).data()[0].isChecked);
+                                        });
+                                    }
+                                },
+                                columns: [
+                                    {
+                                        "data": "isChecked",
+                                        "class": "cbcell",
+                                        "orderable": false,
+                                        "title": "<input type='checkbox' />",
+                                        "render": function (dataItem) {
+                                            if (dataItem)
+                                                return "<input checked type='checkbox'/>";
+                                            else
+                                                return "<input type='checkbox'/>";
+                                        }
+                                    },
+                                    { data: "IdSugerido", title: 'Id Sugerido' },
+                                    { data: "Orden_Compra", title: "Orden Compra" },
+                                    { data: "Id_Sucursal", title: "Id Sucursal" },
+                                    { data: "Nombre_Sucursal", title: 'Nombre Sucursal' },
+                                    { data: "IdProveedor", title: 'Id Proveedor' },
+                                    { data: "Proveedor", title: "Proveedor" },
+                                    { data: "Importe", title: "Importe" },
+                                    { data: "Estatus", title: "Estatus" }
+                                ],
+                                select: true,
+                                scrollCollapse: true,
+                                info: false,
+                                paging: true,
+                                responsive: true,
+                                searching: true
+                            });
+
+
+                            $("th input[type=checkbox]").on("click", function () {
+                                var isChecked = this.checked;
+                                var ld = $('#tbOrdenesCompra').DataTable().rows().data();
+                                $.each(ld, function (i, item) {
+                                    item.isChecked = isChecked;
+                                });
+
+                                $(".cbcell input").prop("checked", isChecked);
+                            });
+
+                        $("#tbOrdenesCompra").on("click", "td input[type=checkbox]", function () {
+                                var isChecked = this.checked;
+                                var dtRow = dtapi.rows($(this).closest("tr"));
+                                dtRow.data()[0].isChecked = isChecked;
+
+                                if (!isChecked) {
+                                    $("th input[type=checkbox]").prop("checked", false);
+                                }
+                                else {
+                                    $("th input[type=checkbox]").prop("checked", true);
+                                    $.each(dtapi.data(), function (i, item) {
+                                        if (!item.isChecked) {
+                                            $("th input[type=checkbox]").prop("checked", false);
+                                            return false;
+                                        }
+                                    });
+                                }
+                            });
+                    },
+                    error: function (response) {
+                    }
+                });
+        }
+        function DeleteOrdenesCompra() {
+            swal({
+                title: 'Eliminar Ordenes de Compra',
+                text: "¿Seguro Eliminar Ordenes de Compra marcadas?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Eliminar Ordenes",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+
+                console.log(resp)
+
+                if (resp) {
+                    console.log("entre al resp")
+
+                    var dt = $('#tbOrdenesCompra').DataTable().data();
+
+                    var formData = new FormData();
+                    var count = 0;
+
+
+
+                    for (var i = 0; i < dt.length; i++) {
+
+                        if (dt[i].isChecked) {
+
+                            count++;
+
+                            console.log(count - 1);
+                            var idx = count - 1;
+
+                            formData.append("model[" + idx + "].IdSugerido", dt[i].IdSugerido);
+                            formData.append("model[" + idx + "].Orden_Compra", dt[i].Orden_Compra);
+                            formData.append("model[" + idx + "].Id_Sucursal", dt[i].Id_Sucursal);
+                            formData.append("model[" + idx + "].IdProveedor", dt[i].IdProveedor);
+
+                        } 
+                    }
+
+                    if (count == 0) {
+                        swal('Mensaje', 'Nada Seleccionado', "warning");
+                        return;
+                    } else {
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/OC/EliminarOrdenCompra",
+                            processData: false,
+                            contentType: false,
+                            data: formData,
+                            success: function (data) {
+                                hideLoading();
+
+                                if (data.Success) {
+                                    swal("Proceso terminado", data.Message, "success").then((value) => {
+                                    });
+                                } else {
+                                    swal("Error al Eliminar Ordenes de compra", 'Intente de nuevo', "error");
+                                }
+                                getOrdenesCompra();
+
+                            },
+                            error: function (response) {
+                                hideLoading();
+                                swal("Error inesperado al Eliminar OC", '', "error: " + response);
+                            }
+                        });
+
+                    }
+                }
+            });
+
+        }
+
+        function EnviarOrdenesCompra() {
+            swal({
+                title: 'Enviar Ordenes de Compra',
+                text: "¿Seguro Enviar las Ordenes de Compra marcadas?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Enviar Ordenes",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+
+                if (resp) {
+
+                    //$.ajax({
+                    //    type: "POST",
+                    //    url: "/OC/EnviarOrdenesCompra",
+                    //    processData: false,
+                    //    contentType: false,
+                    //    data: null,
+                    //    success: function(data) {
+                    //        hideLoading();
+
+                    //        if (data.Success) {
+                    //            swal("Proceso terminado", data.Message, "success").then((value) => {
+                    //            });
+                    //        } else {
+                    //            swal("Error al Enviar Ordenes de compra", 'Intente de nuevo', "error");
+                    //        }
+                    //        getOrdenesCompra();
+
+                    //    },
+                    //    error: function (response) {
+                    //        hideLoading();
+                    //        swal("Error inesperado al Eliminar OC", '', "error: " + response);
+                    //    }
+                    //});
+                   
+                    showLoading();
+
+                    var dt = $('#tbOrdenesCompra').DataTable().data();
+
+                    var formData = new FormData();
+                    var count = 0;
+
+
+
+                    for (var i = 0; i < dt.length; i++) {
+
+                        if (dt[i].isChecked) {
+
+                            count++;
+
+                            console.log(count - 1);
+                            var idx = count - 1;
+
+                            formData.append("model[" + idx + "].IdSugerido", dt[i].IdSugerido);
+                            formData.append("model[" + idx + "].Orden_Compra", dt[i].Orden_Compra);
+                            formData.append("model[" + idx + "].Id_Sucursal", dt[i].Id_Sucursal);
+                            formData.append("model[" + idx + "].IdProveedor", dt[i].IdProveedor);
+
+                        }
+                    }
+
+                    if (count == 0) {
+
+                        hideLoading();
+
+                        swal('Mensaje', 'Nada Seleccionado', "warning");
+                        return;
+                    } else {
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/OC/EnviarOrdenesCompra",
+                           
+                            processData: false,
+                            contentType: false,
+                            data: formData,
+                            success: function (data) {
+                                hideLoading();
+
+                                if (data.Success) {
+                                    swal("Proceso terminado", data.Message, "success").then((value) => {
+                                    });
+                                } else {
+                                    swal("Error al Enviar Ordenes de compra", data.Message, "error");
+                                }
+                               getOrdenesCompra();
+
+                            },
+                            error: function (response) {
+                                hideLoading();
+                                swal("Error inesperado al Eliminar OC", '', "error: " + response);
+                            }
+                        });
+
+                    }
+                }
+            });
+        }
+
+
+
+
+
+
+    </script>
+    
+}

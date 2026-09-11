@@ -1,0 +1,146 @@
+﻿@model PortalGRFP.Models.PerfilViewModel
+@{
+    ViewBag.Title = "Editar Perfil";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>CONFIGURACION/PERFILES</a></li>
+}
+
+<div class="col-lg-12">
+    <div class="row">
+        @using (Html.BeginForm("ActualizaPerfil", "Perfiles", FormMethod.Post, new { role = "form", @class = "" }))
+        {
+            <div class="row">
+                <div class="col-lg-5" style="border:none">
+                    @Html.HiddenFor(d => d.IdPerfil)
+                    @Html.LabelFor(d => d.Nombre)
+                    @Html.TextBoxFor(d => d.Nombre, new { placeholder = "Nombre perfil", @disabled = "disabled", @class = "form-comtrol" })
+                    @Html.HiddenFor(d => d.ModulosSeleccionados)
+                </div>
+                <div class="col-lg-2" style="border:none">
+                    @Html.CheckBoxFor(m => m.Activo) Activo
+                </div>
+                <div class="col-lg-5" style="text-align: right; border: none">
+                    <button class="btn btn-sm pd-x-15 btn-success mg-l-5" type="button" id="btnGuardar" onclick="valdidaDatos()">
+                        Actualizar
+                    </button>
+                    <button class="btn btn-sm pd-x-15 btn-secondary mg-l-5" type="button" id="btnCancelar" onclick="cancela()">
+                        Cancelar
+                    </button>
+                </div>
+             </div>
+                <br />
+                <div class="col-lg-12">
+                    @Html.Raw(@ViewBag.TablaModuloAcciones)
+                </div>
+                <div class="col-lg-12" style="text-align:right;">
+
+                </div>
+                }
+            </div>
+</div>
+
+@section scripts{
+    <script>
+
+            $(function () {
+                $("#tblModulos tbody img").click(function () {
+                    //alert($(this).attr("IdModulo"));
+                    var varIdModulo = $(this).attr("IdModulo");
+                    var fila = $("#fila-" + varIdModulo);
+                    if (fila.css("display") == "none") {
+                        fila.css("display", "table-row");
+                        $(this).attr("src","@Url.Content("~/Content/img/remove.png")");
+                    }
+                    else {
+                        fila.css("display", "none");
+                        $(this).attr("src","@Url.Content("~/Content/img/add.png")");
+                    }
+                });
+            });
+
+        function getSelectedCheckboxValues(name) {
+            const checkboxes = document.querySelectorAll(`input[name="${name}"]:checked`);
+            var modulosSelec = "";
+            checkboxes.forEach((checkbox) => {
+                modulosSelec += checkbox.value + '|';;
+            });
+            return modulosSelec;
+        }
+
+        function valdidaDatos() {
+            var varEstatus, varNombre, varIdPerfil, varModulosSeleccionados, varBanderaModulo, varBanderaValida, varMensajeValida;
+            varModulosSeleccionados = '';
+            varNombre = ($("#Nombre").val() == null ? "" : $("#Nombre").val());
+            varIdPerfil = $("#IdPerfil").val();
+            varEstatus = false;
+            if (document.getElementById('Activo').checked) {
+                varEstatus = true;
+            }
+            varBanderaModulo = false;
+            varModulosSeleccionados = getSelectedCheckboxValues('color');
+            //alert(varModulosSeleccionados);
+            if (varModulosSeleccionados.length > 0) {
+                varBanderaModulo = true;
+            }
+
+            varBanderaValida = true;
+            var MensajeUsuario = "";
+            if (varNombre.length == 0) {
+                MensajeUsuario += "Proporcione Nombre de perfil"
+            }
+            if (varEstatus == true) // si estatrus es falso no valida modulos
+            {
+                if (varBanderaModulo != true) {
+                    if (MensajeUsuario.length > 0) {
+                        MensajeUsuario += " y seleccione algún modulo."
+                    }
+                    else {
+                        MensajeUsuario += "Seleccione algún modulo."
+                    }
+                }
+            }
+            if (MensajeUsuario.length > 0) {
+                varBanderaValida = false;
+            }
+
+            if (varBanderaValida == true) {
+                var dataObject =
+                {
+                    IdPerfil: varIdPerfil,
+                    Nombre: (varNombre.length == 0, "", varNombre),
+                    Activo: varEstatus,
+                    ModulosSeleccionados: varModulosSeleccionados,
+                };
+
+                $.ajax({
+                    url: "ActualizaPerfil",
+                    data: dataObject,
+                    dataType: "json",
+                    type: "POST",
+                    success: function (response) {
+                        if (response.Success == true) {
+                            swal(response.Message, '', "success").then((value) => {
+                                window.location.href = "/Perfiles/Index";
+                            });
+                        }
+                        else {
+                            swal(response.Message, '', "error");
+                        }
+                    }
+                })
+            }
+            else {
+                swal(MensajeUsuario, '', "error");
+            }
+        }
+
+        function cancela() {
+            var url = "/Perfiles/Index";
+            window.location.href = url;
+        }
+
+    </script>
+}

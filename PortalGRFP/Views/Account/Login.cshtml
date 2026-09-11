@@ -1,0 +1,69 @@
+﻿
+@{
+    Layout = null;
+}
+@model string
+<!DOCTYPE html>
+@Html.Hidden("ErrorMessage", Model);
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    <link href="~/assets/css/dashforge.min.css" rel="stylesheet" />
+    <link href="~/lib/fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: Helvetica,Arial,sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex align-items-center justify-content-center pd-y-40 bg-gray-100 ht-100v">
+        <div class="pd-20 pd-sm-40 bg-white" style="border: 1px solid;border-color: #b4bdce;
+        margin: 10px !important">
+            <fieldset>
+                <legend></legend>
+                <div class="form-group d-flex justify-content-center">
+                    @*<img src="~/assets/img/RFP.png" width="210" height="80" style="object-fit:fill"/>*@
+                    <img src="~/assets/img/Logo_Farma.png" width="210" height="80" style="object-fit:fill" />
+                </div>
+                <div class="form-group">
+                    <br />
+                    <h4 class="d-flex justify-content-center" style="color:#3b4863">Motor Abasto</h4>
+                    <h6 class="mg-b-5">Ingrese con su correo corporativo</h6>
+                </div>
+                @*@using (Html.BeginForm("LoginGmail", "Account", FormMethod.Post))
+                {
+                    <div class="form-group">
+                        <input type="email" name="correo" class="form-control" placeholder="usuario@rfp.mx" required>
+                    </div>
+                    <button name="activeServers" type="submit" value="activeServers" class="btn btn-success btn-block pull-right">Iniciar sesión</button>
+                }*@
+
+                @using (Html.BeginForm("SignIn", "Account", FormMethod.Post))
+                {
+                    <button name="activeServers" type="submit" value="activeServers" class="btn btn-primary btn-block pull-right">Iniciar sesión</button>
+                }
+                <br />
+                <br />
+                <div class="form-group d-flex justify-content-center">
+                    <div class="copyright">&copy; <span class="current-year"></span><span class="text-bold text-uppercase" style="font-size:10pt!important">GRUPO FARMATODO</span>. <span style="font-size:8pt!important">Todos los derechos reservados</span></div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/App/Common/sweetalert.min.js"></script>
+    <script>
+        $(function () {
+            'use strict'
+
+            let message = $("#ErrorMessage").val();
+            if (message.length > 0) {
+                swal('Error', message, "error");
+            }
+        })
+    </script>
+</body>
+</html>

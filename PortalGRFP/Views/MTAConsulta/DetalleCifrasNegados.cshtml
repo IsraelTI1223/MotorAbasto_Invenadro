@@ -1,0 +1,72 @@
+﻿@model PortalGRFP.Entities.Response.ResponseList<PortalGRFP.Entities.Common.DetalleInputNegado>
+@using PortalGRFP.Entities.Common
+@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>INFO</a></li>
+    <li class="breadcrumb-item"><a>DETALLE NEGADO</a></li>
+}
+@*<form method="post" class="form-group col-md-12" action="~/MTAConsulta/DetalleConsulta">  *@
+<div class="col-lg-12" style="margin-top:5%">
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-striped" id="tblConciliacionVentasMensual">
+                <thead class="thead-primary">
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th scope="col">TIENDAS</th>
+                        <th scope="col">CADENA</th>
+                        <th scope="col">NEGADOS</th>
+                        <th scope="col">FECHA</th>
+                        <th scope="col">NEGADOS SIN CARGA</th>
+                        <th>&nbsp;</th>
+
+                        @*<th scope="col" style="background-color:salmon">MOTIVO</th>*@
+
+
+
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    @foreach (var u in Model.Result)
+                    {
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>
+                            @u.Tienda
+                        </td>
+                        <td>
+                            @u.Cadena
+                        </td>
+
+                        <td>
+                            @u.Negados
+                        </td>
+                        <td>
+                            @u.Fecha
+                        </td>
+                        <td>
+                            @u.NegadosSin
+                        </td>
+                        <td>&nbsp;</td>
+
+
+                    </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script type="text/javascript" src="~/Scripts/App/Views/IndexDetalle.js"></script>
+}

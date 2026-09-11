@@ -1,0 +1,497 @@
+@model PortalGRFP.Entities.Common.ReporteInvenadroAutModel
+@using PortalGRFP.Entities.Common
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Consulta</a></li>
+    <li class="breadcrumb-item"><a>Reporte Invenadro Automatizado</a></li>
+}
+
+<style>
+    .filter-section {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .btn-buscar {
+        margin-top: 25px;
+    }
+    .grid-container {
+        margin-top: 20px;
+    }
+    .alert-custom {
+        margin-top: 10px;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h4><i class="fa fa-chart-line"></i> Reporte de Invenadro Automatizado</h4>
+        </div>
+        <div class="card-body">
+            <!-- Sección de Filtros -->
+            <div class="filter-section">
+                @using (Html.BeginForm("BuscarReporteInvenadroAut", "Reportes", FormMethod.Post, new { id = "frmFiltros" }))
+                {
+                    <div class="row">
+                        <!-- Grupo (Obligatorio) -->
+                        <div class="col-md-3">
+                            <label for="Grupo">
+                                Grupo <span class="text-danger">*</span>
+                            </label>
+                            <select id="Grupo" name="Grupo" multiple="multiple" class="form-control">
+                                @foreach (var item in TempData["GrupoTMP"] as List<ComboGenerico>)
+                                {
+                                    <option value="@item.Id">@item.Valor</option>
+                                }
+                            </select>
+                        </div>
+
+                        <!-- Sucursales/Farmacias (Obligatorio) -->
+                        <div class="col-md-3">
+                            <label for="Sucursal">
+                                Farmacia <span class="text-danger">*</span>
+                            </label>
+                            <select id="Sucursal" name="Sucursal" multiple="multiple" class="form-control" disabled>
+                                <option value="0">Seleccione una Sucursal</option>
+                            </select>
+                        </div>
+
+                        <!-- SKU (Opcional) -->
+                        <div class="col-md-3">
+                            <label for="SKU">SKU (Opcional)</label>
+                            <input type="text" 
+                                   id="SKU" 
+                                   name="SKU" 
+                                   class="form-control" 
+                                   placeholder="Ingrese SKU para buscar"
+                                   maxlength="30" />
+                            <small class="form-text text-muted">Dejar vacío para mostrar todos</small>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="col-md-3">
+                            <button type="button" 
+                                    id="btnBuscar" 
+                                    class="btn btn-primary btn-block btn-buscar">
+                                <i class="fa fa-search"></i> Buscar
+                            </button>
+                            <button type="button" 
+                                    id="btnLimpiar" 
+                                    class="btn btn-secondary btn-block"
+                                    style="margin-top: 10px;">
+                                <i class="fa fa-eraser"></i> Limpiar
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Mensajes -->
+            <div id="mensaje-contenedor"></div>
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error:</strong> @TempData["Error"]
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+
+            <!-- Botón de Exportar Excel (inicialmente oculto) -->
+            <div class="row" id="exportarSection" style="display: none;">
+                <div class="col-md-12 text-right mb-3">
+                    <button type="button" id="btnExportarExcel" class="btn btn-success">
+                        <i class="fa fa-file-excel"></i> Descargar Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid de Resultados -->
+            <div class="grid-container">
+                <div class="table-responsive">
+                    <table id="tbReporteInvenadro" 
+                           class="display table table-striped table-bordered table-hover" 
+                           style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>ID Suc.</th>
+                                <th>Sucursal</th>
+                                <th>SKU</th>
+                                <th>Descripcion</th>
+                                <th>PVD</th>
+                                <th>Inv. Objetivo</th>
+                                <th>Monto Objetivo</th>
+                                <th>Optimo Ant.</th>
+                                <th>Monto Ant.</th>
+                                <th>Optimo Act.</th>
+                                <th>Monto Nuevo</th>
+                                <th>Rel. Inv/Venta</th>
+                                <th>Estatus</th>
+                                <th>% Dif Pzas</th>
+                                <th>% Dif Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los datos se cargan dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <!-- DataTables CSS y JS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        var tablaReporte = null;
+
+        $(document).ready(function () {
+            'use strict';
+
+            // Inicializar multiselect para Grupo
+            $('#Grupo').multiselect({
+                nonSelectedText: 'Seleccione un grupo',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '100%',
+                buttonTextAlignment: 'left',
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Grupos Seleccionados"
+            });
+
+            // Inicializar multiselect para Sucursal
+            $('#Sucursal').multiselect({
+                nonSelectedText: 'Seleccione una Farmacia',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '100%',
+                buttonTextAlignment: 'left',
+                selectAllText: "Marcar Todas",
+                allSelectedText: "Todas Seleccionadas",
+                nSelectedText: "Farmacias Seleccionadas"
+            });
+
+            // Evento change de Grupo para cargar Sucursales
+            $("#Grupo").on("change", function () {
+                var idGrupo = $(this).val();
+                if (idGrupo && idGrupo.length > 0) {
+                    var datos = new FormData();
+                    datos.append("idGrupo", idGrupo.join(','));
+                    GetFarmacias(datos);
+                } else {
+                    $('#Sucursal').empty();
+                    $('#Sucursal').multiselect('rebuild');
+                    document.getElementById("Sucursal").disabled = true;
+                }
+            });
+
+            // Función para obtener farmacias por grupo
+            function GetFarmacias(datos) {
+                showLoading();
+                $('#Sucursal').empty();
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetSucursalReporteInv", "Reportes")",
+                    data: datos,
+                    dataType: "json",
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        hideLoading();
+                        var sucursales = '';
+
+                        if (response && response.length > 0) {
+                            for (var i = 0; i < response.length; i++) {
+                                sucursales += '<option value="' + response[i].Id + '">' + response[i].Valor + '</option>';
+                            }
+                            $('#Sucursal').append(sucursales);
+                            $('#Sucursal').multiselect('rebuild');
+                            document.getElementById("Sucursal").disabled = false;
+                        } else {
+                            mostrarMensaje('No se encontraron farmacias para los grupos seleccionados.', 'warning');
+                            document.getElementById("Sucursal").disabled = true;
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        hideLoading();
+                        mostrarMensaje('Error al cargar farmacias: ' + error, 'danger');
+                    }
+                });
+            }
+
+            // Evento click del botón Buscar
+            $("#btnBuscar").on("click", function () {
+                var grupo = $("#Grupo").val();
+                var sucursal = $("#Sucursal").val();
+
+                // Validar campos obligatorios
+                if (!grupo || grupo.length === 0) {
+                    mostrarMensaje('Debe seleccionar al menos un Grupo.', 'warning');
+                    return;
+                }
+
+                if (!sucursal || sucursal.length === 0) {
+                    mostrarMensaje('Debe seleccionar al menos una Farmacia.', 'warning');
+                    return;
+                }
+
+                buscarReporte();
+            });
+
+            // Evento click del botón Limpiar
+            $("#btnLimpiar").on("click", function () {
+                $('#Grupo').val([]);
+                $('#Grupo').multiselect('refresh');
+                $('#Sucursal').empty();
+                $('#Sucursal').multiselect('rebuild');
+                $('#SKU').val('');
+                document.getElementById("Sucursal").disabled = true;
+                $('#exportarSection').hide();
+                $('#mensaje-contenedor').empty();
+
+                if (tablaReporte) {
+                    tablaReporte.clear().draw();
+                }
+            });
+
+            // Función para buscar el reporte
+            function buscarReporte() {
+                showLoading();
+                $('#mensaje-contenedor').empty();
+
+                var datos = {
+                    Grupo: $("#Grupo").val().join(','),
+                    Sucursal: $("#Sucursal").val().join(','),
+                    SKU: $("#SKU").val()
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("BuscarReporteInvenadroAut", "Reportes")",
+                    data: datos,
+                    dataType: "json",
+                    success: function (response) {
+                        hideLoading();
+
+                        if (response.success) {
+                            if (response.data && response.data.length > 0) {
+                                cargarTabla(response.data);
+                                mostrarMensaje(response.message, 'success');
+                                $('#exportarSection').show();
+                            } else {
+                                mostrarMensaje('No se encontraron registros con los filtros seleccionados.', 'info');
+                                $('#exportarSection').hide();
+                                if (tablaReporte) {
+                                    tablaReporte.clear().draw();
+                                }
+                            }
+                        } else {
+                            mostrarMensaje(response.message || 'Error al buscar datos.', 'danger');
+                            $('#exportarSection').hide();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        hideLoading();
+                        mostrarMensaje('Error al realizar la búsqueda: ' + error, 'danger');
+                        $('#exportarSection').hide();
+                    }
+                });
+            }
+
+            // Función para cargar la tabla con datos
+            function cargarTabla(datos) {
+                if (tablaReporte) {
+                    tablaReporte.destroy();
+                }
+
+                tablaReporte = $('#tbReporteInvenadro').DataTable({
+                    data: datos,
+                    columns: [
+                        { data: 'IdSucursal' },
+                        { data: 'Sucursal' },
+                        { data: 'SKU' },
+                        { data: 'Descripcion' },
+                        { 
+                            data: 'PVD',
+                            render: function (data) {
+                                return data ? parseFloat(data).toFixed(2) : '0.00';
+                            }
+                        },
+                        { 
+                            data: 'InventarioObjetivo',
+                            render: function (data) {
+                                return data ? parseFloat(data).toFixed(2) : '0.00';
+                            }
+                        },
+                        { 
+                            data: 'MontoObjetivo',
+                            render: function (data) {
+                                return data ? '$' + parseFloat(data).toFixed(2) : '$0.00';
+                            }
+                        },
+                        { data: 'OptimoAnterior', defaultContent: '0' },
+                        { 
+                            data: 'InvMontoAnterior',
+                            render: function (data) {
+                                return data ? '$' + parseFloat(data).toFixed(2) : '$0.00';
+                            }
+                        },
+                        { data: 'OptimoActualizado', defaultContent: '0' },
+                        { 
+                            data: 'InvMontoNuevo',
+                            render: function (data) {
+                                return data ? '$' + parseFloat(data).toFixed(2) : '$0.00';
+                            }
+                        },
+                        { data: 'RelacionInvenadroVenta', defaultContent: 'N/A' },
+                        { 
+                            data: 'EstatusProducto',
+                            render: function (data) {
+                                var clase = data === 'Activo' ? 'badge-success' : 'badge-secondary';
+                                return '<span class="badge ' + clase + '">' + data + '</span>';
+                            }
+                        },
+                        { 
+                            data: 'PorcDifPiezas',
+                            render: function (data) {
+                                return data ? parseFloat(data).toFixed(2) + '%' : '0.00%';
+                            }
+                        },
+                        { 
+                            data: 'PorcDifMonto',
+                            render: function (data) {
+                                return data ? parseFloat(data).toFixed(2) + '%' : '0.00%';
+                            }
+                        }
+                    ],
+                    language: {
+                        url: "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json",
+                        search: "Buscar en resultados:",
+                        lengthMenu: "Mostrar _MENU_ registros por página",
+                        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                        infoEmpty: "No hay registros disponibles",
+                        infoFiltered: "(filtrado de _MAX_ registros totales)",
+                        paginate: {
+                            first: "Primero",
+                            last: "Último",
+                            next: "Siguiente",
+                            previous: "Anterior"
+                        }
+                    },
+                    pageLength: 25,
+                    lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
+                    responsive: true,
+                    dom: 'Bfrtip',
+                    buttons: []
+                });
+            }
+
+            // Evento para descargar Excel
+            $("#btnExportarExcel").on("click", function () {
+                var grupo = $("#Grupo").val();
+                var sucursal = $("#Sucursal").val();
+                var sku = $("#SKU").val();
+
+                if (!sucursal || sucursal.length === 0) {
+                    mostrarMensaje('Debe realizar una búsqueda antes de exportar.', 'warning');
+                    return;
+                }
+
+                // Crear formulario dinámico para enviar datos
+                var form = $('<form>', {
+                    'method': 'POST',
+                    'action': '@Url.Action("DescargarExcelInvenadroAut", "Reportes")'
+                });
+
+                form.append($('<input>', {
+                    'type': 'hidden',
+                    'name': 'Grupo',
+                    'value': grupo.join(',')
+                }));
+
+                form.append($('<input>', {
+                    'type': 'hidden',
+                    'name': 'Sucursal',
+                    'value': sucursal.join(',')
+                }));
+
+                form.append($('<input>', {
+                    'type': 'hidden',
+                    'name': 'SKU',
+                    'value': sku
+                }));
+
+                $('body').append(form);
+                form.submit();
+                form.remove();
+            });
+
+            // Función para mostrar mensajes
+            function mostrarMensaje(mensaje, tipo) {
+                var alertClass = 'alert-' + tipo;
+                var icono = tipo === 'success' ? 'fa-check-circle' : 
+                           tipo === 'danger' ? 'fa-exclamation-circle' : 
+                           tipo === 'warning' ? 'fa-exclamation-triangle' : 
+                           'fa-info-circle';
+
+                var html = '<div class="alert ' + alertClass + ' alert-dismissible fade show alert-custom" role="alert">' +
+                          '<i class="fa ' + icono + '"></i> ' + mensaje +
+                          '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                          '<span aria-hidden="true">&times;</span>' +
+                          '</button>' +
+                          '</div>';
+
+                $('#mensaje-contenedor').html(html);
+
+                // Auto-ocultar después de 5 segundos
+                setTimeout(function () {
+                    $('#mensaje-contenedor .alert').fadeOut('slow', function () {
+                        $(this).remove();
+                    });
+                }, 5000);
+            }
+
+            // Funciones de loading
+            function showLoading() {
+                if (typeof $.blockUI !== 'undefined') {
+                    $.blockUI({
+                        message: '<i class="fa fa-spinner fa-spin fa-3x"></i><br/>Cargando...',
+                        css: {
+                            border: 'none',
+                            padding: '15px',
+                            backgroundColor: '#000',
+                            '-webkit-border-radius': '10px',
+                            '-moz-border-radius': '10px',
+                            opacity: .5,
+                            color: '#fff'
+                        }
+                    });
+                }
+            }
+
+            function hideLoading() {
+                if (typeof $.unblockUI !== 'undefined') {
+                    $.unblockUI();
+                }
+            }
+        });
+    </script>
+}

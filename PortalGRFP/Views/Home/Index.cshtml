@@ -1,0 +1,222 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    List<PortalGRFP.Models.EstatusPedidos> stts = ViewBag.data;
+    PortalGRFP.CifraTotal cifra = ViewBag.cifra;
+}
+
+<div class="d-sm-flex align-items-center justify-content-between mg-b-20 mg-lg-b-25 mg-xl-b-30">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-style1 mg-b-10">
+                <li class="breadcrumb-item"><a href="#">Logistic Module</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Assortment Tracking</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="d-none d-md-block">
+        @*<button class="btn btn-sm pd-x-15 btn-white btn-uppercase"><i data-feather="save" class="wd-10 mg-r-5"></i> Save</button>
+            <button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="upload" class="wd-10 mg-r-5"></i> Export</button>*@
+        <!--<button class="btn btn-sm pd-x-15 btn-white btn-uppercase mg-l-5"><i data-feather="share-2" class="wd-10 mg-r-5"></i> Share</button>-->
+        <!--<button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5"><i data-feather="sliders" class="wd-10 mg-r-5"></i> Settings</button>-->
+    </div>
+</div>
+
+<div class="col-12 col-md-12 col-lg-12 mg-t-10">
+    @using (Html.BeginForm("Index", "Home", FormMethod.Get, new { @class = "form-horizontal" }))
+    {
+        @*<div data-label="Selecciona Fecha - Cadena - Sucursal" class="df-example demo-forms">
+            <div class="row row-sm">
+                <div class="col-sm-4">
+                    <input type="text" name="FechaPedido" class="form-control" placeholder="Fecha" id="datepicker4" autocomplete="off">
+                </div>
+                <div class="col-sm-4 mg-t-10 mg-sm-t-0">
+                    @Html.DropDownList("Marcas", ViewBag.marcas as SelectList, "Cadena...", new { @class = "form-control", @name = "Mar" })
+                </div>
+                <div class="col-sm-4 mg-t-10 mg-sm-t-0">
+                    @Html.DropDownList("Sucursales", ViewBag.sucursales as SelectList, "Sucursal...", new { @class = "form-control", @name = "Suc" })
+                </div>
+            </div>
+            &nbsp;&nbsp;<br />
+            <button class="btn btn-sm pd-x-15 btn-white btn-uppercase" type="submit" id="btnSeleccion">Aceptar</button>
+        </div>*@
+        <br />
+    }
+</div>
+
+@if (cifra != null)
+{
+<div class="col-lg-3 col-md-6 mg-t-10">
+    <div class="card">
+        <div class="card-body pd-y-20 pd-x-25">
+            <div class="row row-sm">
+                <div class="col-7">
+                    <h3 class="tx-normal tx-rubik tx-spacing--1 mg-b-5">@cifra.pedido</h3>
+                    <h6 class="tx-12 tx-semibold tx-uppercase tx-spacing-1 tx-primary mg-b-5">Pedidos</h6>
+                    <p class="tx-11 tx-color-03 mg-b-0">#Piezas: @cifra.cantidadpedida</p>
+                    <p class="tx-11 tx-color-03 mg-b-0">#Fecha: @cifra.fecha_ped</p>
+                </div>
+                <div class="col-5">
+                    <div class="chart-ten">
+                        <div id="flotChart3" class="flot-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="col-lg-3 col-md-6 mg-t-10">
+        <div class="card">
+            <div class="card-body pd-y-20 pd-x-25">
+                <div class="row row-sm">
+                    <div class="col-7">
+                        <h3 class="tx-normal tx-rubik tx-spacing--1 mg-b-5">@cifra.pedido_conf</h3>
+                        <h6 class="tx-12 tx-semibold tx-uppercase tx-spacing-1 tx-pink mg-b-5">Confirmado</h6>
+                        <p class="tx-11 tx-color-03 mg-b-0">#Piezas: @cifra.cantidadconf</p>
+                    </div>
+                    <div class="col-5">
+                        <div class="chart-ten">
+                            <div id="flotChart3" class="flot-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mg-t-10">
+        <div class="card">
+            <div class="card-body pd-y-20 pd-x-25">
+                <div class="row row-sm">
+                    <div class="col-7">
+                        <h3 class="tx-normal tx-rubik tx-spacing--1 mg-b-5">@cifra.pedido_fact</h3>
+                        <h6 class="tx-12 tx-semibold tx-uppercase tx-spacing-1 tx-teal mg-b-5">Facturado</h6>
+                        <p class="tx-11 tx-color-03 mg-b-0">#Piezas: @cifra.cantidadfact</p>
+                    </div>
+                    <div class="col-5">
+                        <div class="chart-ten">
+                            <div id="flotChart3" class="flot-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mg-t-10">
+        <div class="card">
+            <div class="card-body pd-y-20 pd-x-25">
+                <div class="row row-sm">
+                    <div class="col-7">
+                        <h3 class="tx-normal tx-rubik tx-spacing--1 mg-b-5">@cifra.pedido_conf_suc</h3>
+                        <h6 class="tx-12 tx-semibold tx-uppercase tx-spacing-1 tx-primary mg-b-5">Entrada Farmacia</h6>
+                        <p class="tx-11 tx-color-03 mg-b-0">#Piezas:  @cifra.cantidadRecSuc</p>
+                    </div>
+                    <div class="col-5">
+                        <div class="chart-ten">
+                            <div id="flotChart3" class="flot-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-12 col-md-6 col-lg-12 mg-t-10">
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h6 class="mg-b-0">Tracking Details</h6>
+                <div class="d-flex tx-18">
+                    <a href="" class="link-03 lh-0"><i class="icon ion-md-refresh"></i></a>
+                    <a href="" class="link-03 lh-0 mg-l-10"><i class="icon ion-md-more"></i></a>
+                </div>
+            </div>
+
+            @if (stts != null)
+            {
+                <ul class="list-group list-group-flush tx-13">
+
+                    @foreach (var o in stts)
+                    {
+                        if (o.Estatus == "Facturado")
+                        {
+                            <li class="list-group-item d-flex pd-sm-x-20">
+                                <div class="avatar d-none d-sm-block"><span class="avatar-initial rounded-circle bg-teal"><i class="icon ion-md-checkmark"></i></span></div>
+                                <div class="pd-sm-l-10">
+                                    <p class="tx-medium mg-b-0">Cadena: @o.MARCA &nbsp;&nbsp; IDSucursal: @o.COD_SUC &nbsp;&nbsp; IDUbictum: @o.ID_UBICT &nbsp;&nbsp; Nombre: @o.NOM_SUC</p>
+                                    <small class="tx-12 tx-color-03 mg-b-0">FolioPedido: @Html.ActionLink(@o.foliopedido, "GetPedido", "Home", new { folio = o.foliopedido }, new { @class = "" })  &nbsp;&nbsp; FechaPedido: @o.Fecha &nbsp;&nbsp; FolioCliente: @o.folio_cliente &nbsp;&nbsp; #SAP: @o.no_entrega_sap &nbsp;&nbsp; Factura: @o.foliofacturafinal</small>
+                                </div>
+                                <div class="mg-l-auto text-right">
+                                    <p class="tx-medium mg-b-0">Status Tracking</p>
+                                    <small class="tx-12 tx-success mg-b-0">@o.Estatus</small>
+                                </div>
+                            </li>
+
+
+                        }
+                        else if (o.Estatus == "Confirmado")
+                        {
+                            <li class="list-group-item d-flex pd-sm-x-20">
+                                <div class="avatar d-none d-sm-block"><span class="avatar-initial rounded-circle bg-orange op-5"><i class="icon ion-md-bus"></i></span></div>
+                                <div class="pd-sm-l-10">
+                                    <p class="tx-medium mg-b-2">Cadena: @o.MARCA &nbsp;&nbsp; IDSucursal: @o.COD_SUC &nbsp;&nbsp; IDUbictum: @o.ID_UBICT &nbsp;&nbsp; Nombre: @o.NOM_SUC</p>
+                                    <small class="tx-12 tx-color-03 mg-b-0">FolioPedido: @Html.ActionLink(@o.foliopedido, "GetPedido", "Home", new { folio = o.foliopedido }, new { @class = "" })  &nbsp;&nbsp; FechaPedido: @o.Fecha &nbsp;&nbsp; FolioCliente: @o.folio_cliente &nbsp;&nbsp; #SAP: @o.no_entrega_sap &nbsp;&nbsp; Factura: @o.foliofacturafinal</small>
+                                </div>
+                                <div class="mg-l-auto text-right">
+                                    <p class="tx-medium mg-b-2">Status Tracking</p>
+                                    <small class="tx-12 tx-info mg-b-0">@o.Estatus</small>
+                                </div>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="list-group-item d-flex pd-sm-x-20">
+                                <div class="avatar d-none d-sm-block"><span class="avatar-initial rounded-circle bg-indigo op-5"><i class="icon ion-md-return-left"></i></span></div>
+                                <div class="pd-sm-l-10">
+                                    <p class="tx-medium mg-b-2">Cadena: @o.MARCA &nbsp;&nbsp; IDSucursal: @o.COD_SUC &nbsp;&nbsp; IDUbictum: @o.ID_UBICT &nbsp;&nbsp; Nombre: @o.NOM_SUC</p>
+                                    <small class="tx-12 tx-color-03 mg-b-0">@Html.ActionLink(@o.foliopedido, "GetPedido", "Home", new { folio = o.foliopedido }, new { @class = "" })  &nbsp;&nbsp; FechaPedido: @o.Fecha &nbsp;&nbsp; FolioCliente: @o.folio_cliente &nbsp;&nbsp; #SAP: @o.no_entrega_sap &nbsp;&nbsp; Factura: @o.foliofacturafinal</small>
+                                </div>
+                                <div class="mg-l-auto text-right">
+                                    <p class="tx-medium mg-b-2">Status Tracking</p>
+                                    <small class="tx-12 tx-success mg-b-0">@o.Estatus</small>
+                                </div>
+                            </li>
+                        }
+
+                    }
+
+                </ul>
+            }
+            <div class="card-footer text-center tx-13">
+                <a href="" class="link-03">View All Transactions <i class="icon ion-md-arrow-down mg-l-5"></i></a>
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts{
+
+    <script type="text/javascript">
+        $.datepicker.regional['es'] = {
+            closeText: 'Cerrar',
+            prevText: '< Ant',
+            nextText: 'Sig >',
+            currentText: 'Hoy',
+            monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+            dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+            dayNamesMin: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+            weekHeader: 'Sm',
+            firstDay: 1,
+            isRTL: false,
+            showMonthAfterYear: false,
+            yearSuffix: ''
+        };
+        $.datepicker.setDefaults($.datepicker.regional['es']);
+        $(function () {
+            $("#datepicker4").datepicker({
+                dateFormat: 'yy-mm-dd'
+            });
+        });
+    </script>
+}

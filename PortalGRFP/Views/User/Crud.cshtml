@@ -1,0 +1,301 @@
+﻿@model PortalGRFP.Entities.Models.CatUsersModel
+@{
+    ViewBag.Title = "Usuario";
+}
+@using PortalGRFP.Entities.Models
+
+
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+@section Breadcrumbs{
+    <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+    <li class="breadcrumb-item"><a>Configuración</a></li>
+    <li class="breadcrumb-item"><a>Usuarios </a></li>
+}
+<div class="container-fluid">
+
+    @*<label for="cbGrupo">Seleccionar Grupo:</label> <br />
+    <select class="form-control" id="cbGrupo" multiple="multiple" min="1" required>
+        @foreach (var item in TempData["gruposList"] as List<GruposModel>)
+        {
+            <option value="@item.Id">@item.Nombre</option>
+        }
+    </select>*@
+    @using (Html.BeginForm("CrudD", "User", FormMethod.Post, new { role = "form", id = "frmUser" }))
+    {
+        //@Html.AntiForgeryToken()
+        <div class="row">
+            <div class="col-6">
+                <div class="mt-1">
+                    @Html.HiddenFor(m => m.IdUsusario, new { @class = "control-label", @Id = "IdUsusario" })
+                    @Html.LabelFor(m => m.Nombre, new { @class = "control-label", @for = "Nombre" })
+                    @Html.ValidationMessageFor(m => m.Nombre, null, new { @class = "text-danger" })
+                    @Html.TextBoxFor(m => m.Nombre, new { required = true,id="Nombre", @pattern = "[A-Za-z ]+", @type = "text", oninput = "validity.valid||(value='')",@class = "form-control" })
+
+                </div>
+                <div class="mt-1">
+                    @Html.LabelFor(m => m.ApPaterno, new { @class = "control-label", @for = "ApPaterno" })
+                    @Html.ValidationMessageFor(m => m.ApPaterno, null, new { @class = "text-danger" })
+                    @Html.TextBoxFor(m => m.ApPaterno, new { required = true, id = "ApPaterno", @pattern = "[A-Za-z ]+", @type = "text", oninput = "validity.valid||(value='')", @class = "form-control" })
+                </div>
+                <div class="mt-1">
+                    @Html.LabelFor(m => m.ApMaterno, new { @class = "control-label" })
+                    @Html.ValidationMessageFor(m => m.ApMaterno, null, new { @class = "text-danger" })
+                    @Html.TextBoxFor(M => M.ApMaterno, new { required = true, id = "ApMaterno", @pattern = "[A-Za-z ]+", @type = "text", oninput = "validity.valid||(value='')", @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="col-6">
+                @Html.LabelFor(m => m.Correo, new { @class = "control-label" })
+                @*@Html.ValidationMessageFor(m => m.Correo, null, new { @class = "text-danger" })*@
+                @Html.TextBoxFor(m => m.Correo, new {required = true,id= "Correo", @type = "email", @class = "form-control" })
+                <div class="mt-1">
+                    <label class="text-danger">@ViewBag.UsuarioId</label>
+                </div>
+
+                @Html.LabelFor(m => m.Perfil, new { @class = "control-label" })
+                @Html.ValidationMessageFor(m => m.Perfil, null, new { @class = "text-danger" })
+                @Html.DropDownList("Perfil", null, "Seleccione", htmlAttributes: new { required = true, @class = "form-control", id = "IdPerfil", name = "IdPerfil" })
+
+                @*@Html.LabelFor(m => m.Grupo, new { @class = "control-label" })
+                    @Html.ValidationMessageFor(m => m.Grupo, null, new { @class = "text-danger" })
+                    @Html.DropDownList("Grupo", null, "Seleccione", htmlAttributes: new { @class = "form-control", id = "IdGrupo", name = "IdGrupo" })*@
+                <br />
+                <label for="cbGrupo">Seleccionar Grupo:</label> <br />
+                <select class="form-control" id="Grupos" name="Grupos" multiple="multiple" min="1" required>
+                    @foreach (var item in TempData["gruposList"] as List<CatUsersModel.Grupo>)
+                    {
+                        <option value="@item.Id" checked>@item.Nombre</option>
+                    }
+                </select>
+
+                <div class="mt-4" id="activoUs">
+                    @Html.LabelFor(m => m.Activo, new { @class = "form-label" })
+                    @Html.CheckBoxFor(m => m.Activo, new { @Checked = "Checked" })
+                </div>
+
+            </div>
+
+        </div>
+        <div class="row m-3 float-md-right">
+            <button class="btn btn-secondary btn-uppercase mg-l-5" type="button" id="btnCancelar">
+                Cancelar
+            </button>
+            @{
+                if (Model == null)
+                {
+                    <input value="Agregar" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" type="submit">
+                        
+                   
+                }
+                else
+                {
+                    <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" type="submit">
+                        Actualizar
+                    </button>
+                }
+            }
+        </div>
+
+    }
+</div>
+
+@section scripts{
+    <script>
+            $(document).ready(function () {
+
+                $('#Grupos').multiselect({
+                    includeSelectAllOption: true,
+                    selectAllText: "Marcar Todos",
+                    allSelectedText: "Todas Seleccionados",
+                    nonSelectedText: "Seleccionar Grupo",
+                    nSelectedText: "Grupos Seleccionados"
+                });
+
+                //var data = [1, 6];
+
+                //$("#Grupos").multiselect("deselect_all");
+
+                //$("#Grupos").multiselect("select", 1);
+
+
+                //$('option[value="1"]', $('#Grupos')).prop('selected', true);
+                //$('option[value="6"]', $('#Grupos')).prop('selected', true);
+
+
+                //$('#Grupos').multiselect('refresh');
+
+
+
+                if ($("#IdUsusario").val() != "") {
+                    $("#Correo").attr('readonly', true);
+                }
+                else
+                {
+                    $("#activoUs").hide();
+                }
+
+                $("#btnCancelar").click(function () {
+                window.location = "@Url.Action("Index", "User")";
+
+                });
+
+                    function ValidateEmail(inputText)
+                    {
+                    var mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+                    if(inputText.match(mailformat))
+                    {
+                    return true;
+                    }
+                    else
+                    {
+                    $('#Correo').focus();
+                    return false;
+                    }
+                    }
+
+                $("#frmUser").on("submit", function (event) {
+                    event.preventDefault();
+
+                    if ($('#Nombre').val()=="" ) {
+                        swal("Campo Nombre es obligatorio", '', "error");
+                        return;
+                    }
+
+                    if ($('#ApPaterno').val() == "") {
+                        swal("Campo  A. Paterno es obligatorio", '', "error");
+                        return;
+                    }
+
+                    if ($('#ApMaterno').val() == "") {
+                        swal("Campo A. Materno es obligatorio", '', "error");
+                        return;
+                    }
+
+                    if ($('#Correo').val() == "") {
+
+                       
+                        swal("Campo Correo es obligatorio", '', "error");
+                        return;
+                    } else {
+                       
+
+                        if (ValidateEmail($('#Correo').val()) == true) {
+                           
+                            console.log("correo valido")
+
+                        } else {
+                          
+                            swal("Correo invalido", '', "error");
+                            return;
+                        }
+
+                    }
+                    console.log( $("#IdPerfil option:selected").text() )
+
+                    if ($("#IdPerfil option:selected").text() == "Seleccione") {
+                        swal("Campo Perfil es obligatorio", '', "error");
+                        return;
+                    }
+
+
+
+
+
+
+
+
+
+
+
+
+                        var dataFRM = $("#frmUser").serializeArray()
+                            .filter(function (elem) {
+                                //console.log(elem);
+
+                                return $.trim(elem.value);
+                            });
+
+                        showLoading();
+                        $.ajax({
+                            type: $("#frmUser").attr('method'),
+                            url: $("#frmUser").attr('action'),
+                            data: dataFRM,
+                            success: function (response) {
+                                hideLoading();
+                                if (response == "OK") {
+                                    swal("Los cambios se guardaron correctamente", '', "success").then((value) => {
+                                       window.location.href = "/User/Index";
+                                    });
+                                } else {
+                                    swal("Ocurrio un error al guardar, intente de nuevo", '', "error").then((value) => {
+
+                                    });
+                                }
+                            },
+                            error: function (response) {
+                                swal("Ocurrio un error de comunicación", '', "warning");
+                            }
+                        });
+
+                });
+
+                function valdiateInput() {
+                    console.log($('#Nombre').val());
+                    console.log($('#Nombre').text());
+
+                    return;
+                }
+
+                //$("#frmUser").on("submit", function (event) {
+                //    event.preventDefault();
+                //    console.log($("#IdUsusario").val())
+                //});
+
+                /*$("#btnGuardar").click(function () {
+
+
+                    var gruposArray = [];
+
+                    gruposArray = $("#cbGrupo").val();
+
+                    console.log(gruposArray)
+
+                });*/
+
+                getGruposUsuario();
+
+
+                function getGruposUsuario() {
+
+                    console.log("la data " + $("#IdUsusario").val())
+
+                    showLoading();
+
+                    $.ajax({
+                         url: "@Url.Action("GetGruposUsuario", "User")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: $("#IdUsusario").val()},
+
+                        success: function (response) {
+                            hideLoading();
+                            //var sucursales = "";
+                            for (var i = 0; i < response.data.length; i++) {
+                                //sucursales = sucursales + '<option value=' + response.data[i].ID + '>' + response.data[i].Valor + '</option>';
+                                $('option[value="' + response.data[i].Id+'"]', $('#Grupos')).prop('selected', true);
+                            }
+                            $('#Grupos').multiselect('refresh');
+
+                        },
+                        error: function (response) {
+                            hideLoading();
+                            swal("Error al consultar datos de usuario", '', "error").then((value) => { location.reload();});
+                        }
+                    });
+
+                }
+            });
+    </script>
+}

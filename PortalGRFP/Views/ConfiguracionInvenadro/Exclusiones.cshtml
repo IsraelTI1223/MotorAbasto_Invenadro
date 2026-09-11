@@ -1,0 +1,248 @@
+﻿@using PortalGRFP.Entities.Common
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Generales</a></li>
+    <li class="breadcrumb-item"><a>Invenadro</a></li>
+}
+<div class="container">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a href='@Url.Action("Index", "ConfiguracionInvenadro")' class="btn btn-secondary">Invenadro General</a>
+        <a href='@Url.Action("Exclusiones", "ConfiguracionInvenadro")' id="btnPestañaExcluidos" class="btn btn-secondary active">Excluidos</a>
+        <a href='@Url.Action("ResumenInvenadro", "ConfiguracionInvenadro")' id="btnResumen" class="btn btn-secondary">Resumen Invenadro</a>
+        <a href='@Url.Action("BalanceoCDRs", "ConfiguracionInvenadro")' id="btnPestañaCDR " class="btn btn-secondary">Balanceo</a>
+    </div>
+
+    <div class="card" style="width:100%">
+
+        <div class="container-fluid">
+            <br />
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="label-primary">SKU: </label>
+                        <input type="text" id="txtSKU" class="form-control" maxlength="30" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="label-primary">Sucursal: <span style="color:gray"></span></label>
+                        <select class="form-control" id="cmbSucursal" name="cmbSucursal" data-mdb-filter="true" multiple>
+                            @if (TempData["Sucursal"] != null)
+                            {
+                                foreach (var item in TempData["Sucursal"] as List<ComboGenerico>)
+                                {
+                                    <option value="@item.Id"> @item.Valor</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <button class="btn btn-sm pd-x-15 btn-secondary mg-l-6" type="button" id="btnConsulta" onclick="GetExcludos();">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <div class="col-md-3">
+                </div>
+                <div class="col-auto">
+                    <button title="Exportar Excel" class="btn btn-success" id="btnExportarExcel"
+                            style="margin-top: 25px;">
+                        Exportar Excel
+                    </button>
+                </div>
+            </div>
+
+
+        </div>
+        
+        <br>
+    </div>
+
+    <div class="card" style="width:100%">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card-body" id="fullTbl2">
+                    <div class="table-responsive">
+                        <table id="tblExcluidos" class="table table-striped table-bordered">
+                        </table>
+
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    @*<div class="card" style="width:100%">
+        <div class="card-body" id="cardAutorizacion" style="display:none;">
+            <div class="row align-items-end">
+                <div class="col-md-6">
+                    <label><b>Cargar Excel de Excluidos</b></label>
+                    <input type="file" id="fileExcelExcluidos"
+                           class="form-control"
+                           accept=".xlsx,.xls" />
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary"
+                            id="btnAutorizarMasivo">
+                        Autorizar Excluidos
+                    </button>
+                </div>
+            </div>
+        </div>
+        <br>
+    </div>*@
+
+
+
+</div>
+
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css">
+
+
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#cmbSucursal').multiselect({
+            nonSelectedText: 'Lista de Sucursales',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '250px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todas",
+            nSelectedText: "Farmacias Seleccionadas",
+            allSelectedText: "Todas Seleccionadas",
+            enableCaseInsensitiveFiltering: true,
+            nSelectedText: "Sucursales Seleccionadas"
+        });
+
+        $("#btnExportarExcel").hide();
+
+    });
+
+    $("#btnExportarExcel").on("click", function () {
+       var sku = $("#txtSKU").val().trim();
+       var sucursales = $("#cmbSucursal").val();
+       var sucursalesCSV = "";
+
+       if (sucursales != null && sucursales.length > 0) {
+        sucursalesCSV = sucursales.join(",");
+       }
+
+        var url = "@Url.Action("DescargarExcelExcluidos", "ConfiguracionInvenadro")"
+        + "?SKU=" + encodeURIComponent(sku)
+        + "&Sucursales=" + encodeURIComponent(sucursalesCSV);
+
+        window.location.href = url;
+    });
+
+    function GetExcludos() {
+        showLoading();
+        var sku = $("#txtSKU").val().trim();
+        var sucursales = $("#cmbSucursal").val();
+        var sucursalesCSV = "";
+
+        if (sucursales != null && sucursales.length > 0) {
+            sucursalesCSV = sucursales.join(",");
+        }
+        $.ajax({
+          url: "@Url.Action("GetProdExcluidos", "ConfiguracionInvenadro")",
+          type: "GET",
+          dataType: "json",
+          data: {
+            SKU: sku,
+            Sucursales: sucursalesCSV
+          },
+          success: function (response) {
+              hideLoading();
+              if (response.Success) {
+                  $("#btnExportarExcel").show();
+                  $("#cardAutorizacion").show();
+                  $('#tblExcluidos').DataTable({
+                      data: response.Result,
+                      destroy: true,
+                      processing: true,
+                      deferRender: true,
+                      pageLength: 10,
+                      scrollCollapse: true,
+                      searching: true,
+                      ordering: true,
+                      dom: 'Bfrtip',
+                      columns: [
+                          { data: "IdSucursal", title: "Id" , visible: false},
+                          { data: "NombreSucursal", title: "Sucursal" },
+                          { data: "SKU", title: "SKU" },
+                          { data: "NombreSKU", title: "Descripción", visible: false },
+                          { data: "OptimoAnterior", title: "Óptimo Actual" },
+                          { data: "OptimoActualizado", title: "Óptimo Nuevo" },
+                          { data: "PVD", title: "PVD" },
+                          { data: "RelacionInvenadroVenta", title: "Relación Invenadro" },
+                          { data: "Motivo", title: "Motivo" }
+                      ]
+                  });
+              } else {
+                  swal("Sin resultados", "", "warning");
+              }
+          },
+          error: function () {
+              hideLoading();
+              swal("Error al consultar excluidos", "", "error");
+          }
+        });
+
+    }
+
+    @*$("#btnAutorizarMasivo").on("click", function () {
+
+        var fileInput = $("#fileExcelExcluidos")[0];
+
+         if (fileInput.files.length === 0) {
+            swal("Selecciona un archivo Excel", "", "warning");
+            return;
+         }
+
+        var formData = new FormData();
+        formData.append("archivoExcel", fileInput.files[0]);
+
+        showLoading();
+
+        $.ajax({
+            url: '@Url.Action("AutorizarExcluidosMasivo", "ConfiguracionInvenadro")',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                hideLoading();
+    
+                if (response.Success) {
+                    swal("Autorización realizada correctamente", "", "success");
+                    GetExcludos(); // refrescar tabla
+                } else {
+                    swal("Error", response.Message, "error");
+                }
+            },
+            error: function () {
+                hideLoading();
+                swal("Error al procesar el archivo", "", "error");
+            }
+        });
+    });*@
+
+
+</script>
+

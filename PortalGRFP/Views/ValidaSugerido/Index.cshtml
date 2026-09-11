@@ -1,0 +1,682 @@
+﻿@model PortalGRFP.Entities.Common.SugeridoFiltros
+@using PortalGRFP.Entities.Common
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Sugerido de Compra</a></li>
+    <li class="breadcrumb-item"><a>Sugerido</a></li>
+}
+
+
+@using (Html.BeginForm("CrearSugerido", "ValidaSugerido", FormMethod.Post, new { role = "form", id = "frmSugerido" }))
+{
+    <div class="row">
+        <div class="col-md-2">
+            Grupo
+            <select id="Grupo" name="Grupo" multiple="multiple" class="form-control col-md-10">
+                @foreach (var item in TempData["GrupoTMP"] as List<ComboGenerico>)
+                {
+                    <option value="@item.Id">@item.Valor</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            Sucursales
+            <select id="Sucursal" name="Sucursal" multiple="multiple" class="form-control col-md-10" disabled>
+                <option value="0">Seleccione una Sucursal</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            Proveedores
+            <select id="Proveedor" name="Proveedor" multiple="multiple" class="form-control" disabled>
+                <option value="0">Seleccione un Proveedor</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            Reglas
+            <select id="Conceptos" name="Conceptos" multiple="multiple" class="form-control" disabled>
+                @*<option value="1">Negados</option>
+                    <option value="2">Compra Especial</option>
+                    <option value="3">Resurtido Natural</option>
+                    <option value="4">Invenadro</option>
+                    <option value="5">Especiales Farmacia</option>
+                    <option value="6">Pie de Camión Mayorista</option>*@
+                @foreach (var item in TempData["ReglasSug"] as List<ComboGenerico>)
+                {
+                    <option value="@item.Id">@item.Valor</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="submit" value="Guardar" class="btn btn-primary" />
+        </div>
+    </div>
+}
+@if (Session["FolioSugerido"] != null)
+{
+    <input type="hidden" id="hdFolio" value="@Session["FolioSugerido"]" />
+}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="btn-group float-right" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-secondary" id="ValidaN" style="display:none">Validar Negados</button>
+                @*<button type="button" class="btn btn-primary" id="AplicaN" style="display:none">Aplicar Negados</button>*@
+                <button type="button" class="btn btn-success" id="CalcularSugerido" style="display:none">Calcular Sugerido</button>
+                <button type="button" class="btn btn-success" id="AsignacionProv" style="display:none">Asignación de proveedores</button>
+            </div>
+        </div>
+        <div class="card-body" id="contenedor_tb">   
+            <h5>Rechazos De Validación de Negados</h5><br />
+            <row>
+                <table id="tbLogerror" class="display compact cell-border" width="100%"></table>
+            </row>
+        </div>
+        <div class="card-body" id="contenedor_tb2">       
+            <h5>Rechazos Sucursales sin Cuenta</h5><br />
+            <row>
+                <table id="tbCuenta" class="display compact cell-border" width="100%"></table>
+            </row>
+        </div>
+    </div>
+    <input type="hidden" id="idSugerido" />
+</div>
+@section scripts{
+    <script>
+
+        var sucursalesG = '';
+
+
+        $("#contenedor_tb").hide();
+        $("#contenedor_tb2").hide();
+
+        $(document).ready(function () {
+            'use strict';
+
+            $('#Grupo').multiselect({
+                nonSelectedText: 'Seleccione un grupo',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '150px',
+                buttonTextAlignment: 'left',
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Grupos Seleccionados"
+            });
+
+            $('#Sucursal').multiselect({
+                nonSelectedText: 'Seleccione una Sucursal',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '250px',
+                //dropUp: true,
+                selectAllText: "Marcar Todas",
+                allSelectedText: "Todas Seleccionadas",
+                nSelectedText: "Sucursales Seleccionados"
+            });
+
+            $('#Proveedor').multiselect({
+                nonSelectedText: 'Seleccione un proveedor',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '250px',
+                //dropUp: true,
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Proveedores Seleccionados"
+            });
+
+            $('#Conceptos').multiselect({
+                nonSelectedText: 'Seleccione un concepto',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '150px',
+                //dropUp: true,
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Conceptos Seleccionados"
+            });
+
+            $("#Grupo").on("change", function () {
+                var datos = new FormData();
+                datos.append("idGrupo", $(this).val());
+                GetFarmacias(datos);
+            });
+
+            function GetFarmacias(datos) {
+                showLoading();
+                $('#Sucursal').empty();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetSucursal", "ValidaSugerido")",
+                    data: datos,
+                    dataType: "json",
+                    processData: false,  // tell jQuery not to process the data
+                    contentType: false,
+                    success: function (response) {
+                        hideLoading();
+                        var sucursales = '';
+                        for (var i = 0; i < response.length; i++) {
+                            sucursales = sucursales + '<option value=' + response[i].Id + '>' + response[i].Valor + '</option>';
+                        }
+
+                        $('#Sucursal').append(sucursales);
+
+                        $('#Sucursal').multiselect('rebuild');
+
+                        document.getElementById("Sucursal").disabled = false;
+
+                    },
+                    error: function (response) {
+                    }
+                });
+            }
+
+            $("#Sucursal").on("change", function () {
+                var datos = new FormData();
+                datos.append("idSucursal", $(this).val());
+                console.log($(this).val())
+                GetProveedores(datos);
+            });
+
+            function GetProveedores(datos) {
+                showLoading();
+                $('#Proveedor').empty();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetProveedores", "ValidaSugerido")",
+                    data: datos,
+                    dataType: "json",
+                    processData: false,  // tell jQuery not to process the data
+                    contentType: false,
+                    success: function (response) {
+                        hideLoading();
+                        var proveedores = '';
+                        for (var i = 0; i < response.length; i++) {
+                            proveedores = proveedores + '<option value=' + response[i].Id + '>' + response[i].Valor + '</option>';
+                        }
+                        $('#Proveedor').append(proveedores);
+                        $('#Proveedor').multiselect('rebuild');
+                        document.getElementById("Proveedor").disabled = false;
+                    },
+                    error: function (response) {
+                    }
+                });
+            }
+
+            $("#Proveedor").on("change", function () {
+                $('#Conceptos').multiselect('rebuild');
+                document.getElementById("Conceptos").disabled = false;
+            });
+
+            $("#frmSugerido").on("submit", function (event) {
+                event.preventDefault();
+                $("#ValidaN").css("display", "none");
+                //$("#AplicaN").css("display", "none");
+                $("#CalcularSugerido").css("display", "none");
+                //if (ValidacionForm()) {
+                var form = $("#frmSugerido").serializeArray()
+                        .filter(function (elem) {
+                            return $.trim(elem.value);
+                        });
+                    showLoading();
+                    $.ajax({
+                        type: $("#frmSugerido").attr('method'),
+                        url: $("#frmSugerido").attr('action'),
+                        data: form,
+                        success: function (response) {
+
+                            console.log(response)
+
+                            hideLoading();
+                            if (response.Success) {
+                                if ($('#Conceptos').val().includes("1") && $('#Conceptos').val().length == 1)//negados
+                                {
+                                    //console.log($('#Conceptos').val().length);
+                                    $("#ValidaN").css("display", "block");
+                                    //$("#AplicaN").css("display", "block");
+                                   // $("#CalcularSugerido").css("display", "block");
+                                } else {
+                                    $("#CalcularSugerido").css("display", "block");
+                                    //swal('Error al Gen Sug.', response.Message, "warning");
+                                }
+                                if (response.Message == "Algunas sucursales no tienen cuenta con los proveedores seleccionados.")
+                                {
+                                    swal('', response.Message, "warning");
+
+                                    getDTCuenta();
+
+                                } else {
+                                         swal('', response.Message, "success");
+                                        }
+                            } else {
+                                swal('', response.Message, "warning");
+                            }
+
+                        },
+                        error: function (response) {
+                            swal(response.Message, '', "warning");
+                        }
+                    });
+
+            });
+
+
+            $("#ValidaN").click(function () {
+
+                swal({
+                    title: "Iniciar Validación de Negados",
+                    text: "¿Seguro de continuar?",
+                    icon: "warning",
+                    buttons: {
+                        cancel: "Cancelar",
+                        catch: {
+                            text: "Continuar",
+                            value: true
+                        }
+                    }
+                }).then((resp) => {
+
+                    if (resp) {
+
+                        showLoading();
+
+                        sucursalesG = String($("#Sucursal").val());
+
+
+                        var tiendasArray = [];
+
+                        tiendasArray = $("#Sucursal").val();
+
+                        var formData = new FormData();
+
+                        var index = 0;
+
+                        for (var i of tiendasArray) {
+
+                            console.log(i)
+                            formData.append("Sucursales[" + index + "].Id", i);
+                            index++;
+                        }
+
+
+                   $.ajax({
+                    type: "POST",
+                            url: "/ValidaSugerido/ValidarNegados",
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function (response) {
+                        hideLoading();
+                        console.log(response)
+                        if (response.data.Success) {
+
+
+                            swal('', 'Termino la validación de Negados', 'success').then((value) => {
+
+                                $("#CalcularSugerido").css("display", "block");
+                                $("#ValidaN").css("display", "none");
+
+
+                                //getIncidenciasList();
+                                getDTIncidencias();
+                            });
+                        } else {
+                            //$("#CalcularSugerido").css("display", "block");
+                            //$("#ValidaN").css("display", "none");
+
+                            swal('Error al validar Negados', response.data.Message, "error");
+                        }
+                    },
+                    error: function (e) {
+                        hideLoading();
+                        swal("¡Error inesperado en la carga! " + response.data.Message, '', "error");
+                    }
+                        })
+
+                }
+                });
+
+            });
+
+
+
+            function getDTIncidencias() {
+
+                showLoading();
+                $('#cbIncidencias').empty();
+                $.ajax({
+                    type: "POST",
+                    url: "/ValidaSugerido/GetDTLogError",
+                    data: { tiendas: sucursalesG },
+                    dataType: "json",
+                    success: function (data) {
+                        $("#contenedor_tb").show();
+                        hideLoading();
+              
+
+                        console.log(data)
+
+                        hideLoading();
+
+                        $('#tbLogerror').DataTable({
+                            data: data,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "FechaCarga", title: 'FechaCarga' },
+                                { data: "Fecha_Validacion", title: "Fecha_Validacion" },
+                                { data: "Motivo_Negado", title: "Motivo_Negado" },
+                                { data: "Sucursal", title: "Sucursal" },
+                                { data: "SKU", title: "SKU" },
+                                { data: "Descripcion", title: "Descripcion" },
+                                { data: "Piezas_rechazadas", title: "Piezas_rechazadas" },
+                                { data: "Incidencia", title: "Incidencia" }
+                            ],
+                            select: true,
+                            scrollCollapse: true,
+                            info: false,
+                            paging: true,
+                            responsive: true,
+                            searching: true
+                        });
+                        if (data.length == 0) {
+                            swal("No se encontraron incidencias", '', "warning");
+                        }
+
+                    },
+                    error: function (response) {
+                        hideLoading();
+                        swal("¡Error inesperado " + response, '', "error");
+
+
+                    }
+                });
+            }
+
+            function getIncidenciasList() {
+
+                showLoading();
+                $('#cbIncidencias').empty();
+                $.ajax({
+                    type: "POST",
+                    url: "/ValidaSugerido/GetIncidenciasList",
+                    data: { tiendas: sucursalesG },
+                    dataType: "json",
+                    //processData: false,
+                    //contentType: false,
+                    success: function (response) {
+                        $("#contenedor_tb").show();
+                        hideLoading();
+                        var incidencias = "";
+                        for (var i = 0; i < response.data.length; i++) {
+                            incidencias = incidencias + '<option value=' + response.data[i].Valor + '>' + response.data[i].Valor + '</option>';
+                        }
+                        incidencias = incidencias + '<option disabled selected>Seleccione una incidencia </option>'
+                        $("#cbIncidencias").append(incidencias);
+
+                    },
+                    error: function (response) {
+                        hideLoading();
+                        swal("¡Error inesperado " + response, '', "error");
+
+
+                    }
+                });
+            }
+
+            /*$("#cbIncidencias").on("change", function () {
+                getLogError();
+            });
+            */
+
+
+            @*$("#AplicaN").click(function () {
+                showLoading();
+                var idUsugerido = $("#idSugerido").val();
+                $.ajax({
+                    type: "Post",
+                    url: "@Url.Action("CalcularSugerido", "ValidaSugerido")",
+                    dataType: "json",
+                    data: {Sugerido: idUsugerido},
+                    success: function (response) {
+                        hideLoading();
+                        swal('', response.Message, "success");
+                    },
+                    error: function (response) {
+                        swal('', response.Message, "warning");
+                    }
+                });
+            });*@
+
+
+
+            $("#CalcularSugerido").click(function () {
+                showLoading();
+
+                $.ajax({
+                    type: "Post",
+                    url: "@Url.Action("CalcularSugerido", "ValidaSugerido")",
+                    dataType: "json",
+                    //data: {Sugerido: idUsugerido},
+                    success: function (response) {
+                        hideLoading();
+                        if (response.Success) {
+                            $("#CalcularSugerido").css("display", "none");
+                            $("#AsignacionProv").css("display", "block");
+                            swal('', response.Message, "success");
+                        } else{
+                            swal('', response.Message, "warning");
+                            //$("#CalcularSugerido").css("display", "none");
+                        }
+                    },
+                    error: function (response) {
+                        hideLoading();
+                        swal('', response.Message, "warning");
+                    }
+                });
+            });
+
+     
+
+            $("#AsignacionProv").click(function () {
+
+
+
+
+                showLoading();
+
+                $.ajax({
+                    type: "Post",
+                    url: "@Url.Action("AsignacionProveedor", "ValidaSugerido")",
+                    dataType: "json",
+                    //data: {Sugerido: idUsugerido},
+                    success: function (response) {
+                        hideLoading();
+
+                        var ids = response.Message.split('-')[1];
+                        console.log("_" + ids)
+                        
+
+
+                        swal("Proveedor Asignado", response.Message.split('-')[0], "success").then((value) => {
+
+                            location.href = '@Url.Action("ValidarMontosSugerido", "Sugerido")?IdSugerido=' + ids;
+
+                        });
+
+
+
+                    },
+                    error: function (response) {
+                        hideLoading();
+                        swal('', response.Message, "warning");
+                    }
+                });
+            });
+
+        });
+
+        //function validarNegados() {
+
+        //    swal({
+        //        title: "Iniciar Validación de Negados",
+        //        text: "¿Seguro de continuar?",
+        //        icon: "warning",
+        //        buttons: {
+        //            cancel: "Cancelar",
+        //            catch: {
+        //                text: "Continuar",
+        //                value: true
+        //            }
+        //        }
+        //    }).then((resp) => {
+
+        //        console.log(resp)
+
+        //        if (resp) {
+        //            showLoading();
+        //            $.ajax({
+        //                type: "POST",
+        //                url: "/ValidaSugerido/ValidarNegados",
+        //                data: { flag: 1 },
+        //                dataType: "json",
+        //                processData: false,  // tell jQuery not to process the data
+        //                contentType: false,
+        //                success: function (response) {
+        //                    hideLoading();
+        //                    var sucursales = "";
+        //                    for (var i = 0; i < response.data.length; i++) {
+        //                        sucursales = sucursales + '<option value=' + response.data[i].ID + '>' + response.data[i].Valor + '</option>';
+        //                    }
+
+
+        //                    $("#cbTiendas").append(sucursales);
+
+        //                    $('#cbTiendas').multiselect('rebuild');
+
+
+
+        //                },
+        //                error: function (response) {
+        //                }
+        //            });
+        //        }
+
+
+        //    });
+
+        //}
+
+        function getLogError() {
+            console.log(sucursalesG);
+             showLoading();
+             $.ajax({
+                    url: "@Url.Action("GetListLogError", "ValidaSugerido")",
+                 dataType: "json",
+                 data: { incidencia: $("#cbIncidencias option:selected").text(), tiendas: sucursalesG },
+                    success: function (data) {
+                        console.log(data)
+
+                        hideLoading();
+
+                        $('#tbLogerror').DataTable({
+                            data: data,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "FechaCarga", title: 'FechaCarga' },
+                                { data: "Fecha_Validacion", title: "Fecha_Validacion" },
+                                { data: "Motivo_Negado", title: "Motivo_Negado" },
+                                { data: "Sucursal", title: "Sucursal" },
+                                { data: "SKU", title: "SKU" },
+                                { data: "Descripcion", title: "Descripcion" },
+                                { data: "Piezas_rechazadas", title: "Piezas_rechazadas" },
+                                { data: "Incidencia", title: "Incidencia" }
+                            ],
+                            select: true,
+                            scrollCollapse: true,
+                            info: false,
+                            paging: true,
+                            responsive: true,
+                            searching: true
+                        });
+                        if (data.length == 0){
+                        swal("No se encontraron incidencias", '', "warning");
+                        }
+
+                    },
+                    error: function (response) {
+
+                        hideLoading();
+                        swal("Error al consultar", '', "error").then((value) => {
+                            //location.reload();
+                        });
+                    }
+                });
+
+
+        }
+
+        function getDTCuenta() {
+            showLoading();
+            $('#cbIncidencias').empty();
+            $.ajax({
+                type: "POST",
+                url: "/ValidaSugerido/GetDTCuenta",
+                dataType: "json",
+                success: function (data) {
+                    $("#contenedor_tb2").show();
+                    hideLoading();
+
+                    console.log(data)       
+
+                    hideLoading();
+
+                    $('#tbCuenta').DataTable({
+                        data: data.Result,
+                        "destroy": true,
+                        "processing": true,
+                        dom: 'Bfrtip',
+                        columns: [
+                            { data: "idSugerido", title: 'idSugerido' },                          
+                            { data: "idSucursal", title: "idSucursal" },
+                            { data: "id_proveedor", title: "id_proveedor" },
+                            { data: "CADENA", title: "CADENA" },
+                            { data: "RAZON_SOCIAL", title: "RAZON_SOCIAL" },
+                            { data: "Desc_tienda", title: "Desc_tienda" },
+                            { data: "Desc_proveedor", title: "Desc_proveedor" }
+                        ],
+                        select: true,
+                        scrollCollapse: true,
+                        info: false,
+                        paging: true,
+                        responsive: true,
+                        searching: true
+                    });
+                    if (data.length == 0) {
+                        swal("No se encontraron incidencias", '', "warning");
+                    }
+                },
+                error: function (response) {
+                    hideLoading();
+                    swal("¡Error inesperado " + response, '', "error");
+
+
+                }
+            });
+        }
+
+
+
+    </script>
+}

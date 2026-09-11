@@ -1,0 +1,1327 @@
+﻿
+@using PortalGRFP.Entities.Common
+
+@{
+    ViewBag.Title = "Articulos Permiso Compra-Venta";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Mantenimiento</a></li>
+    <li class="breadcrumb-item"><a>Articulos</a></li>
+    <li class="breadcrumb-item"><a>Permisos de Compra-Venta</a></li>
+}
+
+<style>
+    #card_compra {
+        border-bottom-color: red;
+        background-color: transparent;
+    }
+
+    #card_venta {
+        border-bottom-color: cornflowerblue;
+        background-color: transparent;
+    }
+</style>
+<div class="container">
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="nav-item"><a class="nav-link active" href="#permisoCompra" data-toggle="tab">Permiso de Compra</a></li>
+        <li class="nav-item"><a class="nav-link" href="#permisoVenta" data-toggle="tab">Permiso de Venta</a></li>
+        <li class="nav-item"><a class="nav-link" href="#cargaMasiva" data-toggle="tab">Carga Masiva</a></li>
+    </ul>
+    <div class="tab-content my-tab">
+        <div class="tab-pane active" id="permisoCompra">
+            <div class="card" id="card_compra" style="width:100%">
+                <div class="card-header">
+                    <h5>Permisos de Compra</h5>
+                    <div class="row">
+                        <div class="col-auto">
+                            <!--<label class="control-label col-md-12">SKU</label>-->
+                            <input type="Text" class="form-control" id="txtSkuCompra" name="txtSkuCompra" placeholder="Buscar SKU" required />
+                        </div>
+                        <div class="col-auto">
+                            <!--<label class="control-label col-md-12">Descripción</label>-->
+                            <input type="Text" class="form-control" id="txtDescripcionCompra" name="txtDescripcionCompra" placeholder="Buscar por descripción" />
+                        </div>
+                        <div class="col-auto">
+                            <select class="form-control" id="cbCadenasCompra" multiple required>
+                                @foreach (var item in TempData["CadenasListAPXS"] as List<ComboGenerico>)
+                                {
+                                    <option value="|@item.Valor|">@item.Valor</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <select class="form-control" id="cbTiendasCompra" min="1" multiple required>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button title="Buscar Articulo" class="btn btn-sm pd-x-15 btn-success btn-lg" id="btnBuscarCompra" onclick="sendDataSearchCompra()">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="col-auto">
+                            <button title="Guardar Cambios Compra" class="btn btn-sm pd-x-15 btn-danger btn-lg" id="btnGuardarCompra">
+                                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-auto">
+                            <select id="CatConceptocompra" name="CatConceptocompra" class="form-control col-md-10">
+                                <option value="0">Concepto</option>
+                                @foreach (var item in TempData["CatSub"] as List<CatSubEstatusModel>)
+                                {
+                                    <option value="@item.Id">@item.Nombre</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <table id="dtPermisoCompra" class="display compact cell-border" width="100%"></table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="tab-pane" id="permisoVenta">
+            <div class="card" id="card_venta" style="width:100%">
+                <div class="card-header">
+                    <h5>
+                        Permisos de Venta
+                    </h5>
+                    <div class="row">
+                        <div class="col-auto">
+                            <!--<label class="control-label col-md-12">SKU</label>-->
+                            <input type="Text" class="form-control" id="txtSkuVenta" name="txtSkuVenta" placeholder="Buscar SKU" required />
+                        </div>
+                        <div class="col-auto">
+                            <!--<label class="control-label col-md-12">Descripción</label>-->
+                            <input type="Text" class="form-control" id="txtDescripcionVenta" name="txtDescripcionVenta" placeholder="Buscar por descripción" />
+                        </div>
+                        <div class="col-auto">
+                            <select class="form-control" id="cbCadenasVenta" multiple required>
+                                @foreach (var item in TempData["CadenasListAPXS"] as List<ComboGenerico>)
+                                {
+                                    <option value="|@item.Valor|">@item.Valor</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <select class="form-control" id="cbTiendasVenta" min="1" multiple required>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button title="Buscar Articulo" class="btn btn-sm pd-x-15 btn-success btn-lg" id="btnBuscarVenta" onclick="sendDataSearchVenta()">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </button>
+                        </div>
+
+                        <div class="col-auto">
+                            <button title="Guardar Cambios Venta" class="btn btn-sm pd-x-15 btn-primary btn-lg" id="btnGuardarVenta">
+                                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-auto">
+                            <select id="CatConcepto" name="CatConcepto" class="form-control col-md-10">
+                                <option value="0">Concepto</option>
+                                @foreach (var item in TempData["CatSub"] as List<CatSubEstatusModel>)
+                                {
+                                    <option value="@item.Id">@item.Nombre</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table id="dtPermisoVenta" class="display compact cell-border" width="100%"></table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane" id="cargaMasiva">
+            <div class="card" style="width:100%">
+                <div class="card-header">
+                    <h5>
+                        Carga Masiva
+                    </h5>
+
+                </div>
+                <div class="card-body">
+                    <div class="card" style="width:100%">
+                        <div class="card-header">
+                            <div style="text-align: left">
+                                <button type="button" id="btnExcel" class="btn btn-sm pd-x-15 btn-primary mg-l-5" data-toggle="modal" data-target="#modalExcel" data-placement="top" title="Subir Archivo de Excel">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-cloud-upload" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z" />
+                                        <path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z" />
+                                    </svg> Carga Archivo
+                                </button>
+                            </div>
+
+                            <form id="frmSendData" style="margin-top:2%">
+                                <div class="row">
+                                    <div class="col-sm-6 pb-1">
+                                        <label for="groupBtn">Activo para Compra</label>
+                                        <div class="card" id="groupBtn">
+                                            <div class="card-body">
+                                                <div class="form-check">
+
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" id="cbActivaCompra" name="cbActivaCompra" class="custom-control-input">
+                                                        <label class="custom-control-label" for="cbActivaCompra">Sí, Activar compra</label>
+                                                    </div>
+
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" id="cbNoActivaCompra" name="cbActivaCompra" class="custom-control-input">
+                                                        <label class="custom-control-label" for="cbNoActivaCompra">No, Activar compra</label>
+                                                    </div>
+                                                    <select disabled id="Concepto" name="Concepto" class="form-control col-md-10">
+                                                        <option value="0">Seleccione</option>
+                                                        @foreach (var item in TempData["CatSub"] as List<CatSubEstatusModel>)
+                                                        {
+                                                            <option value="@item.Id">@item.Nombre</option>
+                                                        }
+                                                    </select>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 pb-1">
+                                        <label for="groupBtn">Activo para Venta</label>
+                                        <div class="card" id="groupBtn">
+                                            <div class="card-body">
+                                                <div class="form-check">
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" id="cbActivaVenta" name="cbActivaVenta" class="custom-control-input">
+                                                        <label class="custom-control-label" for="cbActivaVenta">Sí, Activar Venta</label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio">
+                                                        <input type="radio" id="cbNoActivaVenta" name="cbActivaVenta" class="custom-control-input">
+                                                        <label class="custom-control-label" for="cbNoActivaVenta">No, Activar Venta</label>
+                                                    </div>
+                                                    @*<select id="Concepto2" name="Concepto2" class="form-control col-md-10">
+                                                            <option value="0">Seleccione</option>
+                                                            @foreach (var item in TempData["CatSub"] as List<CatSubEstatusModel>)
+                                                                {
+                                                                    <option value="@item.Id">@item.Nombre</option>
+                                                                }
+                                                        </select>*@
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="text-align:right; margin-top:2%">
+                                    <button class="btn btn-sm pd-x-15 btn-success btn-lg" type="submit">
+                                        Iniciar Carga Masiva
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-body" id="cardDT" style="display: none">
+                            <h5>Rechazos</h5><br />
+                            <table id="dtLog" class="display compact cell-border" width="100%"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="modalExcel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <form id="frmExcel" enctype="multipart/form-data" method="post">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalExcel-label">Cargar Excel</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="custom-file">
+                                    <input onchange="setTextInputFile(event)" type="file" class="custom-file-input" id="fileExcel" name="fileExcel" multiple data-show-upload="false">
+                                    <label id="lblFileName" class="custom-file-label" for="customFile">Seleccionar archivo</label>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-primary" id="EnviarExcel">Cargar Archivo</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+</div>
+
+@section scripts{
+    <script>
+        /*Permisos de compra*/
+
+        var _descripcionCompra; var _skuCompra;
+
+        $(document).ready(function () {
+
+            $("#txtSkuCompra").focusout(function () {
+                setValueComponentsCompra();
+            });
+
+            $("#txtDescripcionCompra").focusout(function () {
+                setValueComponentsCompra();
+            });
+
+            function setValueComponentsCompra() {
+                console.log("entre")
+                $("#txtSkuCompra").val(_skuCompra);
+                $("#txtDescripcionCompra").val(_descripcionCompra);
+            }
+
+
+            $('#cbNoActivaCompra').change(function () {
+                if (this.checked) {
+
+                    $("#Concepto").multiselect('rebuild');
+                    $('#Concepto').prop("disabled", false);
+
+                }
+            });
+            $('#cbActivaCompra').change(function () {
+                if (this.checked) {
+
+                    $('#Concepto').val("0");
+                   $("#Concepto").multiselect("disable");
+                }
+            });
+
+            //$('#cbNoActivaVenta').change(function () {
+            //    if (this.checked) {
+
+            //        $("#Concepto2").multiselect('rebuild');
+            //        $('#Concepto2').prop("disabled", false);
+
+            //    }
+            //});
+            //$('#cbActivaVenta').change(function () {
+            //    if (this.checked) {
+
+            //        $('#Concepto2').val("0");
+            //        $("#Concepto2").multiselect("disable");
+            //    }
+            //});
+
+        });
+
+        $("#txtSkuCompra").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url:"@Url.Action("AutocommpleteSKUAPXS", "MantenimientoArticulo")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: request.term },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return { label: item.Valor };
+                            }))
+                        }
+                    })
+                },
+                select: function (event, ui) {
+
+                    _skuCompra = ui.item.value.split(',')[0];
+
+                     $.ajax({
+                        url: "@Url.Action("GetProductoBySku", "MantenimientoArticulo")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: ui.item.value.split(',')[0] },
+                        success: function (data) {
+
+                            $("#txtDescripcionCompra").val(data.Descripcion);
+                            _descripcionCompra = data.Descripcion;
+
+                        }
+                    });
+                }
+            });
+
+        $("#txtDescripcionCompra").autocomplete({
+                source: function (request, response) {
+                    minLength: 5,
+                    $.ajax({
+                        url: "@Url.Action("AutocommpleteDESCAPXS", "MantenimientoArticulo")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: request.term },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return { label: item.Valor };
+                            }))
+                        }
+                    })
+                },
+                select: function (event, ui) {
+                    _descripcionCompra = ui.item.value.split(',')[0];
+                    $.ajax({
+                        url: "@Url.Action("GetProductoByDesc", "MantenimientoArticulo")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: ui.item.value.split(',')[0] },
+                        success: function (data) {
+                            $("#txtSkuCompra").val(data.Sku);
+                            _skuCompra = data.Sku;
+
+                        }
+                    });
+
+                }
+            });
+
+        $('#cbCadenasCompra').multiselect({
+            nonSelectedText: 'Lista de Cadenas',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todas",
+            allSelectedText: "Todas Seleccionadas",
+            nSelectedText: "Cadenas"
+        });
+
+        $('#cbTiendasCompra').multiselect({
+            nonSelectedText: 'Lista de Sucursales',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todas",
+            allSelectedText: "Todas Seleccionados",
+            nSelectedText: "Sucursales"
+        });
+
+        $('#CatConceptocompra').multiselect({
+            nonSelectedText: 'Seleccione un grupo',
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todos",
+            allSelectedText: "Todos Seleccionados",
+            nSelectedText: "Grupos Seleccionados"
+        });
+
+      
+        $("#cbCadenasCompra").on("change", function () {
+
+            $('#cbTiendasCompra').empty();
+
+            if ($("#cbCadenasCompra").val() != '') {
+                showLoading();
+                $.ajax({
+                    url: "@Url.Action("GetSucursalesXCadenas", "MantenimientoArticulo")",
+                    type: "POST",
+                    dataType: "json",
+                    data: { cadenas: String($("#cbCadenasCompra").val()) },
+                    success: function (response) {
+                        hideLoading();
+                        var sucursales = "";
+
+                        console.log(response)
+
+                        if (response.data != null) {
+
+                            for (var i = 0; i < response.data.length; i++) {
+                                sucursales = sucursales + '<option value=' + response.data[i].Id + '>' + response.data[i].Valor + '</option>';
+                            }
+                        }
+
+                        $("#cbTiendasCompra").append(sucursales);
+
+                        $('#cbTiendasCompra').multiselect('rebuild');
+                    },
+                    error: function (response) {
+                        hideLoading();
+                    }
+                });
+
+            } else {
+                $("#cbTiendasCompra").append("");
+
+                $('#cbTiendasCompra').multiselect('rebuild');
+            }
+        });
+
+        /*Consulta Compra*/
+        var dtapi;
+        var fillInDT = 0;
+
+
+        function sendDataSearchCompra() {
+            GetArticulosCompra($("#txtSkuCompra").val())
+        }
+
+
+        function GetArticulosCompra(articulo) {
+            console.log($("#cbTiendasCompra").val())
+
+            if ($("#cbTiendasCompra").val().length == 0  || $("#txtSkuCompra").val() == '') {
+                swal('Mensaje', 'Seleccione todos los parametros de busqueda', "warning");
+                return;
+            }
+
+            showLoading();
+
+            $.ajax({
+                url: "@Url.Action("GetPermisosArticuloSucursal", "MantenimientoArticulo")",
+                type: "POST",
+                dataType: "json",
+                //data: { sku: String($("#txtSkuCompra").val()), sucursales: String($("#cbTiendasCompra").val()) },
+                data: { sku: articulo, sucursales: String($("#cbTiendasCompra").val()) },
+                success: function (data) {
+                    hideLoading();
+                    //console.log(data)
+                    if (data.Success) {
+
+                        dtapi = null;
+                        dtapi = $('#dtPermisoCompra').DataTable({
+                            data: data.Result,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            "drawCallback": function (settings) {
+                                // not important on first draw so not worried about dtapi being defined on table initialization
+                                if (dtapi) {
+                                    var visibleRows = $("td.cbcell").closest("tr");
+                                    visibleRows.each(function (i, item) {
+                                        $("td.cbcell input", item).prop("checked", dtapi.rows(item).data()[0].isChecked);
+                                    });
+                                }
+                            },
+                            columns: [
+                                {
+                                    "data": "isChecked",
+                                    // adding the class name just to make finding the checkbox cells eaiser
+                                    "class": "cbcell",
+                                    "orderable": false,
+                                    // Put the checkbox in the title bar
+                                    "title": "<input type='checkbox' />",
+                                    // puts the checkbox in each row
+                                    "render": function (data, type, row) {
+                                       // console.log(data)
+                                        //console.log(type)
+                                        //console.log(row.ActivoCompra)
+                                        if (row.ActivoCompra =='Activo')
+                                            return "<input checked type='checkbox'/>";
+                                        else
+                                            return "<input type='checkbox'/>";
+                                    }
+                                },
+                                { data: "Cadena", title: 'Cadena' },
+                                { data: "IdSucursal", title: 'Id Sucursal' },
+                                { data: "Sucursal", title: 'Sucursal' },
+                                { data: "SKU", title: 'SKU' },
+                                { data: "DESCRIPCION", title: 'Descripción' },
+                                { data: "ActivoCompra", title: 'Activo Compra' }
+                               // { data: "ActivoVenta", title: 'Activo Venta' }
+                            ],
+                            select: true,
+                            scrollCollapse: true,
+                            info: false,
+                            paging: true,
+                            responsive: true,
+                            searching: true
+                        });
+
+
+
+                        //validamos si viene por lo menos un inactivo desmarcamos el check del cabecero
+                        var dt = $('#dtPermisoCompra').DataTable().data();
+
+                        $("th input[type=checkbox]").prop("checked", true);
+
+                        var c = 0;
+                        for (var i = 0; i < dt.length; i++) {
+                            if (dt[i].ActivoCompra == 'Inactivo')
+                            {
+                                c++;
+                            }
+                        }
+                        if (c > 0) {
+                            $("th input[type=checkbox]").prop("checked", false);
+                        }
+                        //console.log("sali del for")
+
+                        //////////////////////
+
+
+
+
+                            $("th input[type=checkbox]").on("click", function () {
+                                var isChecked = this.checked;
+                                var ld = $('#dtPermisoCompra').DataTable().rows().data();
+                                $.each(ld, function (i, item) {
+                                    item.isChecked = isChecked;
+                                });
+                                $(".cbcell input").prop("checked", isChecked);
+                            });
+
+                        if (fillInDT == 0) {
+                            $("#dtPermisoCompra").on("click", "td input[type=checkbox]", function () {
+
+                                var isChecked = this.checked;
+
+
+
+                                var dtRow = dtapi.rows($(this).closest("tr"));
+
+                                dtRow.data()[0].isChecked = isChecked;
+
+                                if (!isChecked) {
+                                    //console.log('el false--->' + isChecked)
+
+                                    $("th input[type=checkbox]").prop("checked", false);
+                                }
+                                else {
+                                    //console.log('el true--->' + isChecked)
+
+                                    $("th input[type=checkbox]").prop("checked", true);
+                                    $.each(dtapi.data(), function (i, item) {
+                                        //if (!item.isChecked) {
+                                        if (item.isChecked == false) {
+
+                                            $("th input[type=checkbox]").prop("checked", false);
+                                            return false;
+                                        } else if (item.isChecked == undefined && item.ActivoCompra == 'Inactivo') {
+                                            $("th input[type=checkbox]").prop("checked", false);
+                                            return false;
+                                        }
+                                    });
+                                }
+
+                            });
+                        }
+                        fillInDT = fillInDT + 1;
+
+                    }
+                },
+                error: function (response) {
+                    hideLoading();
+                    swal("Error al consultar Articulos", 'Error al consultar los articulos en las sucursales', "error").then((value) => {
+                        location.reload();
+                    });
+                }
+            });
+        }
+
+        /*GUARDAR COMPRA*/
+
+        $("#btnGuardarCompra").click(function () {
+
+            swal({
+                title: 'Guardar Permisos de Compra',
+                text: "¿Seguro de Guardar los cambios realizados?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Guardar Cambios",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+
+                if (resp) {
+
+                var dt = $('#dtPermisoCompra').DataTable().data();
+                var count = 0;
+
+
+                var dataPermisos = new FormData();
+
+                    dataPermisos.append("SKU", dt[0].SKU);
+                    dataPermisos.append("Flag", 1);
+                    dataPermisos.append("Concepto", $("#CatConceptocompra").val());
+
+                for (var i = 0; i < dt.length; i++) {
+
+                    //console.log(dt[i])
+
+                    if (dt[i].isChecked == undefined) {
+
+                    } else {
+                        dataPermisos.append("Sucursales[" + count + "].IdSucursal", dt[i].IdSucursal);
+                        dataPermisos.append("Sucursales[" + count + "].Compra", dt[i].isChecked);
+
+                        if (dt[i].isChecked == false & $("#CatConceptocompra").val() == 0) {
+                            swal('Atención', 'Para Desactivar, Seleccione un Concepto de la lista', "warning");
+                            return;
+                        }
+
+                        count++;
+                    }
+                }
+
+                    if (count == 0) {
+                    swal('Mensaje', 'No se detectaron cambios para guardar', "warning");
+                        return;
+
+                    }
+                   
+
+                showLoading();
+                $.ajax({
+                    type: "POST",
+                    url: "/MantenimientoArticulo/PermisosPorSucursal",
+                    processData: false,
+                    contentType: false,
+                    data: dataPermisos,
+                    success: function (response) {
+                        hideLoading();
+                        if (response.Success) {
+
+                            swal(response.Message, 'Se guardaron los cambios correctamente', 'success').then((value) => {
+                                GetArticulosCompra(dt[0].SKU);
+                            });
+                        } else {
+                            swal(response.Message, '', 'error');
+                        }
+                    },
+                    error: function (e) {
+                        hideLoading();
+                        swal("¡Error inesperado en la carga!", '', "error");
+                    }
+                });
+
+            }
+            });
+
+        });
+
+        /*PERMISO DE VENTA*/
+
+
+        $('#cbCadenasVenta').multiselect({
+            nonSelectedText: 'Lista de Cadenas',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todas",
+            allSelectedText: "Todas Seleccionadas",
+            nSelectedText: "Cadenas"
+        });
+
+        $('#cbTiendasVenta').multiselect({
+            nonSelectedText: 'Lista de Sucursales',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todas",
+            allSelectedText: "Todas Seleccionados",
+            nSelectedText: "Sucursales"
+        });
+
+        $('#CatConcepto').multiselect({
+            nonSelectedText: 'Seleccione un grupo',
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todos",
+            allSelectedText: "Todos Seleccionados",
+            nSelectedText: "Grupos Seleccionados"
+        });
+
+
+         $("#cbCadenasVenta").on("change", function () {
+
+            $('#cbTiendasVenta').empty();
+
+            if ($("#cbCadenasVenta").val() != '') {
+                showLoading();
+                $.ajax({
+                    url: "@Url.Action("GetSucursalesXCadenas", "MantenimientoArticulo")",
+                    type: "POST",
+                    dataType: "json",
+                    data: { cadenas: String($("#cbCadenasVenta").val()) },
+                    success: function (response) {
+                        hideLoading();
+                        var sucursales = "";
+
+                        console.log(response)
+
+                        if (response.data != null) {
+
+                            for (var i = 0; i < response.data.length; i++) {
+                                sucursales = sucursales + '<option value=' + response.data[i].Id + '>' + response.data[i].Valor + '</option>';
+                            }
+                        }
+
+                        $("#cbTiendasVenta").append(sucursales);
+
+                        $('#cbTiendasVenta').multiselect('rebuild');
+                    },
+                    error: function (response) {
+                        hideLoading();
+                    }
+                });
+
+            } else {
+                $("#cbTiendasVenta").append("");
+
+                $('#cbTiendasVenta').multiselect('rebuild');
+            }
+        });
+
+
+        var _descripcionVenta; var _skuVenta;
+
+        $(document).ready(function () {
+
+            $("#txtSkuVenta").focusout(function () {
+                setValueComponentsCompra();
+            });
+
+            $("#txtDescripcionVenta").focusout(function () {
+                setValueComponentsCompra();
+            });
+
+            function setValueComponentsCompra() {
+              $("#txtSkuVenta").val(_skuVenta);
+              $("#txtDescripcionVenta").val(_descripcionVenta);
+            }
+        });
+
+        $("#txtSkuVenta").autocomplete({
+                source: function (request, response) {
+                    //minLength: 4,
+                    $.ajax({
+                        url:"@Url.Action("AutocommpleteSKUAPXS", "MantenimientoArticulo")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: request.term },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return { label: item.Valor };
+                            }))
+                        }
+                    })
+                },
+                select: function (event, ui) {
+
+                    _skuVenta = ui.item.value.split(',')[0];
+
+                     $.ajax({
+                        url: "@Url.Action("GetProductoBySku", "MantenimientoArticulo")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: ui.item.value.split(',')[0] },
+                        success: function (data) {
+
+                            $("#txtDescripcionVenta").val(data.Descripcion);
+                            _descripcionVenta = data.Descripcion;
+
+                        }
+                    });
+                }
+            });
+
+        $("#txtDescripcionVenta").autocomplete({
+                source: function (request, response) {
+                    minLength: 5,
+                    $.ajax({
+                        url: "@Url.Action("AutocommpleteDESCAPXS", "MantenimientoArticulo")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: request.term },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return { label: item.Valor };
+                            }))
+                        }
+                    })
+                },
+                select: function (event, ui) {
+                    _descripcionVenta = ui.item.value.split(',')[0];
+                    $.ajax({
+                        url: "@Url.Action("GetProductoByDesc", "MantenimientoArticulo")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: ui.item.value.split(',')[0] },
+                        success: function (data) {
+                            $("#txtSkuVenta").val(data.Sku);
+                            _skuVenta = data.Sku;
+                        }
+                    });
+
+                }
+        });
+
+
+         /*Consulta Venta*/
+        var dtapiV;
+        var fillInDTVT = 0;
+
+
+        function sendDataSearchVenta() {
+            GetArticulosVenta($("#txtSkuVenta").val())
+        }
+
+
+        function GetArticulosVenta(articulo) {
+            console.log($("#cbTiendasVenta").val())
+
+            if ($("#cbTiendasVenta").val().length = 0 || $("#txtSkuVenta").val() == '') {
+                swal('Mensaje', 'Seleccione todos los parametros de busqueda', "warning");
+                return;
+            }
+
+            showLoading();
+
+            $.ajax({
+                url: "@Url.Action("GetPermisosArticuloSucursal", "MantenimientoArticulo")",
+                type: "POST",
+                dataType: "json",
+
+                data: { sku: articulo, sucursales: String($("#cbTiendasVenta").val()) },
+                success: function (data) {
+                    hideLoading();
+
+                    if (data.Success) {
+
+                        dtapiV = null;
+                        dtapiV = $('#dtPermisoVenta').DataTable({
+                            data: data.Result,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            "drawCallback": function (settings) {
+                                if (dtapiV) {
+                                    var visibleRows = $("td.cbcell").closest("tr");
+                                    visibleRows.each(function (i, item) {
+                                        $("td.cbcell input", item).prop("checked", dtapiV.rows(item).data()[0].isChecked);
+                                    });
+                                }
+                            },
+                            columns: [
+                                {
+                                    "data": "isChecked",
+                                    "class": "cbcell",
+                                    "orderable": false,
+                                    "title": "<input type='checkbox' />",
+                                    "render": function (data, type, row) {
+                                        if (row.ActivoVenta =='Activo')
+                                            return "<input checked type='checkbox'/>";
+                                        else
+                                            return "<input type='checkbox'/>";
+                                    }
+                                },
+                                { data: "Cadena", title: 'Cadena' },
+                                { data: "IdSucursal", title: 'Id Sucursal' },
+                                { data: "Sucursal", title: 'Sucursal' },
+                                { data: "SKU", title: 'SKU' },
+                                { data: "DESCRIPCION", title: 'Descripción' },
+                                { data: "ActivoVenta", title: 'Activo Venta' },
+                                { data: "ActivoCompra", title: 'Activo Compra' }
+
+                            ],
+                            select: true,
+                            scrollCollapse: true,
+                            info: false,
+                            paging: true,
+                            responsive: true,
+                            searching: true
+                        });
+
+                        //validamos si viene por lo menos un inactivo desmarcamos el check del cabecero
+                        var dt = $('#dtPermisoVenta').DataTable().data();
+
+                        $("th input[type=checkbox]").prop("checked", true);
+
+                        var c = 0;
+                        for (var i = 0; i < dt.length; i++) {
+                            if (dt[i].ActivoVenta == 'Inactivo')
+                            {
+                                c++;
+                            }
+                        }
+                        if (c > 0) {
+                            $("th input[type=checkbox]").prop("checked", false);
+                        }
+
+                            $("th input[type=checkbox]").on("click", function () {
+                                var isChecked = this.checked;
+                                var ld = $('#dtPermisoVenta').DataTable().rows().data();
+                                $.each(ld, function (i, item) {
+                                    item.isChecked = isChecked;
+                                });
+                                $(".cbcell input").prop("checked", isChecked);
+                            });
+
+                        if (fillInDTVT == 0) {
+                            $("#dtPermisoVenta").on("click", "td input[type=checkbox]", function () {
+
+                                var isChecked = this.checked;
+
+                                var dtRow = dtapiV.rows($(this).closest("tr"));
+
+                                dtRow.data()[0].isChecked = isChecked;
+
+                                if (!isChecked) {
+
+
+                                    $("th input[type=checkbox]").prop("checked", false);
+                                }
+                                else {
+
+                                    $("th input[type=checkbox]").prop("checked", true);
+                                    $.each(dtapiV.data(), function (i, item) {
+
+                                        if (item.isChecked == false) {
+
+                                            $("th input[type=checkbox]").prop("checked", false);
+                                            return false;
+                                        } else if (item.isChecked == undefined && item.ActivoVenta == 'Inactivo') {
+                                            $("th input[type=checkbox]").prop("checked", false);
+                                            return false;
+                                        }
+                                    });
+                                }
+
+                            });
+                        }
+                        fillInDTVT = fillInDTVT + 1;
+
+                    }
+                },
+                error: function (response) {
+                    hideLoading();
+                    swal("Error al consultar Articulos", 'Error al consultar los articulos en las sucursales', "error").then((value) => {
+                        location.reload();
+                    });
+                }
+            });
+        }
+
+
+
+        $("#btnGuardarVenta").click(function () {
+
+            console.log($("#CatConcepto").val())
+
+            var b = 0;
+            var mensaje = '';
+            var dt = $('#dtPermisoVenta').DataTable().data();
+            for (var i = 0; i < dt.length; i++) {
+                if (dt[i].isChecked == false) {
+                    b++;
+                }
+            }
+            mensaje = b > 0 ? 'Sí desactiva un permiso de venta también se desactivará el permiso de compra. \n\n ¿Seguro de guardar los cambios realizados?' : '¿Seguro de guardar los cambios realizados?';
+
+            swal({
+                title: 'Guardar Permisos de Venta',
+                text: mensaje,
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Guardar Cambios",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+
+                if (resp) {
+
+                    var count = 0;
+                    var dataPermisos = new FormData();
+
+                    dataPermisos.append("SKU", dt[0].SKU);
+                    dataPermisos.append("Flag", 2);
+                    dataPermisos.append("Concepto", $("#CatConcepto").val());
+
+                    console.log(dataPermisos.data)
+
+                    for (var i = 0; i < dt.length; i++) {
+
+                        if (dt[i].isChecked == undefined) {
+
+                        } else {
+
+                            dataPermisos.append("Sucursales[" + count + "].IdSucursal", dt[i].IdSucursal);
+                            dataPermisos.append("Sucursales[" + count + "].Venta", dt[i].isChecked);
+
+                            if (dt[i].isChecked == false & $("#CatConcepto").val() == 0) {
+                                swal('Atención', 'Para Desactivar, Seleccione un Concepto de la lista', "warning");
+                                return;
+                            }
+
+                            count++;
+                        }
+                    }
+
+                    if (count == 0) {
+                        swal('Mensaje', 'No se detectaron cambios para guardar', "warning");
+                        return;
+                    }
+
+                    showLoading();
+                    $.ajax({
+                        type: "POST",
+                        url: "/MantenimientoArticulo/PermisosPorSucursal",
+                        processData: false,
+                        contentType: false,
+                        data: dataPermisos,
+                        success: function (response) {
+                            hideLoading();
+                            if (response.Success) {
+
+                                swal(response.Message, 'Se guardaron los cambios correctamente', 'success').then((value) => {
+                                    GetArticulosVenta(dt[0].SKU);
+                                });
+                            } else {
+                                swal(response.Message, '', 'error');
+                            }
+                        },
+                        error: function (e) {
+                            hideLoading();
+                            swal("¡Error inesperado en la carga!", '', "error");
+                        }
+                    });
+                }
+            });
+
+        });
+
+        /*Carga Masiva*/
+
+        $('#Concepto').multiselect({
+            nonSelectedText: 'Seleccione un grupo',
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todos",
+            allSelectedText: "Todos Seleccionados",
+            nSelectedText: "Grupos Seleccionados"
+        });
+
+        //$('#Concepto2').multiselect({
+        //    nonSelectedText: 'Seleccione un grupo',
+        //    maxHeight: 400,
+        //    buttonWidth: '150px',
+        //    buttonTextAlignment: 'left',
+        //    selectAllText: "Marcar Todos",
+        //    allSelectedText: "Todos Seleccionados",
+        //    nSelectedText: "Grupos Seleccionados"
+        //});
+
+
+            $("#EnviarExcel").click(function () {
+
+                var formulario = document.getElementById('frmExcel');
+                var archivo = $("#fileExcel").val();
+
+                console.log(archivo)
+
+                if (archivo != "") {
+                    showLoading();
+                    var formData = new FormData(formulario);
+                    $.ajax({
+                        type: "POST",
+                        url: "/MantenimientoArticulo/CargarExcel",
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success: function (response) {
+                            hideLoading();
+                            if (response.Success) {
+                                $("#modalExcel").modal('hide');
+                                swal('Carga de Archivo', 'Se Cargó el archivo de forma exitosa', "success").then((value) => {
+
+                                    //window.location.href = "/ConciliacionRappi/Index";
+                                });
+                            } else {
+                                swal(response.Message, '', "error");
+                            }
+                        },
+                        error: function (e) {
+                            hideLoading();
+                            swal("¡Error inesperado en la carga de archivo!", '', "error");
+                        }
+
+                    })
+                } else {
+                    swal("¡No se ha seleccionado un archivo!", '', "error");
+                }
+            });
+
+        function setTextInputFile(e) {
+            $('#lblFileName').text((e.target.files.length > 0) ? e.target.files[0].name : 'Seleccionar archivo');
+        }
+
+
+        $("#frmSendData").submit(function (e) {
+            e.preventDefault();
+
+
+            if ($("#cbActivaCompra:checked").val() == undefined && $("#cbNoActivaCompra:checked").val() == undefined) {
+                swal("","Seleccione una opcion para compra","error");
+                return;
+            }
+
+            if ($("#cbActivaVenta:checked").val() == undefined && $("#cbNoActivaVenta:checked").val() == undefined) {
+                swal("","Seleccione una opcion para venta","error");
+                return;
+            }
+            var activocompra = $("#cbActivaCompra").val();
+
+            if ($("#cbActivaCompra:checked").val() == "on" && $("#cbNoActivaVenta:checked").val() == "on") {
+                swal("Error","No se pueden desactivar permisos de venta si los permisos de compra están activos", "error");
+                return;
+            }
+
+            console.log($("#fileExcel").val())
+
+            if ($("#fileExcel").val() == '') {
+                swal("","Seleccione Archivo","error");
+                return;
+            }
+
+            if (confirm("Vas guardar información, ¿Seguro de continuar?")) {
+
+                var formData = new FormData();
+
+                if ($("#cbActivaCompra:checked").val() == 'on') {
+                    formData.append("Compra", true);
+                    formData.append("Conceptocompra", 0);
+                   /* formData.append("Conceptoventa", 0);*/
+                } else {
+                    formData.append("Compra", false);
+                    formData.append("Conceptocompra", $("#Concepto").val());
+                    /*  formData.append("Conceptoventa", 0);*/
+
+                }
+
+                if ($("#cbActivaVenta:checked").val() == 'on') {
+                    formData.append("Venta", true);
+                    formData.append("Conceptocompra", 0);
+/*                    formData.append("Conceptoventa", 0);*/
+                } else {
+                    formData.append("Venta", false);
+                   /* formData.append("Conceptoventa", $("#Concepto2").val());*/
+                    formData.append("Conceptocompra", 0);
+                }
+
+                if ($("#cbActivaCompra:checked").val() != 'on' & $("#Concepto").val() == 0) {
+                    swal('Atención', 'Para Desactivar Compra, Seleccione un Concepto de la lista', "warning");
+                    return;
+                }
+
+                showLoading();
+                $.ajax({
+                    type: "POST",
+                    url: "/MantenimientoArticulo/GuardarPermisoCompra",
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function (response) {
+                        hideLoading();
+                        if (response.Success) {
+
+                            swal(response.Message, '', "success").then((value) => {
+
+                                $('input[name="cbActivaCompra"]').prop('checked', false);
+                                $('input[name="cbActivaVenta"]').prop('checked', false);
+                                $("#fileExcel").val("");
+                                $("#frmSendData").hide();
+                                $('#lblFileName').text("");
+                                getLogErrorpermisoCompra();
+
+
+                            });
+                        } else {
+                            swal('', response.Message, "error");
+                        }
+                    },
+                    error: function (e) {
+                        hideLoading();
+                        swal("","¡Error inesperado en la carga!","error");
+                    }
+
+                })
+
+            }
+
+
+        });
+
+         function getLogErrorpermisoCompra() {
+                'use strict'
+
+
+            $('#dtLog').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("ConsultarLogError", "MantenimientoArticulo")",
+                    "dataSrc": "",
+                },//response.Result,
+                "destroy": true,
+                "processing": true,
+                dom: 'Bfrtip',
+                columns: [
+                    { data: "IdSucursal", title: 'Id Sucursal' },
+                    { data: "SKU", title: "SKU" },
+                    { data: "oEx", title: "Motivo de rechazo" }],
+                select: true,
+                scrollCollapse: true,
+                info: false,
+                paging: true,
+                responsive: true,
+                searching: true
+
+            });
+
+             $('#cardDT').show();
+
+            }
+
+
+        //});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+}
+

@@ -1,0 +1,218 @@
+﻿@model PortalGRFP.Entities.Common.MantenimientoSucursal
+@using PortalGRFP.Entities.Common
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Mantenimiento</a></li>
+    <li class="breadcrumb-item"><a>Sucursal</a></li>
+}
+<div class="row">
+    <div class="btn-group float-right" role="group" aria-label="Basic example">
+        <a href="@Url.Action("MantenimientoSuc","MantenimientoSucursal")" class="btn btn-secondary">Sucursal</a>
+        <a href="@Url.Action("SucursalProveedor","MantenimientoSucursal")" class="btn btn-secondary">Sucursal por Proveedor</a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("GuardarManttoSuc", "MantenimientoSucursal", FormMethod.Post, new { role = "form", id = "frmMantSuc" }))
+        {
+        <div class="form-inline">
+            <div class="form-group">
+                @Html.LabelFor(model => model.IdSucursal, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-4">
+                    <select id="IdSucursal" name="IdSucursal" class="form-control">
+                        <option value="0">Seleccione</option>
+                        @foreach (var item in TempData["Sucursales"] as List<ComboGenerico>)
+                        {
+                            <option value="@item.Id">@item.Valor</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Grupo, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-2">
+                    <select id="Grupo" name="Grupo" class="form-control">
+                        <option value="0">Seleccione</option>
+                        @foreach (var item in TempData["Grupos"] as List<ComboGenerico>)
+                        {
+                            <option value="@item.Id">@item.Valor</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Invenadro, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="checkbox">
+                        <input class="check-box" id="Invenadro" name="Invenadro" type="checkbox" value="true">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PVD, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="checkbox">
+                        <input class="check-box" id="PVD" name="PVD" type="checkbox" value="true">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Negados, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <div class="checkbox">
+                        <input class="check-box" id="Negados" name="Negados" type="checkbox" value="true">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Guardar" class="btn btn-primary" />
+                </div>
+            </div>
+        </div>
+        }
+
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            'use strict';
+
+            $('#IdSucursal').multiselect({
+                nonSelectedText: 'Seleccione un grupo',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                enableClickableOptGroups: true,
+                enableCollapsibleOptGroups: true,
+                maxHeight: 400,
+                buttonWidth: '250px',
+                enableCaseInsensitiveFiltering: true,
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Grupos Seleccionados"
+            });
+
+            $('#Invenadro').on("click", function () {
+                if ($(this).is(":checked")) {
+                    $('#PVD').prop("checked", false);
+                } else {
+                    $('#PVD').prop("checked", true);
+                    $('#Invenadro').prop("checked", false);
+                }
+            });
+
+
+            $('#PVD').on("click", function () {
+                if ($(this).is(":checked")) {
+                    $('#Invenadro').prop("checked", false);
+                } else {
+                    $('#PVD').prop("checked", false);
+                    $('#Invenadro').prop("checked", true);
+                }
+            });
+
+            $("#frmMantSuc").on("submit", function (event) {
+                event.preventDefault();
+                if ($("#IdSucursal").val() != "0") {
+                    if ($("#Grupo").val() != "0") {
+                        var formulario = $("#frmMantSuc").serializeArray()
+                            .filter(function (elem) {
+                                return $.trim(elem.value);
+                            });
+
+                        showLoading();
+                        $.ajax({
+                            type: $("#frmMantSuc").attr('method'),
+                            url: $("#frmMantSuc").attr('action'),
+                            data: formulario,
+                            success: function (response) {
+                                hideLoading();
+                                if (response.Success) {
+                                    swal(response.Message, '', "success").then((value) => {
+                                        //ConsultarMovimiento($("#IdSucursal").val());
+                                        $("#frmMantSuc").trigger("reset");
+                                    });
+                                } else {
+                                    swal(response.Message, '', "error").then((value) => {
+                                        ConsultarMovimiento($("#IdSucursal").val());
+                                    });
+                                }
+                            },
+                            error: function (response) {
+                                hideLoading();
+                                swal("Ocurrio un error de comunicación", '', "warning");
+                            }
+                        });
+
+                    } else {
+                        swal("Seleccione un grupo para la sucursal", '', "warning");
+                    }
+                } else {
+                    swal("Seleccione una sucursal", '', "warning");
+                }
+            });
+
+            function ConsultarMovimiento(idSucursal) {
+                showLoading();
+                $("#Grupo").val(0);
+                $("#Negados").prop("checked", false);
+                $("#Invenadro").prop("checked", false);
+                var formulario = $("#frmMantSuc").serializeArray()
+                    .filter(function (elem) {
+                        return $.trim(elem.value);
+                    });
+                $.ajax({
+                    type: "post",
+                    url: "@Url.Action("ConsultarManttoSuc", "MantenimientoSucursal")",
+                    data: formulario,
+                    success: function (response) {
+                        hideLoading();
+                        if (response.Success) {
+                            console.log(response)
+                                $("#IdSucursal").val(response.Result[0].IdSucursal);
+                                $("#Grupo").val(response.Result[0].Grupo);
+                                if (response.Result[0].Invenadro) {
+                                    $("#Invenadro").prop("checked", true);
+                                }                          
+                                if (response.Result[0].Negados) {
+                                    $("#Negados").prop("checked", true);
+                                }
+                                if (response.Result[0].PVD) {
+                                  $("#PVD").prop("checked", true);
+                                }
+
+                        } else {
+                            $("#Grupo").val(0);
+                            $("#Negados").prop("checked", false);
+                            $("#Invenadro").prop("checked", false);
+                            $("#PVD").prop("checked", false);
+                            swal('No tiene grupo asignado', '', "warning");
+                        }
+                    },
+                    error: function (response) {
+                        swal("Ocurrio un error de comunicación", '', "error");
+                    }
+                });
+
+            }
+
+            $("#IdSucursal").change(function () {
+                if ($("#IdSucursal").val() == "0") {
+                    swal("Seleccione una sucursal", '', "warning");
+                } else {
+                    ConsultarMovimiento($("#IdSucursal").val());
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,119 @@
+﻿
+@{
+    ViewBag.Title = "Reporte de Articulos";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Reporte</a></li>
+    <li class="breadcrumb-item"><a>Articulos</a></li>
+}
+
+<div class="card" style="width:100%">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-auto">
+                <label for="txtSearch" class="form-label">Buscar SKU-Descripción:</label>
+                <input type="text" class="form-control" id="txtSearch" placeholder="SKU-Descripción" />
+            </div>
+            <div class="col-auto" style="margin-top:2.3%">
+                <button type="submit" class="btn btn-sm pd-x-15 btn-primary btn-lg" id="btnBuscar" onclick="getArticulosList()">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <div class="card-body">
+
+    </div>
+
+</div> <table id="DTArticulos" class="display compact cell-border" width="100%"></table>
+
+@section scripts{
+
+    <script>
+
+            function getArticulosList() {
+
+                if ($("#txtSearch").val() == '') {
+                    return;
+                }
+                showLoading();
+
+                $.ajax({
+                    url: "@Url.Action("ConsultarProductos", "Consultaproductos")",
+                    type: "POST",
+                    dataType: "json",
+                    data: { search: String($("#txtSearch").val()) },
+                    success: function (data) {
+                        //console.log(data)
+                        hideLoading();
+
+                        $('#DTArticulos').DataTable({
+                            data: data,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "SKU", title: 'SKU' },
+                                { data: "Descripcion", title: 'Descripción' },
+                                { data: "GRUPO", title: 'Grupo' },
+                                { data: "Familia", title: 'Familia' },
+                                { data: "FORMA_SURTIR_FR", title: 'Forma Surtir FR' },
+                                { data: "FORMA_SURTIR_LD", title: 'Forma Surtir LD' },
+                                { data: "FORMA_SURTIR_SSAE", title: 'Forma Surtir SSAE' },
+                                { data: "ESTATUS_PRODUCTO", title: 'Estatus' },
+                                { data: "Empaque", title: 'Empaque' },
+                                { data: "Controlado", title: 'Controlado' },
+                                { data: "Refrigerado", title: 'Refrigerado' },
+                                { data: "AltaEspecialidad", title: 'Alta Especialidad' },
+                                { data: "DERECHO_DEVOLUCION_CADUCIDAD", title: 'Dev. Caducidad' },
+                                { data: "DERECHO_DEVOLUCION_PROVEEDOR", title: 'Dev. Proveedor' },
+                                { data: "DERECHO_DEVOLUCION_VENTA", title: 'Dev. Venta' },
+                                { data: "Invenadro", title: 'Invenadro' }
+                            ],
+                            select: true,
+                            scrollCollapse: true,
+                            info: false,
+                            paging: true,
+                            responsive: true,
+                            searching: true
+                        });
+
+
+
+
+
+                    },
+                    error: function (response) {
+                        hideLoading();
+                    }
+                });
+            }
+
+    </script>
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

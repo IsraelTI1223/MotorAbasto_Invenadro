@@ -1,0 +1,499 @@
+﻿@{
+    ViewBag.Title = "Validar Monto del Sugerido";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Sugerido de Compra</a></li>
+    <li class="breadcrumb-item"><a>Validar los Montos del Sugerido</a></li>
+}
+
+<div class="card" style="width:100%">
+    <div class="card-header">
+        <div style="text-align: left"><span>ID Sugerido: </span><span id="IdSugerido" style="color: #808080">@ViewBag.IdSugerido</span></div>
+        <div style="text-align:right">
+            <button style="display: none" class="btn btn-sm pd-x-15 btn-warning btn-lg" id="btnAplicar" onclick="AplicarSugerido()" title="Aplicar Sugerido">
+                Aplicar Sugerido <i class="fa fa-arrow-circle-right" aria-hidden="true"></i>
+            </button>
+            <button class="btn btn-sm pd-x-15 btn-success btn-lg" id="btnValidar" onclick="validarPermisos()" title="Validar Montos">
+                Autorizar Montos <i class="fa fa-check" aria-hidden="true"></i>
+            </button>
+            <br /><span id="spanTxt" style="color: red;display: none">Sin Cambios para guardar</span>
+        </div>
+        @*<div id="spanTxt" class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Sin Cambios para guardar</strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>*@
+    </div>
+    <div class="card-body">
+        <table id="tbSugerido" class="display compact cell-border" width="100%"></table>
+    </div>
+
+    <div class="card-footer">
+
+        <div class="row">
+            <div class="col-auto">
+                <div style="text-align: left">
+                    <button class="btn btn-sm pd-x-15 btn-primary" id="btnListaSugerido" onclick="goListaSugerido()" title="Ir a lista de sugerido">
+                        Atras
+                    </button>
+                    <button class="btn btn-sm pd-x-15 btn-primary" id="btnOrdComp" onclick="goOrdenesCompra()" title="Ir a Ordenes de Compra">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div style="text-align: right">
+                    <button class="btn btn-sm pd-x-15 btn-info btn-lg" id="btnSugerido" onclick="goDetalleSugerido()" title="Ver Sugerido">
+                        Consultar Sugerido
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+    </div>
+</div>
+
+@section scripts{
+    <script>
+
+        var dtapi;
+        var fillInDT = 0;
+        $(document).ready(function () {
+
+               'use strict';
+            dtapi = null;
+            dtapi = $('#tbSugerido').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("GetListMontosValidar", "Sugerido" )",
+                    "dataSrc": "",
+                    "data": { idsugerido: @ViewBag.IdSugerido}
+                },//response.Result,
+                "destroy": true,
+                "processing": true,
+                dom: 'Bfrtip',
+                "drawCallback": function (settings) {
+                    // not important on first draw so not worried about dtapi being defined on table initialization
+                    if (dtapi) {
+                        var visibleRows = $("td.cbcell").closest("tr");
+                        visibleRows.each(function (i, item) {
+                            $("td.cbcell input", item).prop("checked", dtapi.rows(item).data()[0].isChecked);
+                        });
+                    }
+
+
+                },
+                columns: [
+                    //{ data: "Id", title: 'Id', visible:false },
+                    { data: "IdSugerido", title: "ID Sugerido" },
+                    { data: "IdSucursal", title: "ID Sucursal" },
+                    { data: "Sucursal", title: "Sucursal" },
+                    {
+                        data: "MontoPromedio", title: "Monto Promedio", 'render': function (monto) { return '$ ' + monto; }
+                    },
+                    {
+                        data: "MontoPedido", title: "Monto Pedido", 'render': function (monto) { return '$ ' + monto; }
+                        /*render: $.fn.dataTable.render.number(',', '.', 2, '$ ') */ },
+                    {
+                        data: "MontoFueraLimite", title: "M. Fuera de Limite", 'render': function (monto) { return '$ ' + monto; } },
+                    { data: "PorcentajeVariacion",title:"% Variación Fuera de Limite" },
+                    { data: "PiezasXFarmacia", title: "Total Piezas Farmacia" },
+                    //{
+                    //    data: "Autorizado", title: "Autorizar", render: function (data, type, row) {
+                    //       // console.log(row)
+                    //        if (type === 'display') {
+                    //            return '<input type="checkbox" onclick="ColumnCheck(this)" ' + ((data == true) ? 'checked' : '') + ' id="input' + row.id + '" class="filter-ck" />';
+                    //        }
+                    //        return data;
+                    //    }
+                    //}
+                    {
+                        "data": "isChecked",
+                        "class": "cbcell",
+                        "orderable": false,
+                        "title": "<input type='checkbox' />",
+                        "render": function (data, type, row) {
+                            
+                            if (row.Autorizado == true)
+                                return "<input checked type='checkbox'/>";
+                            else
+                                return "<input type='checkbox'/>";
+                        }
+                    }
+                ],
+                select: true,
+                scrollCollapse: true,
+                info: false,
+                paging: true,
+                responsive: true,
+                searching: true
+            });
+            //
+
+            //////
+            //$("#tbSugerido tbody").on('click', 'tr', function () {
+
+            //    var rowData = $(this).children("td").map(function () {
+            //        return $(this).text();
+            //    }).get();
+
+            //    //console.log(rowData[0] + ", " +
+            //    //    rowData[1] + ", " +
+            //    //    rowData[2] + ", " +
+            //    //    rowData[3] + ", " +
+            //    //    rowData[4] + ", " +
+            //    //    rowData[5] + ", " +
+            //    //    $(this).prop('checked'));
+            //});
+
+            $("th input[type=checkbox]").on("click", function () {
+                var isChecked = this.checked;
+
+                var ld = $('#tbSugerido').DataTable().rows().data();
+                $.each(ld, function (i, item) {
+                    item.isChecked = isChecked;
+                });
+
+                $(".cbcell input").prop("checked", isChecked);
+                // dtapi.data().sum();
+            });
+
+
+            $("#tbSugerido").on("click", "td input[type=checkbox]", function () {
+                var isChecked = this.checked;
+                // set the data item associated with the row to match the checkbox
+                var dtRow = dtapi.rows($(this).closest("tr"));
+                dtRow.data()[0].isChecked = isChecked;
+    
+
+                // determine if the over all checkbox should be checked or unchecked
+                if (!isChecked) {
+                  
+                    $("th input[type=checkbox]").prop("checked", false);
+                }
+                else {
+
+                    $("th input[type=checkbox]").prop("checked", true);
+                    $.each(dtapi.data(), function (i, item) {
+                        if (!item.isChecked) {
+                            $("th input[type=checkbox]").prop("checked", false);
+                            return false;
+                        }
+                    });
+                }
+            });
+
+
+
+        });
+
+
+
+       /* var _dataExchangeColumnList;
+
+        function ColumnCheck(thisObj) {
+           // debugger;
+
+            var dataExchangeCheckColumnVM = $('#tbSugerido').DataTable().row($(thisObj).parents('tr')).data();
+
+            //console.log(dataExchangeCheckColumnVM)
+
+            //universo de rows en el table
+            var dataExchangeCheckColumnList = $('#tbSugerido').DataTable().rows().data();
+
+
+
+            for (var i = 0; i < dataExchangeCheckColumnList.length; i++) {
+
+                if (dataExchangeCheckColumnList[i].FieldCaption !== null) {
+                    if (dataExchangeCheckColumnList[i].FieldCaption === dataExchangeCheckColumnVM.FieldCaption) {
+                        dataExchangeCheckColumnList[i].ColumnCheck = thisObj.checked;
+                    }
+                }
+            }
+            _dataExchangeColumnList = dataExchangeCheckColumnList;
+
+            console.log(dataExchangeCheckColumnList)
+            //console.log(_dataExchangeColumnList["1"])
+            //console.log(_dataExchangeColumnList["2"])
+
+        }*/
+
+
+        var _rowsData;
+
+        function ColumnCheck(thisObj) {
+            //debugger;
+            var dataExchangeCheckColumnVM = $('#tbSugerido').DataTable().row($(thisObj).parents('tr')).data();
+            var dataExchangeCheckColumnList = $('#tbSugerido').DataTable().rows().data();
+            for (var i = 0; i < dataExchangeCheckColumnList.length; i++) {
+                if (dataExchangeCheckColumnList[i].FieldCaption !== null) {
+                    //console.log(dataExchangeCheckColumnList[i].Id)
+                    //console.log(dataExchangeCheckColumnVM.Id)
+
+                    //if (dataExchangeCheckColumnList[i].FieldCaption === dataExchangeCheckColumnVM) {
+                    if (dataExchangeCheckColumnList[i].IdSucursal === dataExchangeCheckColumnVM.IdSucursal) {
+
+
+                        dataExchangeCheckColumnList[i].ColumnCheck = thisObj.checked;
+                    }
+                }
+            }
+            _rowsData = dataExchangeCheckColumnList;
+
+            console.log(_rowsData)
+        }
+
+
+            function validarPermisos() {
+
+                //if (_rowsData == undefined) {
+                //    $("#spanTxt").show();
+                //    return;
+                //}
+                $("#spanTxt").hide();
+
+
+                swal("Validación de Montos", {
+                    text: "Ingrese Usuario para autorizar Montos (email corporativo)",
+                    icon: "warning",
+                    content: "input"
+                }).then((value) => {
+
+                    if (value == null) {
+                        return;
+                    }
+
+                    if (value.length > 3) {
+
+                        $.ajax({
+                            url: "@Url.Action("ValidarPermiso", "Sugerido")",
+                            type: "POST",
+                            dataType: "json",
+                            data: { cuenta: value },
+                            success: function (response) {
+                                hideLoading();
+
+                                if (response.Success) {
+
+                                    swal(response.Message, '', "success").then((value) => {
+                                        autorizarMontos();
+                                    });
+                                } else {
+                                    swal(response.Message, '', "error");
+                                }
+                            },
+                            error: function (response) {
+                                hideLoading();
+                                swal("Error al consultar permisos de validación", '', "error");
+                            }
+                        });
+
+                    } else {
+                        swal("Ingrese una cuenta valida", '', "error");
+                    }
+                    });
+
+            }
+
+        function autorizarMontos() {
+
+            //if (_rowsData == undefined) {
+            //    $("#spanTxt").show();
+            //    return;
+            //}
+            $("#spanTxt").hide();
+
+
+
+            swal({
+                title: 'Validación de montos',
+                text: "¿Validar todo lo Marcado?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Continuar",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+
+                $("#spanTxt").hide();
+
+                if (resp) {
+
+
+                    //preguntar si realmente vas a guardar
+                    //validar usuario y contraseña para autorizar
+
+                    //var formData = new FormData();
+
+                    //for (var i = 0; i < _rowsData.length; i++) {
+                    //    //definir un objeto e irlo llenando dentro de las condiciones
+
+                    //    console.log(_rowsData[i])
+
+                    //    if (_rowsData[i].ColumnCheck === undefined) {
+                    //        //console.log("nada para guardar")
+                    //        console.log(_rowsData[i].IdSugerido + "," + _rowsData[i].Autorizado);
+                    //        formData.append("model[" + i + "].IdSugerido", _rowsData[i].IdSugerido);
+                    //        formData.append("model[" + i + "].Idsucursal", _rowsData[i].IdSucursal);
+                    //        formData.append("model[" + i + "].Autorizado", _rowsData[i].Autorizado);
+                    //       // return;
+                    //        // formData.append("Sucursales[" + index + "].ID", i);
+                    //    } else {
+                    //        console.log(_rowsData[i].IdSugerido + "," + _rowsData[i].ColumnCheck);
+
+                    //        formData.append("model[" + i + "].IdSugerido", _rowsData[i].IdSugerido);
+                    //        formData.append("model[" + i + "].Idsucursal", _rowsData[i].IdSucursal);
+                    //        formData.append("model[" + i + "].Autorizado", _rowsData[i].ColumnCheck);
+                    //    }
+                    //}
+                    var dt = $('#tbSugerido').DataTable().data();
+
+                    var formData = new FormData();
+
+                    var count = 0;
+
+                    for (var i = 0; i < dt.length; i++) {
+
+                        if (dt[i].isChecked) {
+
+                            count++;
+
+                            console.log(count - 1);
+                            var idx = count - 1;
+
+                            //formData.append("model[" + i + "].IdSugerido", _rowsData[i].IdSugerido);
+                            //formData.append("model[" + i + "].Idsucursal", _rowsData[i].IdSucursal);
+                            //formData.append("model[" + i + "].Autorizado", _rowsData[i].Autorizado);
+                            //console.log(dt[i])
+
+                            formData.append("model[" + idx + "].IdSugerido", dt[i].IdSugerido);
+                            formData.append("model[" + idx + "].Idsucursal", dt[i].IdSucursal);
+                            formData.append("model[" + idx + "].Autorizado", dt[i].isChecked);
+
+
+
+                        } else {
+
+                            count++;
+
+                            console.log(count - 1);
+                            var idx = count - 1;
+
+                            console.log("check falso o indefinido");
+                            formData.append("model[" + idx + "].IdSugerido", dt[i].IdSugerido);
+                            formData.append("model[" + idx + "].Idsucursal", dt[i].IdSucursal);
+                            formData.append("model[" + idx + "].Autorizado", false);
+
+                        }
+                    }
+
+                    if (count == 0) {
+                        swal('Mensaje', 'Nada para Autorizar', "warning");
+                        return;
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Sugerido/GuardarValidacionMontos",
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success: function (response) {
+                            hideLoading();
+                            if (response.Success) {
+
+                                swal(response.Message, '', "success").then((value) => {
+                                    $("#btnAplicar").show();
+                                });
+                            } else {
+                                swal(response.Message, '', "error");
+                            }
+                        },
+                        error: function (e) {
+                            hideLoading();
+                            swal("¡Error inesperado en la carga!", '', "error");
+                        }
+                    });
+                }
+            });
+        }
+
+
+        function AplicarSugerido() {
+
+            swal({
+                title: '¿Aplicar Sugerido?',
+                text: "Se Aplicarán todos los montos validados",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Continuar",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+
+                if (resp) {
+                    showLoading();
+
+                    $.ajax({
+                    url: "@Url.Action("AplicarSugerido", "Sugerido")",
+                    type: "POST",
+                    dataType: "json",
+                        data: { idsugerido: @ViewBag.IdSugerido},
+                        success: function (data) {
+                            hideLoading();
+
+                            if (data.Success) {
+
+                                swal("Sugerido Aplicado", '', "success").then((value) => {
+
+                                    //window.location.href = '@Url.Action("OrdenesCompra", "OC",new { id_sugerido = @ViewBag.IdSugerido})'
+                                    window.location.href = '@Url.Action("OrdenesCompra", "OC")'
+
+
+                                });
+                            } else {
+                                swal("Error al aplicar el sugerido", '', "error");
+                            }
+                        },
+                        error: function (response) {
+                            hideLoading();
+                                swal("Error al aplicar el sugerido", '', "error");
+                        //    swal("Error al eliminar", '', "error: " + response);
+                        }
+
+                    });
+                }
+            });
+            }
+
+            function goDetalleSugerido() {
+                window.location.href = "@Url.Action("ConsultaSugerido", "ValidaSugerido", new { @idsugerido = @ViewBag.IdSugerido })";
+            }
+
+            function goListaSugerido() {
+                window.location.href = "@Url.Action("ListaSugerido", "Sugerido")";
+            }
+
+            function goOrdenesCompra() {
+                window.location.href = "@Url.Action("OrdenesCompra", "OC")";
+            }
+
+
+    </script>
+}

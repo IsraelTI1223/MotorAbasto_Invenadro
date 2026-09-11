@@ -1,0 +1,877 @@
+﻿
+@using PortalGRFP.Entities.Common.ComprasEspeciales
+
+@{
+    ViewBag.Title = "Consulta de Pedidos";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Compras Especiales</a></li>
+    <li class="breadcrumb-item"><a>Consulta de Pedidos</a></li>
+}
+
+<div class="card" style="width:100%">
+    <div class="card-header">
+        <div class="row" style="margin-top:1%">
+            <div class="col-auto">
+                <label for="cbGrupos">Seleccionar Grupos:</label><br />
+                <select class="form-control" id="cbGrupos" min="1" multiple required>
+                    <!--<option value="0">Seleccione Grupo</option>-->
+                    @foreach (var item in TempData["listGrupos"] as List<ConsultaPedidosModel.GruposListViewsModel>)
+                    {
+                        <option value="@item.ID">@item.Valor</option>
+                    }
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="cbTiendas">Seleccionar Sucursales:</label><br />
+                <select class="form-control" id="cbTiendas" min="1" multiple required>
+                </select>
+            </div>
+            <div class="col-auto" style="margin-top:2.3%">
+                <button type="submit" class="btn btn-sm pd-x-15 btn-warning btn-lg" id="btnBuscar" onclick="getPedidos()">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="col-auto" style="margin-top:2.3%">
+                <button title="Nuevo Pedido" class="btn btn-sm pd-x-15 btn-success btn-lg" onclick="document.location.href='@Url.Content("~/ComprasEspeciales/GeneracionPedido/")'">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="col-auto" style="margin-top:2.3%">
+                <button style="display: none" title="Eliminar Pedido Marcado" class="btn btn-sm pd-x-15 btn-danger btn-lg" id="btnEliminar">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="col-auto" style="margin-top:2.3%">
+                <button style="display: none" class="btn btn-sm pd-x-15 btn-primary btn-lg" id="btnEnviarSugerido" onclick="enviarSugerido()" title="Enviar a Sugerido">
+                    <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                </button>
+                
+            </div>
+
+            </div>
+        </div>
+    <div class="card-body">
+        <table id="tbPedidos" class="display compact cell-border" width="100%"></table>
+    </div>
+
+</div>
+
+@section scripts{
+    <script>
+
+        $('#cbGrupos').multiselect({
+            nonSelectedText: 'Lista de Grupos',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todos",
+            allSelectedText: "Todas Seleccionados",
+            nSelectedText: "Grupos"
+        });
+
+        $('#cbTiendas').multiselect({
+            nonSelectedText: 'Lista de Sucursales',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todas",
+            allSelectedText: "Todas Seleccionados",
+            nSelectedText: "Sucursales"
+        });
+
+        var dtapi;
+
+
+        var sucursales_G;
+
+         function getPedidos() {
+
+             sucursales_G = String($("#cbTiendas").val());
+
+                showLoading();
+
+                $.ajax({
+                    url: "@Url.Action("ConsultarPedidos", "ComprasEspeciales")",
+                    type: "POST",
+                    dataType: "json",
+                    data: { search: String($("#cbTiendas").val()) },
+                    success: function (data) {
+                        hideLoading();
+                        console.log(data)
+
+                        if (data != null) {
+                            $("#btnEliminar").show();
+                            $("#btnEnviarSugerido").show();
+                        } else {
+                            $("#btnEliminar").hide();
+                            $("#btnEnviarSugerido").hide();
+                        }
+
+                        dtapi = null;
+                        dtapi =  $('#tbPedidos').DataTable({
+                            data: data,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            "drawCallback": function (settings) {
+                                // not important on first draw so not worried about dtapi being defined on table initialization
+                                if (dtapi) {
+                                    var visibleRows = $("td.cbcell").closest("tr");
+                                    visibleRows.each(function (i, item) {
+                                        $("td.cbcell input", item).prop("checked", dtapi.rows(item).data()[0].isChecked);
+                                    });
+                                }
+                            },
+                            columns: [
+
+                               /* {
+                                    data: null, title: "Todos", render: function (data, type, row) {
+                                        if (type === 'display') {
+                                            return '<input type="checkbox" onclick="ColumnCheck(this) class="filter-ck" />';
+                                        }
+                                        return data;
+                                    }
+                                },*/
+                                {
+                                    "data": "isChecked",
+                                    // adding the class name just to make finding the checkbox cells eaiser
+                                    "class": "cbcell",
+                                    "orderable": false,
+                                    // Put the checkbox in the title bar
+                                    "title": "<input type='checkbox' />",
+                                    // puts the checkbox in each row
+                                    "render": function (dataItem) {
+                                        if (dataItem)
+                                            return "<input checked type='checkbox'/>";
+                                        else
+                                            return "<input type='checkbox'/>";
+                                    }
+                                },
+                                { data: "Folio", title: 'Folio' },
+                                { data: "Id_proveedor", title: "Id Proveedor" },
+                                { data: "Proveedor", title: "Proveedor" },
+                                { data: "Fecha_Carga", title: "Fecha Carga" },
+                                { data: "Fecha_Aplicacion", title: "Fecha Aplicación" },
+                                { data: "Estatus", title: "Estatus" },
+                                { data: "Id_tipo", title: "Id Tipo" },
+                                { data: "Tipo", title: "Tipo Pedido" },
+                                { data: "IdSucursal", title: "Id Sucursal" },
+                                { data: "Importe", title: "Importe" },
+                                { data: "Piezas", title: "Piezas" },
+                                {
+                                    data: null,
+                                    render: function (data, type, row) {
+                                        return '<button class="btn btn-sm pd-x-15 btn-primary" onclick="deletePed(this)" ><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                                    }
+                                }
+                            ],
+                            select: true,
+                            scrollCollapse: true,
+                            info: false,
+                            paging: true,
+                            responsive: true,
+                            searching: true
+                        });
+
+                        $("th input[type=checkbox]").on("click", function () {
+                            var isChecked = this.checked;
+                            var ld = $('#tbPedidos').DataTable().rows().data();
+                            $.each(ld, function (i, item) {
+                                item.isChecked = isChecked;
+                            });
+                            $(".cbcell input").prop("checked", isChecked);
+                           // dtapi.data().sum();
+                        });
+
+
+                        $.fn.dataTable.Api.register('sum()', function () {
+                            var dtData = this;
+                            var total = 0;
+                            $.each(dtData, function (i, it) {
+                               // console.log(it)
+                                //if (it.isChecked) {
+                                //    var a = parseFloat(it.Importe.replace("$", "").replace(",", ""));
+                                //    total += a;
+                                //}
+                            });
+                          // console.log(total)
+                        });
+
+                        $("#tbPedidos").on("click", "td input[type=checkbox]", function () {
+                            var isChecked = this.checked;
+
+                            // set the data item associated with the row to match the checkbox
+                            var dtRow = dtapi.rows($(this).closest("tr"));
+                            dtRow.data()[0].isChecked = isChecked;
+                            //console.log(dtRow.data()[0])
+                            // determine if the over all checkbox should be checked or unchecked
+                            if (!isChecked) {
+                                // if one is unchecked, then checkall cannot be checked
+                               // console.log("entro el falso")
+                                $("th input[type=checkbox]").prop("checked", false);
+                            }
+                            else {
+                                $("th input[type=checkbox]").prop("checked", true);
+                                $.each(dtapi.data(), function (i, item) {
+                                    if (!item.isChecked) {
+                                        $("th input[type=checkbox]").prop("checked", false);
+                                        return false;
+                                    }
+                                });
+                            }
+
+                           // dtapi.data().sum();
+                        });
+
+
+
+
+
+                        $("#btnEliminar").click(function () {
+
+                            //var datatable = dtapi.data();
+                            swal({
+                                title: 'Eliminar Pedido',
+                                text: "¿Seguro de Eliminar los Pedidos seleccionados?",
+                                icon: "warning",
+                                buttons: {
+                                    cancel: "Cancelar",
+                                    catch: {
+                                        text: "Eliminar",
+                                        value: true
+                                    }
+                                },
+                            }).then((resp) => {
+
+                                if (resp) {
+
+                                    var dt = $('#tbPedidos').DataTable().data();
+
+                                    var formData = new FormData();
+
+                                    var count = 0;
+
+                                    for (var i = 0; i < dt.length; i++) {
+
+                                        if (dt[i].isChecked) {
+
+                                            count++;
+
+                                            console.log(count - 1);
+                                            var idx = count - 1;
+
+                                            formData.append("model[" + idx + "].Folio", dt[i].Folio);
+                                            formData.append("model[" + idx + "].Id_tipo", dt[i].Id_tipo);
+                                            formData.append("model[" + idx + "].Id_proveedor", dt[i].Id_proveedor);
+                                            formData.append("model[" + idx + "].IdSucursal", dt[i].IdSucursal);
+                                            formData.append("model[" + idx + "].Sucursales", sucursales_G);
+
+
+                                        } else {
+                                            console.log("check falso o indefinido");
+                                        }
+                                    }
+
+                                    if (count == 0) {
+                                        swal('Mensaje', 'Nada para Eliminar', "warning");
+                                        return;
+                                    } else {
+                                        //console.log(formData.seriali)
+                                        ////return;
+                                    }
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "/ComprasEspeciales/EliminarPedidosList",
+                                        processData: false,
+                                        contentType: false,
+                                        data: formData,
+                                        success: function (response) {
+                                            hideLoading();
+                                            console.log(response)
+
+                                            if (response.Success) {
+
+                                                swal("Termino la Eliminación", 'Los pedidos se eliminaron correctamente', "success").then((value) => {
+
+                                                    if (data != null) {
+                                                        $("#btnEliminar").show();
+                                                    } else {
+                                                        $("#btnEliminar").hide();
+                                                    }
+
+                                                    dtapi = null;
+                                                    dtapi = $('#tbPedidos').DataTable({
+                                                        data: response.Result,
+                                                        "destroy": true,
+                                                        "processing": true,
+                                                        dom: 'Bfrtip',
+                                                        "drawCallback": function (settings) {
+                                                            if (dtapi) {
+                                                                var visibleRows = $("td.cbcell").closest("tr");
+                                                                visibleRows.each(function (i, item) {
+                                                                    $("td.cbcell input", item).prop("checked", dtapi.rows(item).data()[0].isChecked);
+                                                                });
+                                                            }
+                                                        },
+                                                        columns: [
+
+                                                            {
+                                                                "data": "isChecked",
+                                                                "class": "cbcell",
+                                                                "orderable": false,
+                                                                "title": "<input type='checkbox' />",
+                                                                "render": function (dataItem) {
+                                                                    if (dataItem)
+                                                                        return "<input checked type='checkbox'/>";
+                                                                    else
+                                                                        return "<input type='checkbox'/>";
+                                                                }
+                                                            },
+                                                            { data: "Folio", title: 'Folio' },
+                                                            { data: "Id_proveedor", title: "Id Proveedor" },
+                                                            { data: "Proveedor", title: "Proveedor" },
+                                                            { data: "Fecha_Carga", title: "Fecha Carga" },
+                                                            { data: "Fecha_Aplicacion", title: "Fecha Aplicación" },
+                                                            { data: "Estatus", title: "Estatus" },
+                                                            { data: "Id_tipo", title: "Id Tipo" },
+                                                            { data: "Tipo", title: "Tipo Pedido" },
+                                                            { data: "IdSucursal", title: "Id Sucursal" },
+                                                            { data: "Importe", title: "Importe" },
+                                                            { data: "Piezas", title: "Piezas" },
+                                                            {
+                                                                data: null,
+                                                                render: function (data, type, row) {
+                                                                    return '<button class="btn btn-sm pd-x-15 btn-primary" onclick="deletePed(this)" ><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                                                                }
+                                                            }
+                                                        ],
+                                                        select: true,
+                                                        scrollCollapse: true,
+                                                        info: false,
+                                                        paging: true,
+                                                        responsive: true,
+                                                        searching: true
+                                                    });
+
+                                                    $("th input[type=checkbox]").on("click", function () {
+                                                        var isChecked = this.checked;
+                                                        var ld = $('#tbPedidos').DataTable().rows().data();
+                                                        $.each(ld, function (i, item) {
+                                                            item.isChecked = isChecked;
+                                                        });
+                                                        $(".cbcell input").prop("checked", isChecked);
+
+                                                    });
+
+                                                    $("#tbPedidos").on("click", "td input[type=checkbox]", function () {
+                                                        var isChecked = this.checked;
+
+                                                        var dtRow = dtapi.rows($(this).closest("tr"));
+                                                        dtRow.data()[0].isChecked = isChecked;
+                                                        if (!isChecked) {
+                                                            $("th input[type=checkbox]").prop("checked", false);
+                                                        }
+                                                        else {
+                                                            $("th input[type=checkbox]").prop("checked", true);
+                                                            $.each(dtapi.data(), function (i, item) {
+                                                                if (!item.isChecked) {
+                                                                    $("th input[type=checkbox]").prop("checked", false);
+                                                                    return false;
+                                                                }
+                                                            });
+                                                        }
+
+                                                    });
+
+
+
+                                                });
+
+
+
+                                            } else {
+
+                                               swal('Error', 'No se eliminaron los pedidos seleccionados', "error");
+                                            }
+                                        },
+                                        error: function (e) {
+                                            hideLoading();
+                                            swal('Error', 'Error Inesperado'+ e, "error");
+                                        }
+                                    });
+
+
+
+
+
+
+
+
+                                }
+                            });
+                        });
+                    },
+                    error: function (response) {
+                        hideLoading();
+                    }
+                });
+        }
+
+        function deletePed(row){
+
+
+            var row = $('#tbPedidos').DataTable().row($(row).parents('tr')).data();
+            //var dataExchangeCheckColumnList = $('#tbPedidos').DataTable().rows().data();
+            //console.log(row)
+            //console.log(dataExchangeCheckColumnList)
+
+            swal({
+                title: 'Eliminar Pedido',
+                text: "¿Seguro de Eliminar el Pedido?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Eliminar",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+
+
+                if (resp) {
+                    showLoading();
+
+                    $.ajax({
+                    url: "@Url.Action("EliminarPedidos", "ComprasEspeciales")",
+                    type: "POST",
+                    dataType: "json",
+                        data: { folio: row.Folio, id_tipo: row.Id_tipo, id_proveedor: row.Id_proveedor, id_suc: row.IdSucursal, search: String($("#cbTiendas").val()) },
+                        success: function (data) {
+                            hideLoading();
+
+                            if (data.Message == 'OK') {
+                                swal("Pedido eliminado correctamente", '', "success").then((value) => {
+
+                                    // window.location.reload();
+                                   /* $('#tbPedidos').DataTable({
+                                        data: data.Result,
+                                        "destroy": true,
+                                        "processing": true,
+                                        dom: 'Bfrtip',
+                                        columns: [
+                                            { data: "Folio", title: 'Folio' },
+                                            { data: "Id_proveedor", title: "Id Proveedor" },
+                                            { data: "Proveedor", title: "Proveedor" },
+                                            { data: "Fecha_Carga", title: "Fecha Carga" },
+                                            { data: "Fecha_Aplicacion", title: "Fecha Aplicación" },
+                                            { data: "Estatus", title: "Estatus" },
+                                            { data: "Id_tipo", title: "Id Tipo" },
+                                            { data: "Tipo", title: "Tipo Pedido" },
+                                            { data: "IdSucursal", title: "Id Sucursal" },
+                                            { data: "Importe", title: "Importe" },
+                                            { data: "Piezas", title: "Piezas" },
+                                            {
+                                                data: null,
+                                                render: function (data, type, row) {
+                                                    return '<button class="btn btn-sm pd-x-15 btn-primary" onclick="deletePed(this)" ><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                                                }
+                                            }
+                                        ],
+                                        select: true,
+                                        scrollCollapse: true,
+                                        info: false,
+                                        paging: true,
+                                        responsive: true,
+                                        searching: true
+                                    });*/
+
+                                    dtapi = null;
+                                    dtapi = $('#tbPedidos').DataTable({
+                                        data: data.Result,
+                                        "destroy": true,
+                                        "processing": true,
+                                        dom: 'Bfrtip',
+                                        "drawCallback": function (settings) {
+                                            if (dtapi) {
+                                                var visibleRows = $("td.cbcell").closest("tr");
+                                                visibleRows.each(function (i, item) {
+                                                    $("td.cbcell input", item).prop("checked", dtapi.rows(item).data()[0].isChecked);
+                                                });
+                                            }
+                                        },
+                                        columns: [
+                                            {
+                                                "data": "isChecked",
+                                                "class": "cbcell",
+                                                "orderable": false,
+                                                "title": "<input type='checkbox' />",
+                                                "render": function (dataItem) {
+                                                    if (dataItem)
+                                                        return "<input checked type='checkbox'/>";
+                                                    else
+                                                        return "<input type='checkbox'/>";
+                                                }
+                                            },
+                                            { data: "Folio", title: 'Folio' },
+                                            { data: "Id_proveedor", title: "Id Proveedor" },
+                                            { data: "Proveedor", title: "Proveedor" },
+                                            { data: "Fecha_Carga", title: "Fecha Carga" },
+                                            { data: "Fecha_Aplicacion", title: "Fecha Aplicación" },
+                                            { data: "Estatus", title: "Estatus" },
+                                            { data: "Id_tipo", title: "Id Tipo" },
+                                            { data: "Tipo", title: "Tipo Pedido" },
+                                            { data: "IdSucursal", title: "Id Sucursal" },
+                                            { data: "Importe", title: "Importe" },
+                                            { data: "Piezas", title: "Piezas" },
+                                            {
+                                                data: null,
+                                                render: function (data, type, row) {
+                                                    return '<button class="btn btn-sm pd-x-15 btn-primary" onclick="deletePed(this)" ><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                                                }
+                                            }
+                                        ],
+                                        select: true,
+                                        scrollCollapse: true,
+                                        info: false,
+                                        paging: true,
+                                        responsive: true,
+                                        searching: true
+                                    });
+
+                                    $("th input[type=checkbox]").on("click", function () {
+                                        var isChecked = this.checked;
+                                        var ld = $('#tbPedidos').DataTable().rows().data();
+                                        $.each(ld, function (i, item) {
+                                            item.isChecked = isChecked;
+                                        });
+                                        $(".cbcell input").prop("checked", isChecked);
+
+                                    });
+
+                                    $("#tbPedidos").on("click", "td input[type=checkbox]", function () {
+                                        var isChecked = this.checked;
+
+                                        var dtRow = dtapi.rows($(this).closest("tr"));
+                                        dtRow.data()[0].isChecked = isChecked;
+                                        if (!isChecked) {
+                                            $("th input[type=checkbox]").prop("checked", false);
+                                        }
+                                        else {
+                                            $("th input[type=checkbox]").prop("checked", true);
+                                            $.each(dtapi.data(), function (i, item) {
+                                                if (!item.isChecked) {
+                                                    $("th input[type=checkbox]").prop("checked", false);
+                                                    return false;
+                                                }
+                                            });
+                                        }
+
+                                    });
+
+
+
+                                });
+                            } else {
+                                swal("Error al eliminar", '', "error");
+                            }
+                        },
+                        error: function (response) {
+                            hideLoading();
+                            swal("Error inesperado al eliminar", '', "error: " + response);
+                        }
+
+                    });
+                }
+            });
+
+        }
+
+        //$('#btnBuscar').click(function () {
+        //    console.log( String($("#cbTiendas").val()) );
+        //});
+
+
+        $(document).ready(function () {
+
+              'use strict';
+
+            //$("#cbTiendas").on("change", function () {
+
+            //    //console.log($("#cbTiendas").val());
+            //    getPedidos($("#cbTiendas").val());
+
+            //});
+
+            @*function getPedidos(data_) {
+
+                console.log(data_)
+
+                showLoading();
+
+                $.ajax({
+                    url: "@Url.Action("ConsultarPedidos", "ComprasEspeciales")",
+                    type: "POST",
+                    dataType: "json",
+                    data: { texto: data_[0] },
+                    success: function (data) {
+                        hideLoading();
+                        console.log(data)
+                        /*response($.map(data, function (item) {
+                            return { label: item.Valor, value: item.Id + "," + item.Valor };
+                        }))*/
+                        $('#tbPedidos').DataTable({
+                            data: data,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "Folio", title: 'Folio' },
+                                { data: "Proveedor", title: "Proveedor" },
+                                { data: "FechaCarga", title: "Fecha Carga" },
+                                { data: "FechaOC", title: "Fecha Aplicación" },
+                                { data: "Estatus", title: "Estatus" },
+                                { data: "Tipo", title: "Tipo Pedido" },
+                                { data: "Piezas", title: "Piezas" },
+                                { data: "IdSucursal", title: "Tienda" }
+                            ],
+                            select: true,
+                            scrollCollapse: true,
+                            info: false,
+                            paging: true,
+                            responsive: true,
+                            searching: true
+                        });
+                    },
+                    error: function (response) {
+                        hideLoading();
+                    }
+                });
+
+                /*$.ajax({
+                    type: "POST",
+                    url: "/ComprasEspeciales/FiltrarPedidos",
+                    data: data,
+                    dataType: "json",
+                    processData: false,  // tell jQuery not to process the data
+                    contentType: false,
+                    success: function (response) {
+
+                        hideLoading();
+                        var sucursales = "";
+
+                        for (var i = 0; i < response.data.length; i++) {
+                            sucursales = sucursales + '<option value=' + response.data[i].ID + '>' + response.data[i].Valor + '</option>';
+                        }
+
+
+                        $("#cbTiendas").append(sucursales);
+
+                        $('#cbTiendas').multiselect('rebuild');
+
+
+
+                    },
+                    error: function (response) {
+                    }
+                });*/
+            }*@
+
+
+
+
+
+
+
+
+
+            /**
+             * /
+             *Solo envia un grupo
+             */
+
+            //$("#cbGrupos").on("change", function () {
+
+
+            //    var data = new FormData();
+
+            //    data.append("grupo", $("#cbGrupos").val());
+
+            //    getSucursalesCadenas(data);
+            //});
+
+            //function getSucursalesCadenas(data) {
+
+            //    //console.log("la data " + JSON.stringify(data))
+            //    showLoading();
+            //    $('#cbTiendas').empty();
+            //    $.ajax({
+            //        type: "POST",
+            //        url: "/ComprasEspeciales/GetSucursalesXGrupo",
+            //        data: data,
+            //        dataType: "json",
+            //        processData: false,  // tell jQuery not to process the data
+            //        contentType: false,
+            //        success: function (response) {
+            //            hideLoading();
+            //            var sucursales = "";
+            //            for (var i = 0; i < response.data.length; i++) {
+            //                sucursales = sucursales + '<option value=' + response.data[i].ID + '>' + response.data[i].Valor + '</option>';
+            //            }
+
+
+            //            $("#cbTiendas").append(sucursales);
+
+            //            $('#cbTiendas').multiselect('rebuild');
+            //        },
+            //        error: function (response) {
+            //        }
+            //    });
+
+            //}
+
+            $("#cbGrupos").on("change", function () {
+
+                getSucursalesCadenas($("#cbGrupos").val());
+            });
+
+            function getSucursalesCadenas(data) {
+
+                console.log(data)
+                showLoading();
+                $('#cbTiendas').empty();
+                $.ajax({
+                     url: "@Url.Action("GetSucursalesXGrupo", "ComprasEspeciales")",
+                    type: "POST",
+                    dataType: "json",
+                    data: { search: String(data) },
+                    success: function (response) {
+                        hideLoading();
+                        var sucursales = "";
+
+                        console.log(response)
+
+                        if (response.data != null) {
+
+                            for (var i = 0; i < response.data.length; i++) {
+                                sucursales = sucursales + '<option value=' + response.data[i].ID + '>' + response.data[i].Valor + '</option>';
+                            }
+                        }
+
+                        $("#cbTiendas").append(sucursales);
+
+                        $('#cbTiendas').multiselect('rebuild');
+                    },
+                    error: function (response) {
+                        hideLoading();
+                    }
+                });
+
+            }
+
+
+
+
+
+        });
+
+         function enviarSugerido() {
+
+            swal({
+                title: 'Enviar a Sugerido',
+                text: "Todos los Pedidos se enviaran al sugerido, ¿Seguro de continuar?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Continuar",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+                fechaPedidos_ = $("#txtGenOC").val();
+
+
+                if (resp) {
+
+                    var sugerido = $("#frmCargaSugerido").serializeArray()
+                        .filter(function (elem) {
+                            return $.trim(elem.value);
+                        });
+
+                    sugerido.push({ name: "Fecha", value: '2021-01-01' })
+
+                     $.ajax({
+
+                        type: "Post",
+
+                        url: "@Url.Action("EnviarSugerido", "ComprasEspeciales")",
+
+                        dataType: "json",
+
+                        data: sugerido,
+
+                        success: function (response) {
+
+                            if (response.Success) {
+
+                                swal(response.Message, '', "success").then((value) => {
+                                    //location.reload();
+                                    window.location.href = '@Url.Action("index", "ValidaSugerido")'
+                                    //let data = [{
+                                    //    Estatus: "",
+                                    //    Folio: "",
+                                    //    NombreArchivo: "",
+                                    //    TipoPedido: "",
+                                    //    LineasPedido: "",
+                                    //    LineasCargadas: "",
+                                    //}];
+
+                                    //$("#btnSiguiente").show();
+                                    //$("#btnEnviarSugerido").hide();
+
+                                    //$('#tblpedidosCargados').DataTable({
+                                    //    data: data,
+                                    //    "destroy": true,
+                                    //    "processing": true,
+                                    //    dom: 'Bfrtip',
+                                    //    columns: [
+                                    //        { data: "Folio", title: 'Folio' },
+                                    //        { data: "NombreArchivo", title: 'Nombre_Archivo' },
+                                    //        { data: "TipoPedido", title: "Tipo_de_Pedido" },
+                                    //        { data: "LineasPedido", title: "No._lineas_Pedido" },
+                                    //        { data: "LineasCargadas", title: 'No._lineas_cargadas' },
+                                    //        { data: "Estatus", title: "Estatus" },
+                                    //        {
+                                    //            data: null,
+                                    //            render: function (data, type, row) {
+                                    //                return '<button class="btn btn-sm pd-x-15 btn-primary" hidden><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                                    //            }
+                                    //        }
+                                    //    ],
+                                    //    select: true,
+                                    //    buttons: false
+                                    //});
+                                });
+
+                            } else {
+                                swal(response.Message, '', "error");
+                            }
+                            hideLoading();
+                        },
+                        error: function (response) {
+                            hideLoading();
+                            swal(response.Message, '', "warning");
+                        }
+                    });
+                }
+                });
+        }
+    </script>
+}

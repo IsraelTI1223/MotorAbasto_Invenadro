@@ -1,0 +1,181 @@
+﻿@using PortalGRFP.Entities.Common
+@{
+    ViewBag.Title = "Reporte Estadistica Compras";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Consultas</a></li>
+    <li class="breadcrumb-item"><a>Estadística de Compras</a></li>
+}
+<div class="container-fluid">
+    <div class="card">
+        @using (Html.BeginForm("GetReporteEstadistica", "Reportes", FormMethod.Post, new { role = "form", id = "frmReporteEstadisticas" }))
+        {
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Sku/Descripción</label>
+                        <input type="Text" class="form-control" id="autocompletesku" name="autocompletesku" placeholder="Buscar Árticulo" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Grupo Sucursales</label>
+                        <select id="grupo" name="grupo" class="form-control" required>
+                            <option value="0">Seleccione un Grupo</option>
+                            @foreach (var item in TempData["grupo"] as List<ComboGenerico>)
+                            {
+                                <option value="@item.Id">@item.Valor</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <input type="submit" value="Cargar" class="btn btn-primary" />
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="articulo" name="articulo" />
+        }
+
+        <div class="card-body">
+            <h4 id="titleTB">Estadísticas </h4>
+            <div class="container-fluid">
+                <table id="tblCompras" class="display compact" width="100"></table>
+            </div>
+            <hr />
+            <div class="container-fluid">
+                <table id="tblProveedor" class="display compact" width="100"></table>
+            </div>
+            <hr />
+            <div class="container-fluid">
+                <table id="tblVentas28dias" class="display compact" width="100"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+
+            $("#autocompletesku").autocomplete({
+                source: function (request, response) {
+                    minLength: 3,
+                    $.ajax({
+                        url: "@Url.Action("AutocommpleteSKU", "Reportes")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: request.term },
+                        success: function (data) {
+                            if (data.Success) {
+                                response($.map(data.Result, function (item) {
+                                    return { label: item.Valor, value: item.Id + "," + item.Valor };
+                                }))
+                            } else {
+                                swal('Error', data.Message, "error");
+                            }
+                        }
+                    })
+                },
+                select: function (event, ui) {
+                    $("#articulo").val(ui.item.value.split(',')[0]);
+                }
+            });
+
+            $("#frmReporteEstadisticas").on("submit", function (event) {
+                event.preventDefault();
+
+
+                if ($("#autocompletesku").val() == "") {
+                    swal('Error', 'No ha indicado el árticulo a buscar', "error");
+                    return;
+                }
+                if ($("#articulo").val() == "") {
+                    swal('Error', 'Realice la busqueda de nuevo del árticulo', "error");
+                    return;
+                }
+
+                console.log($("#articulo").val());
+                var formulario = document.getElementById('frmReporteEstadisticas');
+
+                showLoading();
+                var formData = new FormData(formulario);
+                console.log($("#grupo").val());
+
+                var art = $("#articulo").val(), grp = $("#grupo").val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetReporteEstadistica", "Reportes")",
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function (response) {
+                        hideLoading();
+                                if (response.Success) {
+                                    $('#tblCompras').DataTable({
+                                        data: response.Result[0].Compras,
+                                        "destroy": true,
+                                        "processing": true,
+                                        dom: 'Bfrtip',
+                                        columns: [
+                                            { data: "SucId", title: 'Id Suc.' },
+                                            { data: "Sucursal", title: 'Sucursal' },
+                                            { data: "Existencia", title: "Existencia" },
+                                            { data: "Transito", title: "Transito" },
+                                            { data: "PVD", title: 'PVD' },
+                                            { data: "ABC", title: "ABC" },
+                                            { data: "PoliticaDias", title: "Politica de Días" },
+                                            { data: "Invenadro", title: "Invenadro" },
+                                            { data: "StockMin", title: 'StockMin' },
+                                            { data: "Activo", title: "Activo" },
+                                            { data: "FechaUltimaVenta", title: "Fecha Ultima Venta" }
+                                            
+                                        ],
+                                        select: true,
+                                    });
+
+                                    $('#tblProveedor').DataTable({
+                                        data: response.Result[0].Proveedor,
+                                        "destroy": true,
+                                        "processing": true,
+                                        dom: 'Bfrtip',
+                                        columns: [
+                                            { data: "Agencia", title: 'Agencia' },
+                                            { data: "Descripcion", title: "Descripcion" },
+                                            { data: "Existencia", title: "Existencia" },
+                                            { data: "Empaque", title: 'Empaque' },
+                                            { data: "Costo", title: "Costo" }
+                                        ],
+                                        select: true
+
+                                    });
+
+                                    $('#tblVentas28dias').DataTable({
+                                        data: response.Result[0].Ventas28,
+                                        "destroy": true,
+                                        "processing": true,
+                                        dom: 'Bfrtip',
+                                        columns: [
+                                            { data: "Dia", title: $("#autocompletesku").val() },
+                                            { data: "Contado", title: "Contado" },
+                                            { data: "Credito", title: "Crédito" },
+                                            { data: "Sad", title: 'Sad' },
+                                            { data: "Total", title: "Total" }
+                                        ],
+                                        select: true
+
+                                    });
+                                } else {
+                                    hideLoading();
+                                    swal("", response.Message, "error");
+                                }
+                    },
+                    error: function (e) {
+                        hideLoading();
+                        swal("¡Error inesperado en la carga!", '', "error");
+                    }
+                });
+            });
+        });
+    </script>
+}

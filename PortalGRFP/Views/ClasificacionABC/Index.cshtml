@@ -1,0 +1,117 @@
+﻿@model PortalGRFP.Entities.Response.ResponseList<PortalGRFP.Entities.Common.ABC>
+@using PortalGRFP.Entities.Common
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Generales de Abasto</a></li>
+    <li class="breadcrumb-item"><a>Clasificacion ABC </a></li>
+}
+
+
+
+@*<form method="post" class="form-group col-md-12" action="~/MTAConsulta/DetalleConsulta">  *@
+<div class="col-lg-11">
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-striped" id="tblConciliacionVentasMensual">
+                <thead class="thead-primary">
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">PIEZAS</th>
+                        <th scope="col">MONTOS</th>
+                        <th scope="col">CLASIFICACION FINAL</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var d in Model.Result)
+                    {
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td>
+                                @d.IdABC
+                            </td>
+                            <td>
+                                @d.Piezas
+                            </td>
+                            <td>
+                                @d.Montos
+                            </td>
+                            <td id="id_@d.IdABC" onclick="Editar(@d.IdABC,this.innerText)">
+                                @d.ClasFinal
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        function Editar(val1, val2) {
+
+
+            swal(`Editar Clasificación Final, ID: ${val1}`,{
+
+                content: {
+                    element: "select",
+                    attributes: {
+                        placeholder: "Valor Actual: " + val2,
+                        id:"selectJcpm",
+                        //type: "text",
+                        //minLength: "1",
+                        //maxLength: "1",
+                        //pattern: "[A-E]",
+                        //required: "required",
+                        //style: "text-transform:uppercase",
+                        //onkeyup: "javascript:this.value=this.value.toUpperCase()",
+                    },
+                }, buttons: {
+                    cancel: "cancelar",
+                    confirm: "continuar",
+                },
+            }).then((value) => {
+                var valor = $("#selectJcpm").val();
+                if (value && valor!="") {
+                    dta = '{idABC:"' + val1 + '", clasifica:"' + valor + '"}';
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("udateClasificacion", "ClasificacionABC")",
+                        data: dta,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (response) {
+                            if (response.Success) {
+                                swal(response.Message, '', "success");
+                                $("#id_" + val1).html(valor);
+                            } else {
+                                swal(response.Message, '', "error");
+                            }
+
+                        },
+                        error: function (e) {
+                            hideLoading();
+                            swal("¡Error inesperado al Actualizar la clasificación!", '', "error");
+                        }
+                    })
+                }
+            });
+            var clasifica = ["A", "B", "C", "D", "E"];
+            var select = $("#selectJcpm");
+            select.append($('<option />', { text: "Selecciona una Opcion", value: "", }));
+            clasifica.forEach(dtoTV => select.append($('<option />', { text: dtoTV, value: dtoTV, })));
+            $('#selectJcpm > option[value="' + val2+'"]').attr('selected','selected');
+
+            select.onchange = function selectChanged(e) {
+                value = e.target.value
+            }
+        }
+    </script>
+    }

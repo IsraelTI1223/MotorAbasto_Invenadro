@@ -1,0 +1,689 @@
+﻿@model PortalGRFP.Entities.Common.SugeridoFiltros
+@using PortalGRFP.Entities.Common
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Sugerido de Compra</a></li>
+    <li class="breadcrumb-item"><a>Consulta Sugerido</a></li>
+}
+<label>ID: @TempData["IdSugerido"].ToString()</label>
+@using (Html.BeginForm("DescargarExcel", "ValidaSugerido", FormMethod.Post, new { role = "form", id = "frmSugerido" }))
+{
+    <div class="row">
+        <div class="col-md-2">
+            Fecha
+            <input type="date" id="Fecha" name="Fecha" class="form-control" min="@{DateTime.Now.AddDays(-7).ToShortDateString();} " />
+        </div>
+        <div class="col-md-2">
+            Sucursales/Grupo
+            <select id="GrupoSuc" name="GrupoSuc" multiple="multiple" class="form-control col-md-10">
+                @{
+                    var sucGrups = TempData["SucGruposTMP"] as List<MultiselectAgrupado>;
+                    var numeroGrupos = (from sg in sucGrups select sg.IdGrupo).ToList().Max();
+
+                    for (int i = 0; i <= numeroGrupos; i++)
+                    {
+
+                        var sgrupo = (from t in sucGrups where t.IdGrupo == i select t.Grupo).FirstOrDefault();
+                        if (sgrupo != null)
+                        {
+
+
+                            var opciones = (from t in sucGrups where t.IdGrupo == i select new ComboGenerico { Id = t.IdSucursal, Valor = t.Sucursal }).ToList();
+
+                            <optgroup label="@sgrupo.ToString()" class="group-1">
+
+                                @foreach (var item in opciones)
+                                {
+                                    <option value="@item.Id">@item.Valor</option>
+                                }
+
+                            </optgroup>
+                        }
+
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            Proveedores
+            <select id="Proveedor" name="Proveedor" multiple="multiple" class="form-control">
+                @foreach (var item in TempData["ProveedorTMP"] as List<ComboGenerico>)
+                {
+                    <option value="@item.Id">@item.Valor</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            Tipo Calculo
+            <select id="TipoCalculo" name="TipoCalculo" multiple="multiple" class="form-control">
+                <option value="1">PVD</option>
+                <option value="2">Invenadro</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            Status Sugerido
+            <select id="EstatusSug" name="EstatusSug" multiple="multiple" class="form-control">
+                @foreach (var item in TempData["EstatusSug"] as List<ComboGenerico>)
+                {
+                    <option value="@item.Id">@item.Valor</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            Grupo
+            <select id="GrupoArt" name="GrupoArt" multiple="multiple" class="form-control">
+                @foreach (var item in TempData["GpoArticulos"] as List<ComboGenerico>)
+                {
+                    <option value="@item.Id">@item.Valor</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            Tipo Pedido
+            <select id="Conceptos" name="Conceptos" multiple="multiple" class="form-control">
+                @*<option value="1">Negados</option>
+                    <option value="2">Compra Especial</option>
+                    <option value="3">Resurtido Natural</option>
+                    <option value="4">Invenadro</option>
+                    <option value="5">Especiales Farmacia</option>
+                    <option value="6">Pie de Camión Mayorista</option>*@
+                @foreach (var item in TempData["ReglasSug"] as List<ComboGenerico>)
+                {
+                    <option value="@item.Id">@item.Valor</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn-dark" id="btnRechazos">Rechazados</button>
+        </div>
+        <div class="col-md-2">
+            Consultar
+            <select id="Consulto" name="Consulto" class="form-control">
+                <option value="1">Resumen(Producto/Proveedor)</option>
+                <option value="2">Detallado</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="button" value="Consultar" id="btnBuscar" class="btn btn-primary" style="margin-top:25px" />
+            <input type="submit" value="Excel" id="btnDescargar" title="Descargar" class="btn btn-warning" style="margin-top:25px" />
+        </div>
+        <div class="col-md-3">
+            <label>Resumen de Sugerido</label>
+            <select id="resumenSug" name="resumenSug" class="form-control">
+                <option value="1">Todos</option>
+                <option value="2">Provedor</option>
+                <option value="3">Proveedor Sucursal</option>
+                <option value="4">Tipo Compra</option>
+            </select>
+        </div>
+        <div>
+            <button type="button" title="Eliminar Sugerido" class="btn btn-sm pd-x-15 btn-danger btn-lg aligned-right" style="margin-top:30px" id="EliminarRenglon">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+    <input type="hidden" id="idSugerido" name="idSugerido" value="@TempData["IdSugerido"].ToString()" />
+
+}
+
+<div class="container-fluid">
+    <div class="col-md-1">
+        <a href="/Sugerido/ListaSugerido/" class="btn btn-sm pd-x-15 btn-primary float-left" title="Regresar"><i class="fa fa-reply" aria-hidden="true"></i></a>
+    </div>
+    <div class="col-md-7"></div>
+    <div class="col-md-4 float-right">
+        <table id="tblmontos">
+        </table>
+    </div>
+</div>
+
+
+<div class="container-fluid overflow-auto" id="detalle">
+    <table id="listSugerido" class="table-striped compact" width="100%"></table>
+</div>
+<div class="container-fluid overflow-auto" id="resumen" style="display:none">
+    <table id="tblResumenProveedor" class="table-striped compact" width="100%"></table>
+</div>
+<div class="container-fluid overflow-auto" id="rechazos" style="display:none">
+    <table id="tblRechazos" class="table-striped compact" width="100%"></table>
+</div>
+
+@section scripts{
+    <script>
+        function sumarDias(fecha, dias) {
+            fecha.setDate(fecha.getDate() + dias);
+            return fecha;
+        }
+        var d = new Date();
+        document.getElementById("Fecha").min = sumarDias(d, -7);
+
+        $(document).ready(function () {
+            'use strict';
+
+            $('#GrupoSuc').multiselect({
+                nonSelectedText: 'Seleccione un grupo',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                enableClickableOptGroups: true,
+                enableCollapsibleOptGroups: true,
+                maxHeight: 400,
+                buttonWidth: '150px',
+                buttonTextAlignment: 'left',
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Grupos Seleccionados"
+            });
+
+            $('#EstatusSug').multiselect({
+                nonSelectedText: 'Seleccione un Estatus',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '150px',
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionadas",
+                nSelectedText: "Estatus Seleccionados"
+            });
+
+            $('#GrupoArt').multiselect({
+                nonSelectedText: 'Seleccione un Grupo',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '150px',
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Grupos Seleccionados"
+            });
+
+            $('#TipoCalculo').multiselect({
+                nonSelectedText: 'Seleccione',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '150px',
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Grupos Seleccionados"
+            });
+
+            $('#Consulto').multiselect({
+                nonSelectedText: 'Seleccione',
+                enableFiltering: true,
+                maxHeight: 400,
+                buttonWidth: '150px',
+
+            });
+
+            $('#Proveedor').multiselect({
+                nonSelectedText: 'Seleccione un proveedor',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '150px',
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Proveedores Seleccionados"
+            });
+
+            $('#Conceptos').multiselect({
+                nonSelectedText: 'Seleccione un concepto',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '150px',
+                //dropUp: true,
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Conceptos Seleccionados"
+            });
+
+        var listSugerido;
+            $("#btnBuscar").on("click", function (event) {
+                //event.preventDefault();
+                var form = $("#frmSugerido").serializeArray()
+                    .filter(function (elem) {
+                        return $.trim(elem.value);
+                    });
+
+                showLoading();
+                $('#detalle').css("display", "block");
+                $('#resumen').css("display", "none");
+                $('#rechazos').css("display", "none");
+
+                $.ajax({
+                    type: "post",
+                    url: '@Url.Action("GetListadoSugerido", "ValidaSugerido")',
+                    data: form,
+                    success: function (response) {
+                        hideLoading();
+                        listSugerido = null;
+                        listSugerido = $('#listSugerido').DataTable({
+                            data: response.Result[0].Listado,
+                            "destroy": true,
+                            "processing": true,
+                            "drawCallback": function (settings) {
+                                if (listSugerido) {
+                                    var visibleRows = $("td.cbcell").closest("tr");
+                                    visibleRows.each(function (i, item) {
+                                        $("td.cbcell input", item).prop("checked", listSugerido.rows(item).data()[0].isChecked);
+                                    });
+                                }
+                            },
+                            dom: 'frtip', 
+                            columns: [
+                                {
+                                    target: 0,
+                                    data: "isChecked",
+                                    class: "cbcell",
+                                    orderable: false,
+                                    title: "<input type='checkbox' />",
+                                    render: function (dataItem) {
+                                        if (dataItem)
+                                            return "<input checked type='checkbox'/>";
+                                        else
+                                            return "<input type='checkbox'/>";
+                                    }
+                                },
+                                { data: "FechaCreacionSugerido", title: 'Fecha Creacion Sugerido' },
+                                { data: "IdSugerido", title: "Id Sugerido" },
+                                { data: "IdSucursal", title: "Id Sucursal" },
+                                { data: "Sucursal", title: 'Sucursal' },
+                                { data: "Proveedor", title: "Proveedor" },
+                                { data: "Articulo_Id", title: "Articulo_Id" },
+                                { data: "Producto", title: 'Producto' },
+                                { data: "CostoNeto", title: "Costo Neto" },
+                                { data: "TipoPedido", title: "Tipo Pedido" },
+                                { data: "PVD", title: "PVD" },
+                                { data: "ExistenciaPza", title: 'Existencia Pza ' },
+                                { data: "TransitoPza", title: "Transito Pza" },
+                                { data: "SugeridoInicial", title: "Sugerido Inicial" },
+                                { data: "NegadosPza", title: "Negados Pza" },
+                                { data: "CompraEspecialPza", title: 'Compra Especial Pza', },
+                                { data: "InvenadroPza", title: "Invenadro Pza" },
+                                { data: "Capacity", title: "Capacity" },
+                                { data: "PedEspFarmacia", title: "Ped Esp Farmacia" },
+                                { data: "PolABCDias", title: "Pol. ABC Dìas" },
+                                { data: "ABC", title: "ABC" },
+                                { data: "TipoCalculo", title: 'Tipo Calculo' },
+                                { data: "FactorEmpaque", title: "Factor Empaque" },
+                                {
+                                    targets: 21,
+                                    render: function (adata, type, row) {
+                                        return '<input class="form-control" id="pc-' + row.IdSugerido + '-' + row.IdSucursal + '" name="pc-' + row.Proveedor + '-' + row.Articulo_Id + '" type="text" value =' + row.PedidoFinal + '>';
+                                    }, title: "Pedido Final"
+                                },
+                                { data: "PedidoFinalMod", title: "Pedido Final Mod" }
+                            ],
+                            //buttons: [
+                            //    $.extend(true, {}, buttonCommon, {
+                            //        extend: 'excelHtml5'
+                            //    })
+                            //],
+                            scrollCollapse: true,
+                            info: false,
+                            paging: true,
+                            searching: true,
+                            deferRender: false,
+                            columnDefs: [],
+                            order: [1],
+                        });
+
+
+                        $("th input[type=checkbox]").on("click", function () {
+                            var isChecked = this.checked;
+                            var ld = $('#listSugerido').DataTable().rows().data();
+                            $.each(ld, function (i, item) {
+                                item.isChecked = isChecked;
+                            });
+                            $(".cbcell input").prop("checked", isChecked);
+                        });
+
+                        $("#listSugerido").on("click", "td input[type=checkbox]", function () {
+                            var isChecked = this.checked;
+                            var dtRow = listSugerido.rows($(this).closest("tr"));
+                            dtRow.data()[0].isChecked = isChecked;
+
+                            if (!isChecked) {
+                                $("th input[type=checkbox]").prop("checked", false);
+                            }
+                            else {
+                                $("th input[type=checkbox]").prop("checked", true);
+                                $.eaUrlrActionlh(listSugerido.data(), function (i, item) {
+                                    if (!item.isChecked) {
+                                        $("th input[type=checkbox]").prop("checked", false);
+                                        return false;
+                                    }
+                                });
+                            }
+                        });
+
+                        $('#tblmontos').DataTable({
+                            data: response.Result[0].Montos,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'lrtip',
+                            columns: [
+                                { data: "MontosPedido", title: 'Monto Total' },
+                                { data: "MontoPiezas", title: "Total Piezas" },
+                                { data: "MontoFueraLimite", title: "Fuera de Limite" }
+                            ],
+                            select: false,
+                            info: false,
+                            paging: false,
+                            searching: false
+                        });
+
+
+                    },
+                    error: function (response) {
+                        hideLoading();
+                        swal("", response.Message, "warning");
+                    }
+                });
+            });
+
+            //var buttonCommon = {
+            //    exportOptions: {
+            //        format: {
+            //            body: function (data, row, column, node) {
+            //                var form = $("#frmSugerido").serializeArray()
+            //                    .filter(function (elem) {
+            //                        return $.trim(elem.value);
+            //                    });
+
+            //                window.location.href = "/ValidaSugerido/DescargarExcel&form=" + form;
+            //            }
+            //        }
+            //    }
+            //};
+
+
+
+            $("#listSugerido").on("change", "input[type='text']", function (evtObj) {
+                var preg = /^([0-9]+\.?[0-9]{0,2})$/; 
+                if (this.value == '') {
+                    var rowData = listSugerido.rows($(this).closest("tr")).data()[0];
+                    this.value = rowData.PedidoFinal;
+                    listSugerido.rows($(this).closest("tr")).invalidate().draw();
+                     swal("", "Valor no válido para este campo", "warning");
+                 } else if (preg.test(this.value) === false) {
+                    var rowData = listSugerido.rows($(this).closest("tr")).data()[0];
+                    this.value = rowData.PedidoFinal;
+                    listSugerido.rows($(this).closest("tr")).invalidate().draw();
+                      swal("", "Valor no válido para este campo", "warning");
+                    } else {
+                        var num = parseFloat(this.value)
+                        var rowData = listSugerido.rows($(this).closest("tr")).data()[0];
+                    if (num <= parseFloat(rowData.PedidoFinal)) {
+                            rowData.PedidoFinalMod = num; //rowData.PedidoFinal
+                            //rowData.PedidoFinal = num;
+                            listSugerido.rows($(this).closest("tr")).invalidate().draw();
+                            ActualizarPedidoFinal(rowData.IdSugerido, rowData.IdSucursal, rowData.Proveedor, rowData.Articulo_Id, rowData.PedidoFinal, rowData.PedidoFinalMod);
+                        } else {
+                            swal("", "Este valor no puede exceder el sugerido calculado", "warning");
+                        }
+                   }
+             });
+
+             $("#EliminarRenglon").on("click", function () {
+                swal({
+                    title: 'Eliminar Pedido',
+                    text: "¿Seguro Eliminar pedidos marcados?",
+                    icon: "warning",
+                    buttons: {
+                        cancel: "Cancelar",
+                        catch: {
+                            text: "Eliminar Pedido",
+                            value: true
+                        }
+                    },
+                }).then((resp) => {
+
+                    console.log(resp)
+
+                    if (resp) {
+                        console.log("entre al resp")
+
+                        var dt = $('#listSugerido').DataTable().data();
+
+                        var formData = new FormData();
+                        var count = 0;
+
+                        for (var i = 0; i < dt.length; i++) {
+
+                            if (dt[i].isChecked) {
+
+                                count++;
+                                console.log(count - 1);
+                                var idx = count - 1;
+
+                                formData.append("model[" + idx + "].IdSugerido", dt[i].IdSugerido);
+                                formData.append("model[" + idx + "].Farmacia", dt[i].IdSucursal);
+                                formData.append("model[" + idx + "].Proveedor", dt[i].Proveedor);
+                                formData.append("model[" + idx + "].SKU", dt[i].Articulo_Id);
+                            }
+                        }
+
+                        if (count == 0) {
+                            swal('Mensaje', 'Nada Seleccionado', "warning");
+                            return;
+                        } else {
+                            showLoading();
+                            $.ajax({
+                                type: "POST",
+                                url: "/ValidaSugerido/EliminarSkuSugerido",
+                                processData: false,
+                                contentType: false,
+                                data: formData,
+                                success: function (response) {
+                                    hideLoading();
+                                    if (response.Success) {
+                                        swal("Proceso terminado", response.Message, "success").then((value) => {
+
+                                            $("#btnBuscar").trigger("click");
+
+                                            //window.location.href = "/ValidaSugerido/ConsultaSugerido?IdSugerido=" + $("#idSugerido").val();
+                                        });
+                                    } else {
+                                        swal("Error al Eliminar el registro del sugerido", 'Intente de nuevo', "error");
+                                    }
+
+                                },
+                                error: function (response) {
+                                    hideLoading();
+                                    swal("Error inesperado", '', "error: " + response.Message);
+                                }
+                            });
+                        }
+                    }
+                });
+
+        });
+
+            $("#resumenSug").on("change", function () {
+                showLoading();
+
+                $('#detalle').css("display", "none");
+                $('#resumen').css("display", "block");
+                $('#rechazos').css("display", "none");
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetResumen", "ValidaSugerido")',
+                    data: { "idSugerido": $("#idSugerido").val(), "accion": $("#resumenSug").val()},
+                    success: function (response) {
+                        hideLoading();
+                        //$('#tblResumenProveedor').DataTable().destroy();
+                        var accion = $("#resumenSug").val();
+                        if (accion == 1) {
+                            $('#tblResumenProveedor').DataTable({
+                                data: response.Result,
+                                "destroy": true,
+                                "processing": true,
+                                dom: 'Bfrtip',
+                                columns: [
+                                    { data: "Proveedor", title: 'Proveedor' },
+                                    { data: "TipoCompra", title: "Tipo Compra" },
+                                    { data: "IdSucursal", title: "Id Sucursal" },
+                                    { data: "Sucursal", title: 'Sucursal' },
+                                    { data: "Monto", title: "Monto" },
+                                    { data: "Piezas", title: "Piezas" }
+                                ]
+                            });
+                        } else  if (accion == 2) {
+                                $('#tblResumenProveedor').DataTable({
+                                    data: response.Result,
+                                    "destroy": true,
+                                    "processing": true,
+                                    dom: 'Bfrtip',
+                                    columns: [
+                                        { data: "Proveedor", title: 'Proveedor' },
+                                        { data: "TipoCompra", title: "Tipo Compra", visible: false  },
+                                        { data: "IdSucursal", title: "Id Sucursal", visible: false  },
+                                        { data: "Sucursal", title: 'Sucursal', visible: false  },
+                                        { data: "Monto", title: "Monto" },
+                                        { data: "Piezas", title: "Piezas" }
+                                    ]
+                                });
+                        } else if (accion == 3) {
+                            $('#tblResumenProveedor').DataTable({
+                                data: response.Result,
+                                "destroy": true,
+                                "processing": true,
+                                dom: 'Bfrtip',
+                                columns: [
+                                    { data: "Proveedor", title: 'Proveedor' },
+                                    { data: "TipoCompra", title: "Tipo Compra", visible: false  },
+                                    { data: "IdSucursal", title: "Id Sucursal" },
+                                    { data: "Sucursal", title: 'Sucursal' },
+                                    { data: "Monto", title: "Monto" },
+                                    { data: "Piezas", title: "Piezas" }
+                                ]
+                            });
+                        } else if (accion == 4) {
+                            $('#tblResumenProveedor').DataTable({
+                                data: response.Result,
+                                "destroy": true,
+                                "processing": true,
+                                dom: 'Bfrtip',
+                                columns: [
+                                    { data: "Proveedor", title: 'Proveedor' },
+                                    { data: "TipoCompra", title: "Tipo Compra" },
+                                    { data: "IdSucursal", title: "Id Sucursal",  visible: false },
+                                    { data: "Sucursal", title: 'Sucursal', visible: false },
+                                    { data: "Monto", title: "Monto" },
+                                    { data: "Piezas", title: "Piezas" }
+                                ]
+                            });
+                        }
+                        hideLoading();
+                    },
+                    error: function (response) {
+                        hideLoading();
+                        swal("", response.Message, "warning");
+                    }
+                });
+            });
+
+            $("#btnRechazos").on("click", function (event) {
+                event.preventDefault();
+
+                showLoading();
+                $('#detalle').css("display", "none");
+                $('#resumen').css("display", "none");
+                $('#rechazos').css("display", "block");
+                $.ajax({
+                    type: 'post',
+                    url: '@Url.Action("GetRechazos", "ValidaSugerido")',
+                    data: { "idSugerido": $("#idSugerido").val()},
+                    success: function (response) {
+                        hideLoading();
+
+                        $('#tblRechazos').DataTable({
+                            data: response.Result,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Blrtip',
+                            columns: [
+                                { data: "IdSucursal", title: 'Id Sucursal' },
+                                { data: "Sucursal", title: "Sucursal" },
+                                { data: "SKU", title: "SKU" },
+                                { data: "Descripcion", title: 'Descripción' },
+                                { data: "Configuracion", title: "Configuración" },
+                                { data: "Empaque", title: "Empaque/SubEmpaque" },
+                                { data: "Sku_Inactivo", title: 'SKU Inactivo' },
+                                { data: "Descontinuado", title: "Descontinuado" },
+                                { data: "Licencia", title: "Licencia Sanitaria" },
+                                { data: "Regla_Negados", title: "Regla Negados" },
+                                { data: "Regla_Compra_Esp", title: 'Regla Compra Especial' },
+                                { data: "NoPublicado", title: "No_publicado_lista_precio_proveedor" }
+                            ],
+                            paging: true,
+                            searching: true
+                        });
+                    },
+                    error: function (response) {
+                        hideLoading();
+                        swal("", response.Message, "warning");
+                    }
+                });
+            });
+
+            function ActualizarPedidoFinal(idSugerido, IdSucursal, Proveedor,Articulo_Id,pedidoFinal, modificado) {
+                showLoading();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("ActualizarPedidoFinal", "ValidaSugerido")',
+                    data: { "idSugerido": idSugerido, "farmacia": IdSucursal,  "proveedor":Proveedor, "sku":Articulo_Id,"pedFinal": pedidoFinal, "PedModificado": modificado },
+                    success: function (response) {
+                        hideLoading();
+                        if (response.Success) {
+                            swal("", response.Message, "success").then((value) => {
+                                $("#btnBuscar").trigger("click");
+
+                                //window.location.href = "/ValidaSugerido/ConsultaSugerido?IdSugerido=" + $("#idSugerido").val();
+                            });
+                        } else {
+                            swal("", response.Message, "warning");
+                        }
+                    }
+                });
+            }
+
+            function getDateNow() {
+
+                var f = new Date();
+                var mes;
+                var year;
+                var dia;
+
+
+                if ((f.getMonth() + 1) < 10) {
+                    mes = "0" + (f.getMonth() + 1)
+                } else {
+                    mes = (f.getMonth() + 1)
+
+                }
+                if (f.getDate() < 10) {
+                    dia = "0" + f.getDate();
+                } else {
+                    dia = f.getDate();
+                }
+                year = f.getFullYear();
+
+                //console.log(year + "-" + mes + "-" + dia + "T00:00:00")
+
+                var diaMax = dia + 3;
+
+                document.getElementById("txtGenOC").min = year + "-" + mes + "-" + dia;
+                document.getElementById("txtGenOC").max = year + "-" + mes + "-" + diaMax;
+            }
+
+        });
+    </script>
+}

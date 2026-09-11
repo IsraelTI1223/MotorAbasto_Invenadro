@@ -1,0 +1,238 @@
+﻿
+@model PortalGRFP.Entities.Common.ConfiguracionProveedorGeneralModel
+
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+    <li class="breadcrumb-item"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Proveedores</a></li>
+    <li class="breadcrumb-item"><a>Generales</a></li>
+}
+
+<style>
+    .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+    }
+
+    @@media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+        }
+    }
+</style>
+
+<body class="bg-light">
+
+    <div class="container">
+        <main>
+
+            <div class="col-md-12 col-lg-12">
+                <h4 class="mb-3">Configuración de Proveedor</h4>
+                <!-- <form class="needs-validation" novalidate>-->
+                <div class="row g-3">
+
+                    <!--<div class="col-sm-5">
+            <label for="idProveedorB" class="form-label"><strong>Buscar Proveedor:</strong></label>
+            <div class="input-group">
+                <input type="text" class="form-control" aria-label="..." id="idProveedorB">
+                <div class="input-group-btn">
+                    <button onclick="buscarProveedor()" type="button" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </div>-->
+                    <div class="col-sm-5">
+                        @Html.LabelFor(model => model.Id)
+                        @Html.DropDownListFor(model => model.Id, new SelectList(Model.lstProveedores, "Value", "Text"), "-Seleccionar Proveedor-", new { @class = "form-control" })
+                    </div>
+                </div>
+
+
+                <div class="row g-3">
+                    @using (Html.BeginForm("Proveedor", "ConfiguracionesProveedores", FormMethod.Post, new { role = "form", @class = "form-row mt-12" }))
+                    {
+
+                    <div class="col-sm-2">
+                        <label for="idProveedor" class="form-label"><strong>ID Proveedor:</strong></label>
+                        <!--<input type="text" class="form-control" id="idProveedor" placeholder="" value="" readonly>-->
+                        @Html.TextBoxFor(d => d.IdProveedorERP, new { @class = "form-control", @placeholder = "ID Proveedor", @type = "number", @id = "IdProveedorERP" })
+
+                    </div>
+
+                    <div class="col-sm-5">
+                        <label for="proveedor" class="form-label">Proveedor</label>
+                        <!--<input type="text" class="form-control" id="proveedor" placeholder="" value="" required>-->
+                        @Html.TextBoxFor(d => d.Nombre, new { @class = "form-control", @placeholder = "Nombre Proveedor", @type = "text", @id = "Nombre" })
+
+                    </div>
+
+
+
+                        <div class="col-sm-12">
+                            <div class="card mb-12" style="height:7.3rem">
+                                <div class="card-body">
+                                    <div class="row g-0">
+                                        <div class="col-md-2 pb-3">
+                                            <label for="proveedor" class="form-label">Aplica Agencia del Proveedor:</label>
+                                            @Html.CheckBoxFor(m => m.AplicaAgencia, new { @class = "form-control" })
+                                        </div>
+
+                                        <div class="col-md-2 pb-3">
+                                            <label for="proveedor" class="form-label">Aplica minimo de compra:</label>
+                                            @Html.CheckBoxFor(m => m.AplicaMinimo, new { @class = "form-control" })
+                                        </div>
+
+                                        <div class="col-md-3 pb-1">
+                                            <label for="proveedor" class="form-label">Minimo de compra Monto:</label>
+                                            <!--<input type="text" class="form-control" id="proveedor" placeholder="" value="" required>-->
+                                            @Html.TextBoxFor(d => d.MinimoMonto, new { @class = "form-control", @placeholder = "Monto", @type = "number", @id = "MinimoMonto" })
+                                        </div>
+
+                                        <div class="col-md-3 pb-1">
+                                            <label for="proveedor" class="form-label">Minimo de compra Piezas:</label>
+                                            <!--<input type="text" class="form-control" id="proveedor" placeholder="" value="" required>-->
+                                            @Html.TextBoxFor(d => d.minimoPiezas, new { @class = "form-control", @placeholder = "Piezas", @type = "number", @id = "minimoPiezas" })
+                                        </div>
+
+                                        <div class="col-md-2 pb-1">
+                                            <label for="proveedor" class="form-label">Dias vigencia de OC</label>
+                                            <!--<input type="text" class="form-control" id="proveedor" placeholder="" value="" required>-->
+                                            @Html.TextBoxFor(d => d.DiasVigenciaOC, new { @class = "form-control", @placeholder = "Dias", @type = "number", @id = "DiasVigenciaOC" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <br /><br />
+
+                        <button class="btn btn-primary btn-lg" type="submit">Guardar Configuración de Proveedor</button>
+                        <!--</form>-->
+                    }
+                </div>
+            </div>
+        </main>
+
+    </div>
+</body>
+
+
+@section scripts{
+
+    <script>
+
+
+            //url = "Url.Content("~/Access/Enter")"
+    /*        parametros = $(this).serialize();
+
+            $.post(url, parametros, function (data) {
+
+                if (data == "1") {
+                    document.location.href = "Url.Content("~/")";
+                }
+                else {
+                    alert(data);
+                }
+            })*/
+    //    })
+    //})
+        /*
+        var cbo = document.getElementById("Id");
+        cbo.addEventListener("change", Refresh);
+        Refresh();
+
+        function Refresh() {
+            console.log(cbo.value);
+
+            var formData = new FormData();
+
+            formData.append("idproveedor", cbo.value);
+
+             $.ajax({
+                 url: "/ConfiguracionesProveedores/BuscarProveedor",
+                            type: 'POST',
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            data: formData,
+
+                 success: function (response) {
+                     console.log(response)
+                            }
+                        });
+
+
+
+
+
+        }*/
+
+        @*function Refresh() {
+            console.log(cbo.value);
+
+            fetch("@Url.Content("~/ConfiguracionesProveedores/BuscarProveedor")" + "?idProveedor=" + cbo.value)
+            .then(function (result) {
+                if (result.ok) {
+                    return result.json();
+                }
+            })
+            .then(function (data) {
+                console.log(data);
+
+
+
+                /*cbo = document.getElementById("animal");
+                cbo.innerHTML = "";
+                data.forEach(function (element) {
+
+                    let opt = document.createElement("option");
+                    opt.appendChild(document.createTextNode(element.Text));
+                    opt.value = element.Value;
+
+                    cbo.appendChild(opt);
+                })*/
+            })
+        }*@
+
+
+
+
+
+
+
+
+
+
+
+        /*function buscarProveedor() {
+
+            console.log($("#idProveedorB").val());
+            console.log($("#idProveedorB").text());
+
+            $.ajax({
+                url: "/ConfiguracionesProveedores/BuscarProveedor",
+                type: 'POST',
+                cache: false,
+                dataType: "JSON",
+                contentType: false,
+                processData: false,
+                data: { proveedor: $("#idProveedorB").text() },
+
+                            success: function (response) {
+                                console.log(response);
+                            }
+                        });
+        }*/
+    </script>
+
+}

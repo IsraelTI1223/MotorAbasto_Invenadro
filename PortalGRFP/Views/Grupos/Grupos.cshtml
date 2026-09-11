@@ -1,0 +1,182 @@
+﻿@model List<PortalGRFP.Entities.Common.GruposModel>
+
+
+@{
+    ViewBag.Title = "Grupos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<span class="anchor" id="formComplex"></span>
+@section Breadcrumbs{
+    <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+    <li class="breadcrumb-item"><a>Mantenimiento</a></li>
+    <li class="breadcrumb-item"><a>Grupos</a></li>
+}
+
+
+
+<div class="col-sm-12">
+    <label for="groupBtn"><strong>Generales del grupo</strong></label>
+    <div class="card mb-12" style="height:7.3rem">
+        <form id="frm">
+            <div class="card-body">
+                <div class="row g-0">
+                    <div class="col-md-2 pb-1">
+                        <label for="idInput" class="visually-hidden">Id</label>
+                        <input readonly type="number" value="0" class="form-control" id="idInput" placeholder="0">
+                    </div>
+                    <div class="col-md-4 pb-1">
+                        <label for="nombreInput" class="visually-hidden">Nombre del Grupo</label>
+                        <input type="text" class="form-control" id="nombreInput" placeholder="Nombre del Grupo" pattern="[A-Za-z0-9 ]+">
+                    </div>
+
+                    <div class="col-md-2" style="margin-top: 2.5%">
+                        <div class="custom-control custom-checkbox form-group">
+                            <input type="checkbox" class="custom-control-input" id="cbEstatus">
+                            <label class="custom-control-label" for="cbEstatus">Estatus del Grupo</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 pb-1">
+                        <button id="btnContinuar" style="margin-top:17%" type="submit" class="btn btn-primary mb-3">Continuar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="col-sm-12" style="margin-top: 1%">
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-striped" id="DTGrupos">
+                <thead class="thead-primary">
+                    <tr>
+                        <th style="width:10%">#Id</th>
+                        <th style="width:50%">Nombre</th>
+                        <th style="width:10%">Estatus</th>
+
+                        <!--<th style="width:10%">Editar</th>-->
+                    </tr>
+                </thead>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Nombre</td>
+                        <td>@item.Estatus</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+
+
+            $(function () {
+                'use strict'
+
+                $('#DTGrupos').dataTable({
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+                        searchPlaceholder: "Buscar",
+                        sSearch: '',
+                        lengthMenu: '_MENU_ filas / paginas'
+                    }
+                });
+            });
+
+
+            $("#frm").submit(function (e) {
+                e.preventDefault();
+
+
+                console.log($("#nombreInput").val())
+                if ($("#nombreInput").val() != "") {
+
+
+
+                if (confirm("Vas guardar información, ¿Seguro de continuar?")) {
+
+
+
+                    var formData = new FormData();
+
+                    formData.append("Nombre", $("#nombreInput").val());
+                    formData.append("Id", $("#idInput").val());
+                    formData.append("Estatus", $("#cbEstatus").prop('checked'));
+
+
+                        $.ajax({
+                            url: "/Grupos/Grupos",
+                            type: 'POST',
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            data: formData,
+
+                            success: function (response) {
+                                if (response == "1") {
+
+                                 swal("Cambios guardados", 'Se guardaron los cambios de forma correcta', "success").then((value) => {
+                                     location.reload();
+                                 });
+
+                                } if (response == "3") {
+
+                                   swal("No se pudo Actualizar", 'El grupo que intenta desactivar tiene sucursales asignadas', "error").then((value) => {
+                                       location.reload();
+                                   });
+
+                                } if (response == "0") {
+
+                                   swal("Error al actualizar o registrar el grupo", '', "error").then((value) => {
+                                       location.reload();
+                                   });
+                                }
+
+                                //else {
+                                //    alert("ERROR AL REGISTRAR " + response);
+                                //}
+                            },
+                            error: function (response) {
+                                hideLoading();
+                            }
+                        });
+                    }
+                } else {
+                    alert("Nombre es obligatorio")
+                }
+
+
+            });
+
+            $("#DTGrupos tbody").on('click', 'tr', function () {
+
+                var rowData = $(this).children("td").map(function () {
+                    return $(this).text();
+                }).get();
+
+                $("#idInput").val(rowData[0]);
+                $("#nombreInput").val(rowData[1]);
+
+                if (rowData[2] == "True") {
+                    $("#cbEstatus").prop('checked', true)
+                } else {
+                    $("#cbEstatus").prop('checked', false)
+                }
+
+            });
+
+    })
+    </script>
+}

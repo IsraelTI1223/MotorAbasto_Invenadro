@@ -1,0 +1,657 @@
+﻿@using PortalGRFP.Entities.Common
+
+@{
+
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Compras Especiales</a></li>
+    <li class="breadcrumb-item"><a>Carga de Pedido</a></li>
+}
+@section Actions{
+
+}
+<div class="container-fluid">
+
+   
+    <div class="card">
+        @using (Html.BeginForm("CargaSugerido", "ComprasEspeciales", FormMethod.Post, new { role = "form", id = "frmCargaSugerido" }))
+        {
+            <div class="card-header">
+                <div class="row">
+                    @*<div class="col-md-3">
+            <select id="tipoPedido" name="tipoPedido " class="form-control" required>
+                <option value="0">Seleccione un Tipo de Pedido</option>
+                @foreach (var item in TempData["TipoPedido"] as List<ComboGenerico>)
+                {
+                    <option value="@item.Id">@item.Valor</option>
+                }
+            </select>
+        </div>*@
+
+               @*<div class="col-md-2">
+                       <select id="tipoProveedor" name="tipoProveedor" class="form-control" required>
+                           <!--<option value="0">Seleccione un Proveedor</option>-->
+                           <option disabled selected>Seleccione Un Proveedor </option>
+                           @foreach (var item in TempData["TipoProveedor"] as List<ComboGenerico>)
+                           {
+                               <option value="@item.Id">@item.Valor</option>
+                           }
+                       </select>
+                 </div>*@
+
+                    @*<div class="col-md-3">
+                        <select id="tipoProveedor" name="tipoProveedor" multiple="multiple" class="form-control" required>
+                            <option disabled selected>Seleccione Un Proveedor </option>
+                            @foreach (var item in TempData["TipoProveedor"] as List<ComboGenerico>)
+                            {
+                                <option value="@item.Id">
+                                    @item.Valor
+                            </option>
+                        }
+                        </select>
+                    </div>*@
+
+                    <div class="col-md-2">
+                        <input type="date" id="txtGenOC" name="txtGenOC" class="form-control" placeholder="Fecha Generación OC" required />
+                    </div>
+                    <div class="col-md-8">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="fileExcel" name="fileExcel" multiple data-show-upload="false">
+                            <label id="lblFileName" class="custom-file-label" for="customFile">Seleccionar archivo</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="btn-group">
+                            @*<input type="button" style="display:none" value="Consultar" id="btnConsultar" name="btnConsultar" class="btn btn-warning" />*@
+                            <input type="submit" value="Cargar" class="btn btn-primary" />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        }
+    <div class="col-auto" style="margin-top:2.3%">
+        <button class="btn btn-sm pd-x-15 btn-primary btn-lg" id="btnEnviarSugerido" onclick="enviarSugerido()" title="Enviar a Sugerido">
+            <i class="fa fa-paper-plane" aria-hidden="true"></i>
+        </button>
+
+        <button class="btn btn-sm pd-x-15 btn-warning btn-lg" id="btnSiguiente" onclick="document.location.href='@Url.Content("~/ValidaSugerido/index/")'" title="siguiente">
+            Siguiente <i class="fa fa-arrow-right" aria-hidden="true"></i>
+        </button>
+    </div>
+        <div class="card-body">
+            <h4 id="titleTB">Pedidos del: </h4>
+            <div class="row">
+                <table id="tblpedidosCargados" class="display compact" width="100"></table>
+            </div>
+            <hr />
+            <div class="row">
+                <table id="tblNegados" class="display compact" width="100"></table>
+            </div>
+        </div>
+    </div>
+   
+</div>
+
+
+@section scripts{
+    <script>
+        //$('#tipoProveedor').multiselect({
+        //    //nonSelectedText: 'Seleccione un proveedor',
+        //    enableFiltering: true,
+        //    includeSelectAllOption: true,
+        //    maxHeight: 400,
+        //    buttonWidth: '250px',
+        //    //dropUp: true,
+        //    selectAllText: "Marcar Todos",
+        //    allSelectedText: "Todos Seleccionados",
+        //    nSelectedText: "Proveedores Seleccionados"
+        //});
+
+        var fechaPedidos_ = '';
+
+        function Consulta(folioNuevo) {
+
+                 var sugerido = $("#frmCargaSugerido").serializeArray()
+                    .filter(function (elem) {
+                        return $.trim(elem.value);
+                    });
+
+
+                sugerido.push({ name: "Folio", value: folioNuevo })
+                sugerido.push({ name: "Fecha", value: String($("#txtGenOC").val())})
+
+
+
+
+              showLoading();
+              $.ajax({
+                  type: "Post",
+                  url: "@Url.Action("ConsultaMasiva", "ComprasEspeciales")",
+                  dataType: "json",
+                  data: sugerido,
+                  success: function (response) {
+                      if (response.Success) {
+
+
+                          console.log(response.Result[0].PedidosCargardosB)
+
+
+                          if (response.Result[0].PedidosCargardosB.length > 0) {
+                              $("#btnEnviarSugerido").show();
+                              $("#titleTB").show();
+                              $("#titleTB").text("Pedidos pendientes o erroneos al dia: " + $("#txtGenOC").val());
+                              fechaPedidos_ = $("#txtGenOC").val();
+
+                          }
+                          console.log(response.Result[0].PedidosCargardosB.length);
+
+                          tblpedidosCargados = $('#tblpedidosCargados').DataTable({
+                              data: response.Result[0].PedidosCargardosB,
+                              "destroy": true,
+                              "processing": true,
+                              dom: 'Bfrtip',
+                              columns: [
+                                  { data: "Folio", title: 'Folio' },
+                                  { data: "NombreArchivo", title: 'Nombre_Archivo' },
+                                  { data: "TipoPedido", title: "Tipo_de_Pedido" },
+                                  { data: "LineasPedido", title: "No._lineas_Pedido" },
+                                  { data: "LineasCargadas", title: 'No._lineas_cargadas' },
+                                  { data: "Estatus", title: "Estatus" },
+                                  {
+                                      data: null,
+                                      render: function (data, type, row) {
+                                          return '<button class="btn btn-sm pd-x-15 btn-primary" onclick="BorrarCarga(this)" ><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                                      }
+                                  }
+                              ],
+                              select: true,
+                              //buttons: [
+                              //    {
+                              //        text: 'Borrar',
+                              //        className: 'bi bi-trash',
+                              //        action: function (e, dt, node, config) {
+                              //            var rowData = tblpedidosCargados.rows(['.selected']).data().toArray();
+                              //            BorrarCarga(rowData[Url].Folio);
+                              //        }
+                              //    }
+                              //]
+                          });
+
+                          $('#tblNegados').DataTable({
+                              data: response.Result[0].RechazadosB,
+                              "destroy": true,
+                              "processing": true,
+                              dom: 'Bfrtip',
+                              columns: [
+                                  { data: "Folio", title: 'Folio' },
+                                  { data: "Proveedor", title: "Proveedor" },
+                                  { data: "FechaCarga", title: "Fecha Carga" },
+                                  { data: "FechaAplicacion", title: 'Fecha aplicación' },
+                                  { data: "Tipo", title: "Tipo" },
+                                  { data: "Farmacia", title: "Sucursal" },
+                                  { data: "SKU", title: "SKU" },
+                                  { data: "Descripcion", title: "Descripción" },
+                                  { data: "TipoIncidencia", title: "Incidencia" }
+                              ],
+                              select: true
+
+                          });
+                      } else {
+                          swal(response.Message, '', "error");
+
+
+
+                          tblpedidosCargados = $('#tblpedidosCargados').DataTable({
+                              data: response.Result[0].PedidosCargardosB,
+                              "destroy": true,
+                              "processing": true,
+                              dom: 'Bfrtip',
+                              columns: [
+                                  { data: "Folio", title: 'Folio' },
+                                  { data: "NombreArchivo", title: 'Nombre_Archivo' },
+                                  { data: "TipoPedido", title: "Tipo_de_Pedido" },
+                                  { data: "LineasPedido", title: "No._lineas_Pedido" },
+                                  { data: "LineasCargadas", title: 'No._lineas_cargadas' },
+                                  { data: "Estatus", title: "Estatus" },
+                                  {
+                                      data: null,
+                                      render: function (data, type, row) {
+                                          return '<button class="btn btn-sm pd-x-15 btn-primary" onclick="BorrarCarga(this)" ><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                                      }
+                                  }
+                              ],
+                              select: true
+                          });
+
+
+                          $('#tblNegados').DataTable({
+                              data: response.Result[0].RechazadosB,
+                              "destroy": true,
+                              "processing": true,
+                              dom: 'Bfrtip',
+                              columns: [
+                                  { data: "Folio", title: 'Folio' },
+                                  { data: "Proveedor", title: "Proveedor" },
+                                  { data: "FechaCarga", title: "Fecha Carga" },
+                                  { data: "FechaAplicacion", title: 'Fecha aplicación' },
+                                  { data: "Tipo", title: "Tipo" },
+                                  { data: "Farmacia", title: "Sucursal" },
+                                  { data: "SKU", title: "SKU" },
+                                  { data: "Descripcion", title: "Descripción" },
+                                  { data: "TipoIncidencia", title: "Incidencia" }
+                              ],
+                              select: true
+
+                          });
+
+
+                      }
+                      hideLoading();
+              },
+                  error: function (response) {
+                      hideLoading();
+                      swal(response.Message, '', "warning");
+                  }
+              });
+            }
+        $(document).ready(function () {
+
+            getDateNow();
+
+            $("#btnEnviarSugerido").hide();
+            $("#titleTB").hide();
+            $("#btnSiguiente").hide();
+
+
+            'use strict';
+            var tblpedidosCargados = $('#tblpedidosCargados').DataTable({
+                data: "",
+                "destroy": true,
+                "processing": true,
+                dom: 'Bfrtip',
+                columns: [
+                    { data: "Folio", title: 'Folio'},
+                    { data: "NombreArchivo", title: 'Nombre_Archivo' },
+                    { data: "TipoPedido", title: "Tipo_de_Pedido" },
+                    { data: "LineasPedido", title: "No._lineas_Pedido" },
+                    { data: "LineasCargadas", title: 'No._lineas_cargadas' },
+                    { data: "Estatus", title: "Estatus" },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return '<button class="btn btn-sm pd-x-15 btn-primary" onclick="BorrarCarga(this)" ><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                        }
+                    }
+                ],
+                select: true,
+                buttons: false
+            });
+
+            var $lblFileName = $('#lblFileName');
+
+            $('#fileExcel').change(function (e) {
+                $lblFileName.text((e.target.files.length > 0) ? e.target.files[0].name : 'Seleccionar archivo');
+            });
+
+            $("#frmCargaSugerido").on("submit", function (event) {
+                event.preventDefault();
+
+                var formulario = document.getElementById('frmCargaSugerido');
+                var archivo = $("#fileExcel").val();
+
+                if (archivo != "") {
+                    showLoading();
+                    var formData = new FormData(formulario);
+
+                    formData.append("txtGenOC2", $("#txtGenOC").val());
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("CargaSugerido", "ComprasEspeciales")",
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success: function (response) {
+                         hideLoading();
+                         if (response.Success) {
+                             swal(response.Message, '', "success").then((value) => {
+                                 Consulta(response.Result[0].folio);
+                             });
+                         } else {
+                             swal(response.Message, '', "error");
+                         }
+                        },
+                        error: function (e) {
+                       hideLoading();
+                        swal("¡Error inesperado en la carga!", '', "error");
+                          }
+
+                        })
+                } else {
+                    swal("¡No se ha seleccionado un archivo!", '', "error");
+                }
+            });
+
+
+
+
+
+            var $lblFileName2 = $('#lblFileName2');
+
+            $('#fileExcel2').bind('change', function(e) {
+                $lblFileName2.text((e.target.files.length > 0) ? e.target.files[0].name : 'Seleccionar archivo');
+            });
+
+            $("#EnviarExcel").click(function () {
+                var formulario = document.getElementById('frmExcel');
+                var archivo = $("#fileExcel2").val();
+                if (archivo != "") {
+                    showLoading();
+                    var formData = new FormData(formulario);
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("CargaInvenadro", "ComprasEspeciales")',
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success: function (response) {
+                            hideLoading();
+                            if (response.Success) {
+                                $("#modalExcel").modal('hide');
+                                swal('',response.Message,  "success");
+                            } else {
+                                swal('',response.Message, "error");
+                            }
+                        },
+                        error: function (e) {
+                            hideLoading();
+                            swal('',"¡Error inesperado en la carga!",  "error");
+                        }
+
+                    });
+                } else {
+                    swal("¡No se ha seleccionado un archivo!", '', "error");
+                }
+            });
+        });
+
+        function getDateNow() {
+
+            var f = new Date();
+            var mes;
+            var year;
+            var dia;
+
+
+            if ((f.getMonth() + 1) < 10) {
+                mes = "0" + (f.getMonth() + 1)
+            } else {
+                mes = (f.getMonth() + 1)
+
+            }
+
+            if (f.getDate() < 10) {
+                dia = "0" + f.getDate();
+
+            } else {
+                dia = f.getDate();
+            }
+
+            var diaMax = 0;
+
+
+            if ((f.getDate()+3) < 10) {
+                diaMax = "0" + (f.getDate()+3);
+
+            } else {
+                diaMax = (f.getDate()+3);
+            }
+
+
+            year = f.getFullYear();
+
+
+
+
+           // console.log(year + "-" + mes + "-" + dia + "T00:00:00")
+
+            //var diaMax = dia + 3;
+            console.log(diaMax)
+
+            document.getElementById("txtGenOC").min = year + "-" + mes + "-" + dia;
+            document.getElementById("txtGenOC").max = year + "-" + mes + "-" + diaMax;
+
+
+
+        }
+
+        function BorrarCarga(obj) {
+
+            console.log(obj);
+
+            var row = $('#tblpedidosCargados').DataTable().row($(obj).parents('tr')).data();
+            //var dataExchangeCheckColumnList = $('#tbPedidos').DataTable().rows().data();
+            console.log(row)
+            //console.log(dataExchangeCheckColumnList)
+
+            swal({
+                title: 'Eliminar Pedido',
+                text: "¿Seguro de Eliminar el Pedido?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Eliminar",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+
+
+                if (resp) {
+                    var sugerido = $("#frmCargaSugerido").serializeArray()
+                        .filter(function (elem) {
+                            return $.trim(elem.value);
+                        });
+
+                    sugerido.push({ name: "Folio", value: row.Folio })
+                    sugerido.push({ name: "Fecha", value: String($("#txtGenOC").val()) })
+
+                    showLoading();
+
+                    $.ajax({
+
+                        type: "Post",
+
+                        url: "@Url.Action("BorrarCarag", "ComprasEspeciales")",
+
+                        dataType: "json",
+
+                        data: sugerido,
+
+                        success: function (response) {
+
+                            if (response.Success) {
+
+                                swal(response.Message, '', "success").then((value) => {
+                                    Consulta(0);
+
+                                //    if (response.Result.length > 0) {
+                                //        $("#btnEnviarSugerido").show();
+                                //        $("#titleTB").show();
+                                //        $("#titleTB").text("Pedidos pendientes o erroneos al dia: " + $("#txtGenOC").val() );
+                                //        fechaPedidos_ = $("#txtGenOC").val();
+
+
+
+                                //    }
+
+                                //    $('#tblpedidosCargados').DataTable({
+                                //        data: response.Result,
+                                //        "destroy": true,
+                                //        "processing": true,
+                                //        dom: 'Bfrtip',
+                                //        columns: [
+                                //            { data: "Folio", title: 'Folio' },
+                                //            { data: "NombreArchivo", title: 'Nombre_Archivo' },
+                                //            { data: "TipoPedido", title: "Tipo_de_Pedido" },
+                                //            { data: "LineasPedido", title: "No._lineas_Pedido" },
+                                //            { data: "LineasCargadas", title: 'No._lineas_cargadas' },
+                                //            { data: "Estatus", title: "Estatus" },
+                                //            {
+                                //                data: null,
+                                //                render: function (data, type, row) {
+                                //                    return '<button class="btn btn-sm pd-x-15 btn-primary" onclick="BorrarCarga(this)" ><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                                //                }
+                                //            }
+                                //        ],
+                                //        select: true,
+                                //    });
+                                });
+
+                            } else {
+                                swal(response.Message, '', "error");
+                            }
+                            hideLoading();
+                        },
+                        error: function (response) {
+                            hideLoading();
+                            swal(response.Message, '', "warning");
+                        }
+                    });
+                }
+            });
+
+
+            @*var sugerido = $("#frmCargaSugerido").serializeArray()
+                .filter(function (elem) {
+                    return $.trim(elem.value);
+                });
+
+
+
+            sugerido.push({ name: "Folio", value: folio })
+            showLoading();
+            $.ajax({
+                type: "Post",
+                url: "@Url.Action("BorrarCarag", "ComprasEspeciales")",
+                dataType: "json",
+                data: sugerido,
+                success: function (response) {
+                    if (response.Success) {
+                        swal(response.Message, '', "success").then((value) => {
+                            window.location.href = "/ComprasEspeciales/GeneracionPedido";
+                        });
+                    } else {
+                        swal(response.Message, '', "error");
+                    }
+                    hideLoading();
+                },
+                error: function (response) {
+                    hideLoading();
+                    swal(response.Message, '', "warning");
+                }
+            });*@
+        }
+
+        function enviarSugerido() {
+
+            swal({
+                title: 'Enviar a Sugerido',
+                text: "Todos los pedidos pendientes con la fecha seleccionada y de maximo 3 dias hacia atras se enviaran al sugerido, ¿Seguro de continuar?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Continuar",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+                fechaPedidos_ = $("#txtGenOC").val();
+
+
+                if (resp) {
+
+                    var sugerido = $("#frmCargaSugerido").serializeArray()
+                        .filter(function (elem) {
+                            return $.trim(elem.value);
+                        });
+
+                    sugerido.push({ name: "Fecha", value: String(fechaPedidos_) })
+
+                     $.ajax({
+
+                        type: "Post",
+
+                        url: "@Url.Action("EnviarSugerido", "ComprasEspeciales")",
+
+                        dataType: "json",
+
+                        data: sugerido,
+
+                        success: function (response) {
+
+                            if (response.Success) {
+
+                                swal(response.Message, '', "success").then((value) => {
+
+
+                                    let data = [{
+                                        Estatus: "",
+                                        Folio: "",
+                                        NombreArchivo: "",
+                                        TipoPedido: "",
+                                        LineasPedido: "",
+                                        LineasCargadas: "",
+                                    }];
+
+
+
+                                    $("#btnSiguiente").show();
+                                    $("#btnEnviarSugerido").hide();
+
+                                    $('#tblpedidosCargados').DataTable({
+                                        data: data,
+                                        "destroy": true,
+                                        "processing": true,
+                                        dom: 'Bfrtip',
+                                        columns: [
+                                            { data: "Folio", title: 'Folio' },
+                                            { data: "NombreArchivo", title: 'Nombre_Archivo' },
+                                            { data: "TipoPedido", title: "Tipo_de_Pedido" },
+                                            { data: "LineasPedido", title: "No._lineas_Pedido" },
+                                            { data: "LineasCargadas", title: 'No._lineas_cargadas' },
+                                            { data: "Estatus", title: "Estatus" },
+                                            {
+                                                data: null,
+                                                render: function (data, type, row) {
+                                                    return '<button class="btn btn-sm pd-x-15 btn-primary" hidden><i class="fa fa-trash" aria-hidden="true"></i></button>';
+                                                }
+                                            }
+                                        ],
+                                        select: true,
+                                        buttons: false
+                                    });
+
+
+                                });
+
+                            } else {
+                                swal(response.Message, '', "error");
+                            }
+                            hideLoading();
+                        },
+                        error: function (response) {
+                            hideLoading();
+                            swal(response.Message, '', "warning");
+                        }
+                    });
+                }
+                });
+
+        }
+    </script>
+}
+

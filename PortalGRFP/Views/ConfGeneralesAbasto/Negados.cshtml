@@ -1,0 +1,472 @@
+﻿@model PortalGRFP.Entities.Common.NegadosViewModel
+
+
+
+@{
+    ViewBag.Title = "Configuración de Negados";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <div class="col-md-12 offset-md-1">
+        <span class="anchor" id="formComplex"></span>
+        @section Breadcrumbs{
+            <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+            <li class="breadcrumb-item"><a>Configuraciones</a></li>
+            <li class="breadcrumb-item"><a>Generales de Abasto</a></li>
+            <li class="breadcrumb-item"><a>Negados</a></li>
+
+        }
+
+        <!-- form complex example -->
+
+        @using (Html.BeginForm("GuardarNegados", "ConfGeneralesAbasto", FormMethod.Post, new { role = "form", @class = "form-row mt-4", id = "frmNegados" }))
+        {
+            @Html.TextBoxFor(d => d.IdNegado, new { style = "display: none;" })
+            <div class="col-sm-3 pb-3">
+                @Html.LabelFor(d => d.PiezasXArticulo, new { @for = "PiezasXArticulo" })
+                @Html.TextBoxFor(d => d.PiezasXArticulo, new { required = true, @class = "form-control", @placeholder = "Piezas Por Articulo", @type = "number", @id = "PiezasXArticulo", min = 0, oninput = "validity.valid||(value='')" })
+                @Html.ValidationMessage("PiezasXArticulo", new { @class = "text-danger" })
+            </div>
+
+            <div class="col-sm-3 pb-3">
+                @Html.LabelFor(d => d.Costo_Articulo, new { @for = "Costo_Articulo" })
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                    @Html.TextBoxFor(d => d.Costo_Articulo, new { required = true, @class = "form-control", @placeholder = "Costo Artículo", @type = "number", @id = "Costo_Articulo", min = 0, step = "0.0001", oninput = "validity.valid||(value='')" })
+                    @Html.ValidationMessage("Costo_Articulo", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-sm-3 pb-3">
+                @Html.LabelFor(d => d.PiezasXFarmacia, new { @for = "PiezasXFarmacia" })
+                @Html.TextBoxFor(d => d.PiezasXFarmacia, new { required = true, @class = "form-control", @placeholder = "Piezas por Farmacia", @type = "number", @id = "PiezasXFarmacia", min = 0, oninput = "validity.valid||(value='')" })
+                @Html.ValidationMessage("PiezasXFarmacia", new { @class = "text-danger" })
+            </div>
+
+            <div class="col-sm-3 pb-3">
+                @Html.LabelFor(d => d.Imp_Negados_XDia, new { @for = "Imp_Negados_XDia" })
+                <div class="input-group">
+                    <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                    @Html.TextBoxFor(d => d.Imp_Negados_XDia, new { required = true, @class = "form-control", @placeholder = "Importe de Negados", @type = "number", @id = "Imp_Negados_XDia", min = 0, step = "0.0001", oninput = "validity.valid||(value='')" })
+                    @Html.ValidationMessage("Imp_Negados_XDia", new { @class = "text-danger" })
+                </div>
+            </div>
+            <br />
+            <div class="col-sm-3 pb-3">
+                <label for="groupBtn"><strong>Invenadro:</strong></label>
+                <div class="card" id="groupBtn" style="height:7.3rem">
+                    <div class="card-body">
+                        <div class="form-check">
+                            @Html.RadioButtonFor(model => model.Invenadro, "1", new { id = "invenadro1", data_val = "true" })
+                            <label for="Option1">Sumar al Sugerido</label>
+                            <br />
+                            @Html.RadioButtonFor(model => model.Invenadro, "2", new { id = "invenadro2", data_val = "true" })
+                            <label for="Option2">Comprar al Mayor</label>
+                            <br />
+                            @Html.RadioButtonFor(model => model.Invenadro, "3", new { id = "invenadro3", data_val = "true" })
+                            <label for="Option3">No Incluir</label>
+                        </div>
+                        @Html.ValidationMessage("Invenadro", new { @class = "text-danger" })
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3 pb-3">
+                <label for="groupBtn"><strong>Resto de Productos:</strong></label>
+                <div class="card" id="groupBtn" style="height: 7.3rem">
+                    <div class="card-body">
+                        <div class="form-check">
+                            @Html.RadioButtonFor(model => model.Resto_Productos, "1", new { id = "resto1", data_val = "true" })
+                            <label for="Option1">Sumar al Sugerido</label>
+                            <br />
+                            @Html.RadioButtonFor(model => model.Resto_Productos, "2", new { id = "resto2", data_val = "true" })
+                            <label for="Option2">Comprar al Mayor</label>
+                            <br />
+                            @Html.RadioButtonFor(model => model.Resto_Productos, "3", new { id = "resto3", data_val = "true" })
+                            <label for="Option3">No Incluir</label>
+                        </div>
+                        @Html.ValidationMessage("Resto_Productos", new { @class = "text-danger" })
+
+                    </div>
+                </div>
+            </div>
+
+            <!--<div class="col-sm-6 pb-3">
+            <label for="groupBtn"><strong>Vigencia por Tipo de Proveedor:</strong></label>
+            <div class="card" id="groupBtn">
+
+                <div class="col-auto">
+                    <label for="staticEmail2" class="visually-hidden">Email</label>
+                    <input type="text" readonly class="form-control-plaintext" id="staticEmail2" value="email@example.com">
+                </div>
+                <div class="col-auto">
+                    <label for="inputPassword2" class="visually-hidden">Password</label>
+                    <input type="password" class="form-control" id="inputPassword2" placeholder="Password">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary mb-3">Confirm identity</button>
+                </div>
+            </div>
+        </div>-->
+            <div class="col-sm-6 pb-3">
+                <label for="groupBtn"><strong>Días de Vigencia por tipo de Proveedor:</strong></label>
+                <div class="card mb-6" style="height:7.3rem">
+                    <div class="card-body">
+                        <div class="row g-0">
+                            <div class="col-md-4 pb-1">
+                                @Html.LabelFor(d => d.Dias_Vigencia_Mayorista, new { @for = "Dias_Vigencia_Mayorista" })
+                                @Html.TextBoxFor(d => d.Dias_Vigencia_Mayorista, new { required = true, @class = "form-control", @placeholder = "Dias Mayorista", @type = "number", @id = "Dias_Vigencia_Mayorista", min = 0, oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("Dias_Vigencia_Mayorista", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-4 pb-1">
+                                @Html.LabelFor(d => d.Dias_Vigencia_Cedis, new { @for = "Dias_Vigencia_Cedis" })
+                                @Html.TextBoxFor(d => d.Dias_Vigencia_Cedis, new { required = true, @class = "form-control", @placeholder = "Dias Cedis", @type = "number", @id = "Dias_Vigencia_Cedis", min = 0, oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("Dias_Vigencia_Cedis", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-4 pb-1">
+                                @Html.LabelFor(d => d.Dias_Vigencia_Pie_Camion, new { @for = "Dias_Vigencia_Pie_Camion" })
+                                @Html.TextBoxFor(d => d.Dias_Vigencia_Pie_Camion, new { required = true, @class = "form-control", @placeholder = "Dias P. Camión", @type = "number", @id = "Dias_Vigencia_Pie_Camion", min = 0, oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("Dias_Vigencia_Pie_Camion", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="col-sm-6 pb-3">
+                <label for="groupBtn"><strong>Ranking Nadro:</strong></label>
+                <div class="card mb-6" style="height:7.3rem">
+                    <div class="card-body">
+                        <div class="row g-0">
+                            <div class="col-md-4 pb-1">
+                                @Html.LabelFor(d => d.chkRanking, new { @for = "Rank_montos" })                             
+                                @Html.CheckBoxFor(m => m.chkRanking, new { @class = "form-check-input ml-2", @onChange = "comprobar(this);" })
+                            </div>
+                            <div class="col-md-4 pb-1">
+                                @Html.LabelFor(d => d.Rank_montos, new { @for = "Rank_montos" })
+                                @Html.TextBoxFor(d => d.Rank_montos, new { required = true, @class = "form-control", @placeholder = "Ranking montos", @type = "number", min = 0, step = "0.0001", @id = "Rank_montos", @style= "display:none", oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("Rank_montos", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-4 pb-1">
+                                @Html.LabelFor(d => d.Rank_piezas, new { @for = "Rank_piezas" })
+                                @Html.TextBoxFor(d => d.Rank_piezas, new { required = true, @class = "form-control", @placeholder = "Ranking piezas", @type = "number", @min = 0, @id = "Rank_piezas", @style = "display:none", oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("Rank_piezas", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div style="text-align: right" class="col-sm-6 pb-3">
+                <input type="submit" class="btn btn-success" value="Guardar" />
+            </div>
+
+
+         
+            <!--<div class="col-sm-3 pb-3">
+            <label for="groupBtn">Invenadro</label>
+            <div class="card" id="groupBtn">
+                <div class="card-body">
+                    <div class="form-check">
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input">
+                            <label class="custom-control-label" for="customRadio1">Sumar al sugerido</label>
+                        </div>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">
+                            <label class="custom-control-label" for="customRadio2">Comprar Al Mayor</label>
+                        </div>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">
+                            <label class="custom-control-label" for="customRadio2">No incluir</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3 pb-3">
+            <label for="groupBtn">Resto de Productos</label>
+            <div class="card" id="groupBtn">
+                <div class="card-body">
+                    <div class="form-check">
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input">
+                            <label class="custom-control-label" for="customRadio1">Sumar al sugerido</label>
+                        </div>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">
+                            <label class="custom-control-label" for="customRadio2">Comprar Al Mayor</label>
+                        </div>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">
+                            <label class="custom-control-label" for="customRadio2">No incluir</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+            <!--<div class="col-sm-3 pb-3">
+            <label for="groupBtn">Color</label>
+            <div class="card" style="height:7rem" id="groupBtn">
+                <div class="card-body">
+                    <div class="col-md-6 pb-3">
+                        <div class="form-group ">
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> Blue
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> Red
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> Red
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div class="col-sm-3 pb-3">
+            <label for="groupBtn">Color</label>
+            <div class="card" style="height:7rem" id="groupBtn">
+                <div class="card-body">
+                    <div class="col-md-6 pb-3">
+                        <div class="form-group ">
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> Blue
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> Red
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> Red
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+        }
+
+
+
+
+        <!--<div class="col-sm-3 pb-3">
+        <label for="exampleAccount">Account #</label>
+        <input type="text" class="form-control" id="exampleAccount" placeholder="XXXXXXXXXXXXXXXX">
+    </div>
+    <div class="col-sm-3 pb-3">
+        <label for="exampleCtrl">Control #</label>
+        <input type="text" class="form-control" id="exampleCtrl" placeholder="0000">
+    </div>
+    <div class="col-sm-3 pb-3">
+        <label for="exampleAmount">Amount</label>
+        <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+            <input type="text" class="form-control" id="exampleAmount" placeholder="Amount">
+        </div>
+    </div>
+    <div class="col-sm-3 pb-3">
+        <label for="exampleAmount">Amount ultimo</label>
+        <div class="input-group">
+            <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+            <input type="text" class="form-control" id="exampleAmount" placeholder="Amount">
+        </div>
+    </div>
+
+    <div class="col-sm-6 pb-3">
+        <label for="exampleFirst">First Name</label>
+        <input type="text" class="form-control" id="exampleFirst">
+    </div>
+    <div class="col-sm-6 pb-3">
+        <label for="exampleLast">Last Name</label>
+        <input type="text" class="form-control" id="exampleLast">
+    </div>
+    <div class="col-sm-6 pb-3">
+        <label for="exampleCity">City</label>
+        <input type="text" class="form-control" id="exampleCity">
+    </div>
+    <div class="col-sm-3 pb-3">
+        <label for="exampleSt">State</label>
+        <select class="form-control" id="exampleSt">
+            <option>Pick a state</option>
+        </select>
+    </div>
+    <div class="col-sm-3 pb-3">
+        <label for="exampleZip">Postal Code</label>
+        <input type="text" class="form-control" id="exampleZip">
+    </div>
+
+    <div class="col-md-6 pb-3">
+        <label for="exampleAccount">Color</label>
+        <div class="form-group small">
+            <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> Blue
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> Red
+                </label>
+            </div>
+            <div class="form-check form-check-inline disabled">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" disabled=""> Green
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option4"> Yellow
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option5"> Black
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option6"> Orange
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 pb-3">
+        <label for="exampleMessage">Message</label>
+        <textarea class="form-control" id="exampleMessage"></textarea>
+        <small class="text-info">
+            Add the packaging note here.
+        </small>
+    </div>
+    <div class="col-12">
+        <div class="form-row">
+            <label class="col-md col-form-label" for="name">Generated Id</label>
+            <input type="text" class="form-control col-md-4" name="gid" id="gid" />
+            <label class="col-md col-form-label" for="name">Date Assigned</label>
+            <input type="text" class="form-control col-md-4" name="da" id="da" />
+        </div>
+    </div>-->
+
+
+    </div>
+
+@section scripts{
+    <script>
+
+        function comprobar(obj) {
+            if (obj.checked) {
+
+                document.getElementById('Rank_montos').style.display = "";
+                document.getElementById('Rank_piezas').style.display = "";
+            } else {
+
+                document.getElementById('Rank_montos').style.display = "none";
+                document.getElementById('Rank_piezas').style.display = "none";
+            }     
+            
+        }
+
+        $("#frmNegados").on("submit", function (event) {
+            event.preventDefault();
+
+            swal({
+                title: '',
+                text: "¿Desea guardar los cambios?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Guardar",
+                        value: true
+                    }
+                },
+            }).then((resp) => {                
+                if (resp) {
+
+                    var sucProv = $("#frmNegados").serializeArray()
+                                .filter(function (elem) {
+                                    return $.trim(elem.value);
+                                });
+
+                    //sucProv.forEach(function (valor, indice, array) {
+
+                    if ($("#chkRanking").is(":checked") === true) {                     
+                            sucProv.push({ name: "chkRanking2", value: true });
+                        } else {
+                            sucProv.push({ name: "chkRanking2", value: false });
+                        }                 
+                        console.log(sucProv);
+
+                    //            if (valor.name == "PiezasXArticulo")
+                    //            {
+                    //                if (!Number.isInteger(parseInt(valor.value))) {
+                    //                    alert("Solo se Aceptan números enteros para: " + valor.name);
+                    //                    return;
+                    //                }
+                
+                    //            }
+                    //        });
+                    console.log(sucProv);
+                
+                            showLoading();
+                            $.ajax({
+                                type: $("#frmNegados").attr('method'),
+                                url: $("#frmNegados").attr('action'),
+                                data: sucProv,
+                                success: function (response) {
+                                    hideLoading();
+                                    if (response != undefined) {
+
+                                        swal("¡Cambios Guardados!", '', "success").then((value) => {
+                                            //window.location.reload();
+                                        });
+                                    } else {
+                                        swal(response, '', "error").then((value) => {
+                
+                                        });
+                                    }
+                                },
+                                error: function (response) {
+                                    swal("Ocurrio un error de comunicación", '', "warning");
+                                    hideLoading();
+                                }
+                            });
+            }
+
+            });
+        });
+
+        $(document).ready(function () {
+            $("#chkRanking").change();
+        });
+    </script>
+}
+
+
+

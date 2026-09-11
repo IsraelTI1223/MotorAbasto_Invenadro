@@ -1,0 +1,699 @@
+﻿@using PortalGRFP.Entities.Models
+@model UsuarioModel
+
+
+
+
+@*<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">*@
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+@*<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>*@
+
+<style>
+
+    @@media (min-width: 992px) {
+        .dropdown-menu .dropdown-toggle:after {
+            border-top: .3em solid transparent;
+            border-right: 0;
+            border-bottom: .3em solid transparent;
+            border-left: .3em solid;
+        }
+
+        .dropdown-menu .dropdown-menu {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .dropdown-menu li {
+            position: relative;
+        }
+
+        .nav-item .submenu {
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: -7px;
+        }
+
+        .nav-item .submenu-left {
+            right: 100%;
+            left: auto;
+        }
+
+        .dropdown-menu > li:hover {
+            background-color: #f1f1f1
+        }
+
+            .dropdown-menu > li:hover > .submenu {
+                display: block;
+            }
+    }
+
+
+    @@import url("//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+
+    .navbar-icon-top .navbar-nav .nav-link > .fa {
+        position: relative;
+        width: 36px;
+        font-size: 24px;
+    }
+
+        .navbar-icon-top .navbar-nav .nav-link > .fa > .badge {
+            font-size: 0.75rem;
+            position: absolute;
+            right: 0;
+            font-family: sans-serif;
+        }
+
+    .navbar-icon-top .navbar-nav .nav-link > .fa {
+        top: 3px;
+        line-height: 12px;
+    }
+
+        .navbar-icon-top .navbar-nav .nav-link > .fa > .badge {
+            top: -10px;
+        }
+
+    @@media (min-width: 576px) {
+        .navbar-icon-top.navbar-expand-sm .navbar-nav .nav-link {
+            text-align: center;
+            display: table-cell;
+            height: 70px;
+            vertical-align: middle;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+            .navbar-icon-top.navbar-expand-sm .navbar-nav .nav-link > .fa {
+                display: block;
+                width: 48px;
+                margin: 2px auto 4px auto;
+                top: 0;
+                line-height: 24px;
+            }
+
+                .navbar-icon-top.navbar-expand-sm .navbar-nav .nav-link > .fa > .badge {
+                    top: -7px;
+                }
+    }
+
+    @@media (min-width: 768px) {
+        .navbar-icon-top.navbar-expand-md .navbar-nav .nav-link {
+            text-align: center;
+            display: table-cell;
+            height: 70px;
+            vertical-align: middle;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+            .navbar-icon-top.navbar-expand-md .navbar-nav .nav-link > .fa {
+                display: block;
+                width: 48px;
+                margin: 2px auto 4px auto;
+                top: 0;
+                line-height: 24px;
+            }
+
+                .navbar-icon-top.navbar-expand-md .navbar-nav .nav-link > .fa > .badge {
+                    top: -7px;
+                }
+    }
+
+    @@media (min-width: 992px) {
+        .navbar-icon-top.navbar-expand-lg .navbar-nav .nav-link {
+            text-align: center;
+            display: table-cell;
+            height: 70px;
+            vertical-align: middle;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+            .navbar-icon-top.navbar-expand-lg .navbar-nav .nav-link > .fa {
+                display: block;
+                width: 48px;
+                margin: 2px auto 4px auto;
+                top: 0;
+                line-height: 24px;
+            }
+
+                .navbar-icon-top.navbar-expand-lg .navbar-nav .nav-link > .fa > .badge {
+                    top: -7px;
+                }
+    }
+
+    @@media (min-width: 1200px) {
+        .navbar-icon-top.navbar-expand-xl .navbar-nav .nav-link {
+            text-align: center;
+            display: table-cell;
+            height: 70px;
+            vertical-align: middle;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+            .navbar-icon-top.navbar-expand-xl .navbar-nav .nav-link > .fa {
+                display: block;
+                width: 48px;
+                margin: 2px auto 4px auto;
+                top: 0;
+                line-height: 24px;
+            }
+
+                .navbar-icon-top.navbar-expand-xl .navbar-nav .nav-link > .fa > .badge {
+                    top: -7px;
+                }
+    }
+</style>
+
+@helper SubMenus(List<SubModuloModel> subMenus)
+{
+    if (subMenus != null)
+    {
+        <ul class="dropdown-menu">
+            @foreach (var subMenu in subMenus)
+            {
+                <li><a tabindex="-1" href="#"><i class="@subMenu.IconoBase text-success"></i>&nbsp;@subMenu.SubModulo</a></li>
+            }
+        </ul>
+    }
+}
+
+<nav class="navbar navbar-icon-top navbar-expand-lg navbar-dark" style="background-color: #1B455C;">
+    <div class="navbar-brand">
+        <a href="@Url.Action("Index","Home")" class="df-logo"><img src="~/assets/img/Logo_icon.png" />Grupo <span>Farmatodo</span></a>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+
+            @if (Model.Permisos != null)
+            {
+                foreach (var menu1 in Model.Permisos.OrderBy(x => x.Orden))
+                {
+                    if (menu1.SubModuloHijos == null || menu1.SubModuloHijos.Count == 0)
+                    {
+
+                        <li class="nav-item active">
+                            <a class="nav-link" href="@Url.Action(menu1.Componente)">
+                                <i class="@menu1.IconoBase"></i>
+                                @menu1.Modulo
+                                <span class="sr-only">(current)</span>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown">
+                                <i class="@menu1.IconoBase"></i>
+                                @menu1.Modulo
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                @foreach (var menu2 in menu1.SubModuloHijos.OrderBy(x => x.Orden))
+                                {
+                                    if (menu2.Modulo != "Validación de Montos")
+                                    {
+                                        if (menu2.SubModuloHijos == null || menu2.SubModuloHijos.Count == 0)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" href="@Url.Action(menu2.Componente)">
+                                                    <i class="@menu2.IconoBase text-success" aria-hidden="true"></i>
+                                                    @menu2.Modulo
+                                                </a>
+                                            </li>
+                                        }
+
+                                        else
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" href="">
+                                                    <i class="@menu2.IconoBase"></i>
+                                                    @menu2.Modulo &nbsp;&raquo;
+                                                </a>
+                                                <ul class="submenu dropdown-menu" aria-labelledby="navbarDropdown">
+                                                    @foreach (var menu3 in menu2.SubModuloHijos.OrderBy(x => x.Orden))
+                                                    {
+                                                        if (menu3.SubModuloHijos == null || menu3.SubModuloHijos.Count == 0)
+                                                        {
+                                                            <li>
+                                                                <a class="dropdown-item" href="@Url.Action(menu3.Componente)">
+                                                                    <i class="@menu3.IconoBase text-success"></i>
+                                                                    @menu3.Modulo
+                                                                </a>
+                                                            </li>
+                                                        }
+                                                        else
+                                                        {
+                                                            <li>
+                                                                <a class="dropdown-item">
+                                                                    <i class="@menu3.IconoBase text-success"></i>
+                                                                    @menu3.Modulo&nbsp;&raquo;
+                                                                </a>
+                                                                <ul class="submenu dropdown-menu" aria-labelledby="navbarDropdown">
+                                                                    @foreach (var menu4 in menu3.SubModuloHijos.OrderBy(x => x.Orden))
+                                                                    {
+                                                                        if (menu4.SubModuloHijos == null || menu4.SubModuloHijos.Count == 0)
+                                                                        {
+                                                                            <li>
+                                                                                <a class="dropdown-item" href="@Url.Action(menu4.Componente)">
+                                                                                    <i class="@menu4.IconoBase text-success"></i>
+                                                                                    @menu4.Modulo
+                                                                                </a>
+                                                                            </li>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <li>
+                                                                                <a class="dropdown-item">
+                                                                                    <i class="@menu4.IconoBase text-success"></i>
+                                                                                    @menu4.Modulo&nbsp;&raquo;
+                                                                                </a>
+                                                                                <ul class="submenu dropdown-menu" aria-labelledby="navbarDropdown">
+                                                                                    @foreach (var menu5 in menu4.SubModuloHijos.OrderBy(x => x.Orden))
+                                                                                    {
+                                                                                        if (menu5.SubModuloHijos == null || menu5.SubModuloHijos.Count == 0)
+                                                                                        {
+                                                                                            <li>
+                                                                                                <a class="dropdown-item" href="@Url.Action(menu5.Componente)">
+                                                                                                    <i class="@menu5.IconoBase text-success"></i>
+                                                                                                    @menu5.Modulo
+                                                                                                </a>
+                                                                                            </li>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+
+                                                                                        }
+                                                                                    }
+                                                                                </ul>
+                                                                            </li>
+                                                                        }
+                                                                    }
+                                                                </ul>
+                                                            </li>
+                                                        }
+
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+
+                }
+            }
+        </ul>
+    </div>
+
+    <!--<<li class="nav-item active">
+    <a class="nav-link" href="#">
+        <i class="fa fa-home"></i>
+        Compras especiales
+        <span class="sr-only">(current)</span>
+    </a>
+    </li>
+
+           <li class="nav-item">
+               <a class="nav-link" href="#">
+                   <i class="fa fa-envelope-o">
+                       <span class="badge badge-danger">11</span>
+                   </i>
+                   Link
+               </a>
+           </li>
+           <li class="nav-item">
+               <a class="nav-link disabled" href="#">
+                   <i class="fa fa-envelope-o">
+                       <span class="badge badge-warning">11</span>
+                   </i>
+                   Disabled
+               </a>
+           </li>
+           <li class="nav-item dropdown">
+               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   <i class="fa fa-envelope-o">
+                       <span class="badge badge-primary">11</span>
+                   </i>
+                   Dropdown
+               </a>
+               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                   <a class="dropdown-item" href="#">Action</a>
+                   <a class="dropdown-item" href="#">Another action</a>
+                   <div class="dropdown-divider"></div>
+                   <a class="dropdown-item" href="#">Something else here</a>
+               </div>
+           </li>-->
+    <!-- <ul class="navbar-nav ">
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fa fa-bell">
+                    <span class="badge badge-info">11</span>
+                </i>
+                Test
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">
+                <i class="fa fa-globe">
+                    <span class="badge badge-success">11</span>
+                </i>
+                Test
+            </a>
+        </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>-->
+    <div class="navbar-right">
+
+        <div class="dropdown dropdown-profile">
+            <a href="" class="dropdown-link" data-toggle="dropdown" data-display="static">
+                <div class="avatar avatar-sm"><img src="~/assets/img/user_account.png" class="rounded-circle" alt=""></div>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right tx-13">
+                <div class="avatar avatar-lg mg-b-15"><img src="~/assets/img/user_account.png" class="rounded-circle" alt=""></div>
+                <h5 class="tx-semibold mg-b-5">@Model.Nombre</h5>
+                <h6 class="tx-semibold mg-b-5">@Model.Correo</h6>
+                <p class="mg-b-25 tx-12 tx-color-03">@Model.Perfil</p>
+                <div class="dropdown-divider"></div>
+                @*<a href="~/assets/Manual_Portal_RCB.pdf" target="_blank" class="dropdown-item"><i data-feather="help-circle"></i> Ayuda</a>*@
+                <a href="/Account/Salir" class="dropdown-item"><i data-feather="log-out"></i>Salir</a>
+            </div>
+        </div>
+    </div>
+</nav>
+<!--<header class="navbar navbar-header navbar-header-fixed" style="width:99%!important">
+    <a href="#" id="mainMenuOpen" class="burger-menu"><i data-feather="menu"></i></a>
+    <div class="navbar-brand">
+        <a href="@Url.Action("Index","Home")" class="df-logo"><img src="~/assets/img/LogoRFP_icon.png" />Grupo<span>RFP</span></a>
+    </div>
+    <div id="navbarMenu" class="navbar-menu-wrapper">
+        <div class="navbar-menu-header">
+            <a href="#" class="df-logo"><img src="~/assets/img/LogoRFP_icon.png" />Grupo<span>RFP</span></a>
+            <a id="mainMenuClose" href=""><i data-feather="x"></i></a>
+        </div>
+
+        <ul class="nav navbar-menu">
+            @if (Model.Permisos != null)
+            {
+                foreach (var menu1 in Model.Permisos.OrderBy(x => x.Orden))
+                {
+                    if (menu1.SubModuloHijos == null || menu1.SubModuloHijos.Count == 0)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action(menu1.Componente)">
+                                <i class="@menu1.IconoBase text-success"></i>
+                                @menu1.Modulo
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown">
+                                <i class="@menu1.IconoBase text-success"></i>
+                                &nbsp;@menu1.Modulo
+                            </a>
+                            <ul class="dropdown-menu">
+                                @foreach (var menu2 in menu1.SubModuloHijos.OrderBy(x => x.Orden))
+                                {
+                                    if (menu2.SubModuloHijos == null || menu2.SubModuloHijos.Count == 0)
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" href="@Url.Action(menu2.Componente)" style="font-size:10pt!important">
+                                                <i class="@menu2.IconoBase text-success"></i>
+                                                @menu2.Modulo
+                                            </a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" href="">
+                                                <i class="@menu2.IconoBase text-success"></i>
+                                                @menu2.Modulo &nbsp;&raquo;
+                                            </a>
+                                            <ul class="submenu dropdown-menu">
+                                                @foreach (var menu3 in menu2.SubModuloHijos.OrderBy(x => x.Orden))
+                                                {
+                                                    if (menu3.SubModuloHijos == null || menu3.SubModuloHijos.Count == 0)
+                                                    {
+                                                        <li>
+                                                            <a class="dropdown-item" href="@Url.Action(menu3.Componente)">
+                                                                <i class="@menu3.IconoBase text-success"></i>
+                                                                @menu3.Modulo
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                    else
+                                                    {
+                                                        <li>
+                                                            <a class="dropdown-item">
+                                                                <i class="@menu3.IconoBase text-success"></i>
+                                                                @menu3.Modulo&nbsp;&raquo;
+                                                            </a>
+                                                            <ul class="submenu dropdown-menu">
+                                                                @foreach (var menu4 in menu3.SubModuloHijos.OrderBy(x => x.Orden))
+                                                                {
+                                                                    if (menu4.SubModuloHijos == null || menu4.SubModuloHijos.Count == 0)
+                                                                    {
+                                                                        <li>
+                                                                            <a class="dropdown-item" href="@Url.Action(menu4.Componente)">
+                                                                                <i class="@menu4.IconoBase text-success"></i>
+                                                                                @menu4.Modulo
+                                                                            </a>
+                                                                        </li>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <li>
+                                                                            <a class="dropdown-item">
+                                                                                <i class="@menu4.IconoBase text-success"></i>
+                                                                                @menu4.Modulo&nbsp;&raquo;
+                                                                            </a>
+                                                                            <ul class="submenu dropdown-menu">
+                                                                                @foreach (var menu5 in menu4.SubModuloHijos.OrderBy(x => x.Orden))
+                                                                                {
+                                                                                    if (menu5.SubModuloHijos == null || menu5.SubModuloHijos.Count == 0)
+                                                                                    {
+                                                                                        <li>
+                                                                                            <a class="dropdown-item" href="@Url.Action(menu5.Componente)">
+                                                                                                <i class="@menu5.IconoBase text-success"></i>
+                                                                                                @menu5.Modulo
+                                                                                            </a>
+                                                                                        </li>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+
+                                                                                    }
+                                                                                }
+                                                                            </ul>
+                                                                        </li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                    }
+
+                                                }
+                                            </ul>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+                }
+            }
+        </ul>
+        @* ESTE ES EL BUENO *@
+        @*@if (Model.Permisos != null)
+            {
+                foreach (var menu1 in Model.Permisos)
+                {
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                            <i class="@menu1.IconoBase text-success"></i>
+                            @menu1.Modulo
+                        </button>
+                        @if (menu1.SubModuloHijos != null)
+                        {
+                            <ul class="dropdown-menu">
+                                @foreach (var menu2 in menu1.SubModuloHijos)
+                                {
+                                    if (menu2.SubModuloHijos == null || menu2.SubModuloHijos.Count == 0)
+                                    {
+                                        <li>
+                                            <a tabindex="-1" href="#">
+                                                <i class="@menu2.IconoBase text-success"></i>
+                                                @menu2.Modulo
+                                            </a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="dropdown-submenu">
+                                            <a class="test" tabindex="-1" href="#">@menu2.Modulo <span class="caret"></span></a>
+                                            <ul class="dropdown-menu">
+                                                @foreach (var menu3 in menu2.SubModuloHijos)
+                                                {
+                                                    if (menu3.SubModuloHijos == null || menu3.SubModuloHijos.Count == 0)
+                                                    {
+                                                        <li><a tabindex="-1" href="#">@menu3.Modulo</a></li>
+                                                    }
+                                                    else
+                                                    {
+                                                        <li class="dropdown-submenu">
+                                                            <a class="test" href="#">@menu3.Modulo <span class="caret"></span></a>
+                                                            <ul class="dropdown-menu">
+                                                                @foreach (var menu4 in menu3.SubModuloHijos)
+                                                                {
+                                                                    if (menu4.SubModuloHijos == null && menu4.SubModuloHijos.Count == 0)
+                                                                    {
+                                                                        <li><a tabindex="-1" href="#">@menu4.Modulo</a></li>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <li class="dropdown-submenu">
+                                                                            <a class="test" href="#">@menu4.Modulo</a>
+                                                                            <ul class="dropdown-menu">
+                                                                                @foreach (var menu5 in menu4.SubModuloHijos)
+                                                                                {
+                                                                                    if (menu5.SubModuloHijos == null || menu5.SubModuloHijos.Count == 0)
+                                                                                    {
+                                                                                        <li><a tabindex="-1" href="#">@menu5.Modulo</a></li>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <li class="dropdown-submenu">
+                                                                                            <a class="test" href="#">@menu5.Modulo</a>
+                                                                                            <ul class="dropdown-menu">
+                                                                                                @foreach (var menu6 in menu5.SubModuloHijos)
+                                                                                                {
+                                                                                                    <li><a tabindex="-1" href="#">@menu6.Modulo</a></li>
+                                                                                                }
+                                                                                            </ul>
+                                                                                        </li>
+                                                                                    }
+                                                                                }
+                                                                            </ul>
+                                                                        </li>
+                                                                    }
+                                                                }
+                                                            </ul>
+                                                        </li>
+                                                    }
+                                                }
+
+                                            </ul>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        }
+                    </div>
+                }
+            }*@
+        @*@if (Model.Permisos != null)
+            {
+
+                foreach (var menu in Model.Permisos)
+                {
+                    <div class="dropdown">
+                        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            <i class="@menu.IconoBase text-success"></i>&nbsp;
+                            @menu.Modulo
+                        </a>
+                        @if (menu.SubModulos != null)
+                        {
+                            SubMenus(menu.SubModulos);
+                        }
+                    </div>
+                }
+
+            }*@
+        @*<ul class="nav navbar-menu">
+
+                @if (Model.Permisos.Any())
+                {
+                    foreach (var menu in Model.Permisos)
+                    {
+                        var withSub = (menu.SubModulos.Any()) ? "with-sub" : string.Empty;
+                        <li class="nav-item @withSub">
+                            <a href="" class="nav-link">
+                                <i class="@menu.IconoBase text-success"></i>&nbsp;@menu.Modulo
+                            </a>
+                            @if (menu.SubModulos.Any())
+                            {
+                                <ul class="navbar-menu-sub">
+                                    @foreach (var submenu in menu.SubModulos)
+                                    {
+                                        <li class="nav-sub-item"><a href="@Url.Action(submenu.Componente)" class="nav-sub-link"><i class="@submenu.IconoBase text-success"></i>&nbsp;@submenu.SubModulo</a></li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+                }
+            </ul>*@
+    </div>
+    <div class="navbar-right">
+
+        <div class="dropdown dropdown-profile">
+            <a href="" class="dropdown-link" data-toggle="dropdown" data-display="static">
+                <div class="avatar avatar-sm"><img src="@Model.FotoGmail" class="rounded-circle" alt=""></div>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right tx-13">
+                <div class="avatar avatar-lg mg-b-15"><img src="@Model.FotoGmail" class="rounded-circle" alt=""></div>
+                <h5 class="tx-semibold mg-b-5">@Model.Nombre</h5>
+                <h6 class="tx-semibold mg-b-5">@Model.Correo</h6>
+                <p class="mg-b-25 tx-12 tx-color-03">@Model.Perfil</p>
+
+                @*<a href="#" class="dropdown-item"><i data-feather="edit-3"></i> Edit Profile</a>*@
+                @*<a href="#" class="dropdown-item"><i data-feather="user"></i> View Profile</a>*@
+                <div class="dropdown-divider"></div>
+                <a href="~/assets/Manual_Portal_RCB.pdf" target="_blank" class="dropdown-item"><i data-feather="help-circle"></i> Ayuda</a>
+                @*<a href="#" class="dropdown-item"><i data-feather="life-buoy"></i> Forum</a>*@
+                @*<a href="#" class="dropdown-item"><i data-feather="settings"></i>Account Settings</a>*@
+                @*<a href="#" class="dropdown-item"><i data-feather="settings"></i>Privacy Settings</a>*@
+                <a href="/Account/Salir" class="dropdown-item"><i data-feather="log-out"></i>Salir</a>
+            </div><!-- dropdown-menu -->
+<!--</div><!-- dropdown
+    </div>
+</header>-->
+<script>
+    //$(document).ready(function () {
+    //    $('.dropdown-submenu a.test').on("click", function (e) {
+    //        $(this).next('ul').toggle();
+    //        e.stopPropagation();
+    //        e.preventDefault();
+    //    });
+    //});
+
+    $(document).on('click', '.dropdown-menu', function (e) {
+        e.stopPropagation();
+    });
+
+    // make it as accordion for smaller screens
+    if ($(window).width() < 992) {
+        $('.dropdown-menu a').click(function (e) {
+            e.preventDefault();
+            if ($(this).next('.submenu').length) {
+                $(this).next('.submenu').toggle();
+            }
+            $('.dropdown').on('hide.bs.dropdown', function () {
+                $(this).find('.submenu').hide();
+            })
+        });
+    }
+</script>

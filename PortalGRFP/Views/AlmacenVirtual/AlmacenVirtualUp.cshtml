@@ -1,0 +1,236 @@
+﻿
+@using PortalGRFP.Entities.Common.AlmacenVirtual
+
+@{
+    ViewBag.Title = "Carga de Archivo Existecia";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Almacen Virtual</a></li>
+    <li class="breadcrumb-item"><a>Carga de Archivo Existecia</a></li>
+}
+
+<div class="card" style="width:100%">
+    <div class="card-header">
+        @using (Html.BeginForm("CargaAlmacen", "AlmacenVirtual", FormMethod.Post, new { role = "form", id = "frmCargaAlmacen" }))
+        {
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="fileExcel" name="fileExcel" multiple data-show-upload="false">
+                        <label id="lblFileName" class="custom-file-label" for="customFile">Seleccionar archivo</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <input type="button" style="display:none" value="Consultar" id="btnConsultar" name="btnConsultar" class="btn btn-success" />
+                        <input type="submit" value="↑ SubirArchivo" class="btn btn-success">
+                    </div>
+                </div>
+
+            </div>
+        }
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="tblResp"></div>
+                </div>
+            </div>
+        </div>
+        <div class="container mt-3"><ul class="list-group" id="detalle"></ul></div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        var cadena = "";
+        function llenaDtable(dataSet) {
+            var tblpedidosCargados = $('#tblExistencias').DataTable({
+                data: dataSet,
+                "destroy": true,
+                "processing": true,
+                columns: [
+                    { data: "FechaCarga", title: "Fecha de Carga" },
+                    { data: "FilenName", title: "Nombre del Archivo" },
+                    { data: "items", title: "Items " },
+                    { data: "usuario", title: "Usuario " },
+                ],
+                "language": {
+                    "zeroRecords": "Ningun dato disponible en esta tabla",
+                    "info": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "infoEmpty": "No hay registros disponibles",
+                    "infoFiltered": "(Filtro de _MAX_  registros)",
+                    "sSearch": "Buscar",
+                    "paginate": {
+                        "previous": "Anterior",
+                        "next": "Siguiente",
+                    },
+                },
+                select: true,
+                buttons: false
+            });
+        }
+
+
+        function llenatblError(dataSet) {
+            var tblpedidosCargados = $('#tblRespuesta ').DataTable({
+                data: dataSet,
+                "destroy": true,
+                "processing": true,
+                columns: [
+                    { data: "Reg", title: "Registros" },
+                    { data: "Fecha", title: "Fecha" },
+                    { data: "Contrato", title: "Contrato" },
+                    { data: "Dato", title: "Valor" },
+                    { data: "Descripcion", title: "Descripcion" },
+                ],
+                "language": {
+                    "zeroRecords": "Ningun dato disponible en esta tabla",
+                    "info": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "infoEmpty": "No hay registros disponibles",
+                    "infoFiltered": "(Filtro de _MAX_  registros)",
+                    "sSearch": "Buscar",
+                    "paginate": {
+                        "previous": "Anterior",
+                        "next": "Siguiente",
+                    },
+                },
+                select: true,
+                buttons: false
+            });
+        }
+
+        function llenatblUpdate(dataSet) {
+            var tblpedidosCargados = $('#tblRespuesta ').DataTable({
+                data: dataSet,
+                "destroy": true,
+                "processing": true,
+                columns: [
+                    { data: "Contrato", title: "Contrato" },
+                    { data: "Almacen", title: "Almacen" },
+                    { data: "Codigo", title: "Codigo" },
+                    { data: "PActual", title: "Piezas Actual" },
+                    { data: "PNueva", title: "Piezas Nuevas" },
+                    { data: "CActual", title: "Costo Actual" },
+                    { data: "CNueva", title: "Costo Nuevo" },
+                ],
+                "language": {
+                    "zeroRecords": "Ningun dato disponible en esta tabla",
+                    "info": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "infoEmpty": "No hay registros disponibles",
+                    "infoFiltered": "(Filtro de _MAX_  registros)",
+                    "sSearch": "Buscar",
+                    "paginate": {
+                        "previous": "Anterior",
+                        "next": "Siguiente",
+                    },
+                },
+                select: true,
+                buttons: false
+            });
+        }
+
+        function updateAlamcenV(valor) {
+            
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("updateAlmacen", "AlmacenVirtual")",
+                data: '{Serializado:"' + cadena + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+
+                success: function (response) {
+                    if (response.Success) {
+                        swal(response.Message, '', "success");
+                        cadena = null;
+                        $("#detalle").html("");
+                    } else {
+                        swal(response.Message, '', "warning");
+                    }
+                    
+                },
+                error: function (e) {
+                    hideLoading();
+                    swal("¡Error inesperado en la carga!", '', "error");
+                }
+
+            })
+
+        }
+
+        $(document).ready(function () {
+            var $lblFileName = $('#lblFileName');
+            $("#tblResp").html('<table id="tblExistencias" class="display expand" width="100%"></table>');
+            $('#fileExcel').change(function (e) {
+                $lblFileName.text((e.target.files.length > 0) ? e.target.files[0].name : 'Seleccionar archivo');
+            });
+            $("#frmCargaAlmacen").on("submit", function (event) {
+                event.preventDefault();
+
+                var formulario = document.getElementById('frmCargaAlmacen');
+                var archivo = $("#fileExcel").val();
+
+                if (archivo != "") {
+                    showLoading();
+                    var formData = new FormData(formulario);
+
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("CargaAlmacen", "AlmacenVirtual")",
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success: function (response) {
+                            hideLoading();
+                            if (response.Success) {
+                                //swal(response.Message, '', "success");
+                                if (response.resp == 2) {
+                                    var tbl = '<li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">Detalle para Actualización<input type="button" onclick="updateAlamcenV('+cadena+')" value="Actualizar" class="btn btn-outline-primary"></li><li class="list-group-item"><table id="tblRespuesta" class="display expand" width="100%"></table></li>';
+                                    $("#detalle").html(tbl);
+                                    llenatblUpdate(response.tblupdate);
+                                    swal(response.Message, '', "info");
+                                    cadena = response.serializado;
+                                    //updateAlamcenV(response.serializado);
+
+                                } else {
+                                    swal(response.Message, '', "success");
+                                }
+
+                            } else {
+                                if (response.resp == 1) {
+                                    var tbl = '<li class="list-group-item d-flex justify-content-between align-items-center list-group-item-warning">Detalle de Catalogos</li><li class="list-group-item"><table id="tblRespuesta" class="display expand" width="100%"></table></li>';
+                                    $("#detalle").html(tbl);
+                                    llenatblError(response.tblerror);
+                                    swal(response.Message, '', "warning");
+                                } else {
+                                    swal(response.Message, '', "warning");
+                                }
+                            }
+
+                            $lblFileName.text('Seleccionar archivo');
+                            $("#fileExcel").val("");
+
+                            llenaDtable(response.tblCargaAV);
+                        },
+                        error: function (e) {
+                            hideLoading();
+                            swal("¡Error inesperado en la carga!", '', "error");
+                        }
+
+                    })
+                } else {
+                    swal("¡No se ha seleccionado un archivo!", '', "error");
+                }
+
+            });
+
+            llenaDtable(null);
+
+            
+            $("#tblActualizaAV").click(function (event) {
+                alert("Hola Mundo");
+            });
+        });
+
+
+    </script>
+}

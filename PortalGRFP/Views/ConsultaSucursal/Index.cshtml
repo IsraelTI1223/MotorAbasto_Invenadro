@@ -1,0 +1,186 @@
+﻿@model PortalGRFP.Entities.Response.ResponseList<PortalGRFP.Entities.Common.ConsultaSucursales>
+@using PortalGRFP.Entities.Common
+@{
+
+    ViewBag.Title = "Consulta Sucursales";
+}
+
+@*<br>
+<br>
+@section Actions{
+    <a href='@Url.Action("DescargarExcel",new {})' class="btn btn-success btn-lg" title="Descargar Reporte">
+        Descargar Reporte
+        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-box-arrow-in-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1h-2z" />
+            <path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+        </svg>
+    </a>
+
+
+}*@
+
+
+<form method="post" class="form-group col-md-12">
+
+    <div class="form-row">
+
+        <div class="form-group col-md-4">
+
+
+
+            <label for="ddlCadena">Buscar Cadena </label>
+            <select id="ddlCadena" class="form-control" name="Cadena">
+                <option selected>Selecciona...</option>
+                @foreach (var item in TempData["Cadena"] as List<ComboGenerico>)
+                {
+                    <option value="@item.Id">@item.Valor</option>
+                }
+            </select>
+        </div>
+
+
+
+        <div class="form-group col-md-3">
+            <label for="ddlMarca">Marca </label>
+            <select id="ddlMarca" class="form-control" name="Marca">
+            </select>
+        </div> 
+        
+        <div class="form-group col-md-3" style="margin-top:2.3%">
+            <button type="submit" class="btn btn-primary" >Consultar</button>
+        </div>
+
+
+
+    </div>
+
+
+
+
+</form>
+
+@if (Model != null) { 
+
+
+<div class="col-lg-12">
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-striped" id="dtDataProd">
+                <thead class="thead-primary">
+                    <tr>
+
+
+                        <th scope="col">CADENA</th>
+                        <th scope="col">MARCA</th>
+                        <th scope="col">SUC_ID</th>
+                        <th scope="col">NOMBRE</th>
+                        <th scope="col">LICENCIA</th>
+                        <th scope="col">SDOM</th>
+                        <th scope="col">HRS</th>
+                        <th scope="col">INVENADRO</th>
+                        <th scope="col">ESTATUS</th>
+                        <th scope="col">CIUDAD</th>
+                        <th scope="col">ESTADO</th>
+
+
+
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var d in Model.Result)
+                    {
+                        <tr>
+
+                            <td>
+
+
+                                @d.Cadena
+                            </td>
+                            <td>
+                                @d.Marca
+                            </td>
+                            <td>
+                                @d.Suc_Id
+                            </td>
+
+
+                            <td>
+                                @d.Suc_Nombre
+                            </td>
+
+                            <td>
+                                @d.Licencia
+                            </td>
+                            <td>
+                                @d.Sdom
+                            </td>
+                            <td>
+                                @d.hrs
+                            </td>
+                            <td>
+                                @d.INVENADRO
+                            </td>
+                            <td>
+                                @d.ESTATUS
+                            </td>
+                            <td>
+                                @d.CIUDAD
+                            </td>
+                            <td>
+                                @d.ESTADO
+                            </td>
+
+
+
+
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+}
+@section scripts{
+    <script type="text/javascript" src="~/Scripts/App/Views/CadenaMarca.js"></script>
+
+
+
+
+    <script>
+
+        $(function () {
+            'use strict'
+
+            $('#dtDataProd').DataTable({
+
+                select: true,
+                scrollCollapse: true,
+                info: false,
+                paging: true,
+                responsive: true,
+                searching: true,
+                "destroy": true,
+                "processing": true,
+                dom: 'Bfrtip',
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+                    searchPlaceholder: "Buscar",
+                    sSearch: '',
+                    lengthMenu: '_MENU_ filas / paginas'
+                }
+            }
+            );
+        });
+
+
+
+
+    </script>
+
+}

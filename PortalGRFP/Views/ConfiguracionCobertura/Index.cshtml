@@ -1,0 +1,983 @@
+﻿@model PortalGRFP.Entities.Common.CoberturaMontoPza
+@using PortalGRFP.Entities.Common
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Generales</a></li>
+    <li class="breadcrumb-item"><a>Catálogos de Cobertura> </a></li>
+    <li class="breadcrumb-item"><a>Montos / Piezas </a></li>
+}
+<div class="container-fluid">
+    @* <div class="row">*@
+    <div class="card">
+        <div class="card-header">
+            @using (Html.BeginForm("AgregarCobertura", "ConfiguracionCobertura", FormMethod.Post, new { role = "form", id = "frmCobertura" }))
+            {
+                @*@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
+                @*<div class="form-inline">*@
+                <div class="form-group row">
+                    <div class="col-xs-3 col-md-2">
+                        <label class="control-label">Forma</label>agregar
+                        <select id="forma" name="forma" class="form-control">
+                            <option value="0">Seleccione</option>
+                            @foreach (var item in TempData["Formas"] as List<CatalogoGenerico_Conf>)
+                            {
+                                <option value="@item.Id_Catalogo">@item.Valor_Catalogo</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-xs-3 col-md-2">
+                        @Html.LabelFor(model => model.Tipo, htmlAttributes: new { @class = "control-label" })
+
+                        <select id="Tipo" name="Tipo" class="form-control">
+                            <option value="0">Seleccione</option>
+                            @foreach (var item in TempData["Tipos"] as List<CatalogoGenerico_Conf>)
+                            {
+                                <option value="@item.Id_Catalogo">@item.Valor_Catalogo</option>
+                            }
+                        </select>
+
+                    </div>
+                    <div class="col-xs-3 col-md-2" data-group="montos" style="display:none">
+                        <label class="control-label">ABC</label>
+                        <select id="ClasficacionMonto" name="ClasficacionMonto" class="form-control">
+                            <option value="0">Seleccione</option>
+                            @foreach (var item in TempData["Clasificaciones"] as List<CatalogoGenerico_Conf>)
+                            {
+                                <option value="@item.Id_Catalogo">@item.Valor_Catalogo</option>
+                            }
+                        </select>
+
+                    </div>
+                    <div class="col-xs-3 col-md-2" data-group="montos" style="display:none">
+                        <label class="control-label" id="MontosPorcentaje"></label>
+                        <div class="text-right">
+                            <label class="control-label float-left">De&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                            @Html.EditorFor(model => model.MontoDe, new { htmlAttributes = new { placeholder = "0.0000", @class = "form-control w-50", type = "number", min = 0, step = "0.0001", oninput = "validity.valid||(value='')" } })
+                        </div>
+                        <div class="text-right">
+                            <label class="control-label float-left"> Hasta</label>
+                            @Html.EditorFor(model => model.MontoHasta, new { htmlAttributes = new { placeholder = "0.0000", @class = "form-control w-50", type = "number", min = 0, step = "0.0001", oninput = "validity.valid||(value='')" } })
+                        </div>
+
+                    </div>
+                    <div class="col-xs-3 col-md-2" data-group="piezas" style="display:none">
+                        <label class="control-label">ABC</label>
+                        <select id="ClasficacionPieza" name="ClasficacionPieza" class="form-control">
+                            <option value="0">Seleccione</option>
+                            @foreach (var item in TempData["Clasificaciones"] as List<CatalogoGenerico_Conf>)
+                            {
+                                <option value="@item.Id_Catalogo">@item.Valor_Catalogo</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-xs-3 col-md-2" data-group="piezas" style="display:none">
+                        <label class="control-label" id="PiezasPorcentaje"></label>
+                        <div class="text-right">
+                            <label class="control-label float-left">De&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                            @Html.EditorFor(model => model.PiezasDe, new { htmlAttributes = new { placeholder = "0", @class = "form-control w-50", type = "number", min = 0, oninput = "validity.valid||(value='')" } })
+                        </div>
+                        <div class="text-right">
+                            <label class="control-label float-left">Hasta</label>
+                            @Html.EditorFor(model => model.PiezasHasta, new { htmlAttributes = new { placeholder = "0", @class = "form-control w-50", type = "number", min = 0, oninput = "validity.valid||(value='')" } })
+                        </div>
+                    </div>
+                    <div class="col-xs-3 col-md-2" data-group="porcentaje" style="display:none">
+                        <div class="text-md-left checkbox form-inline">
+                            <label class="control-label">
+                                % Participación
+                                por Grupo &nbsp;&nbsp;
+                                <input class="check-box form-check-input" data-val="true" id="ParticipacionGrupo" name="ParticipacionGrupo" type="checkbox" value="true">
+                            </label>
+                        </div>
+                        <div class="text-md-left checkbox form-inline">
+                            <label class="control-label">
+                                % Participación
+                                por División  &nbsp;&nbsp;
+                                <input class="check-box form-check-input" data-val="true" id="ParticipacionDivision" name="ParticipacionDivision" type="checkbox" value="true">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-xs-3 col-md-2" data-group="diasInv" style="display:none">
+                        <label class="control-label">Días de Inventario</label>
+                        <label class="control-label"> por tipo de proveedor</label>
+                        <div class="text-left form-inline">
+                            @Html.EditorFor(model => model.DiasCoberturaMay, new { htmlAttributes = new { placeholder = "0", @class = "form-control", style = "width:50px", min = 0, oninput = "validity.valid||(value='')" } })
+                            <label class="control-label float-md-left">Mayorista</label>
+                        </div>
+                        <div class="text-left form-inline">
+                            @Html.EditorFor(model => model.DiasCoberturaCed, new { htmlAttributes = new { placeholder = "0", @class = "form-control", style = "width:50px", min = 0, oninput = "validity.valid||(value='')" } })
+                            <label class="control-label float-md-left">Cedis</label>
+                        </div>
+                        <div class="text-left form-inline">
+                            @Html.EditorFor(model => model.DiasCoberturaPieCam, new { htmlAttributes = new { placeholder = "0", @class = "form-control", style = "width:50px", min = 0, oninput = "validity.valid||(value='')" } })
+                            <label class="control-label float-md-left">Pie de Camión</label>
+                        </div>
+                    </div>
+                    <div class="col-xs-3 col-md-2 text-center" data-group="frec" style="display:none">
+                        <label class="control-label">Frecuencia</label>
+                        <label class="control-label">de Actualización</label>
+                        <select id="Periodicidad" name="Periodicidad" class="form-control">
+                            <option value="0">Seleccione</option>
+                            @foreach (var item in TempData["Periodicidad"] as List<CatalogoGenerico_Conf>)
+                            {
+                                <option value="@item.Id_Catalogo">@item.Valor_Catalogo</option>
+                            }
+                        </select>
+
+                    </div>
+                    <div class="col-sm-3 col-md-2">
+                        <div class="btn-group">
+                            <input type="button" value="Consultar" id="btnConsultar" name="btnConsultar" class="btn btn-warning" />
+                            <input type="submit" value="Agregar" class="btn btn-primary" />
+                        </div>
+                    </div>
+                </div>
+                @*</div>*@
+            }
+        </div>
+
+        <div class="card-body w-100">
+            <table id="tblCobertura" class="display compact cell-border" width="100%"></table>
+        </div>
+    </div>
+    @*</div>*@
+</div>
+
+@section scripts{
+    <script>
+
+
+        $(function () {
+            var tblCobertura = $('#tblCobertura').DataTable({
+                data: "",
+                "destroy": true,
+                "processing": true,
+                dom: 'Bfrtip',
+                columns: [
+                    { data: "LetraMonto", title: 'Clasificación Monto' },
+                    { data: "MontoDe", title: "De" },
+                    { data: "MontoHasta", title: "Hasta" },
+                    { data: "LetraPza", title: 'Clasificación Pieza' },
+                    { data: "PiezasDe", title: "De" },
+                    { data: "PiezasHasta", title: "Hasta" },
+                    { data: "DiasCoberturaMay", title: "Días cobertura Mayorista" },
+                    { data: "DiasCoberturaCed", title: 'Días Cobertura Cedis' },
+                    { data: "DiasCoberturaPieCam", title: 'Días Cobertura Pie Camión' },
+                    {
+                        data: null,
+                        title: 'Eliminar',
+                        render: function (data, type, row) {
+                            var boton = '';
+                            boton = '<button  class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+
+                            return boton;
+                        }
+                    }
+                ],
+                select: true,
+                scrollCollapse: false,
+                info: false,
+                paging: false,
+                searching: false
+            });
+
+
+            $("#frmCobertura").on("submit", function (event) {
+                event.preventDefault();
+                if (ValidacionForm()) {
+
+                    $.ajax({
+                     url: "@Url.Action("ValidarForma", "ConfiguracionCobertura")",
+                type: "POST",
+                dataType: "json",
+                        data: { IdForma: String($("#forma").val()) },
+                    success: function (response) {
+
+                        //console.log(response)
+
+                        if (response.Message != String($("#forma").val())) {
+                            swal({
+                                title: 'Cambio de Forma',
+                                text: "La forma seleccionada es diferente a la forma ya configurada, si continua con el guardado se eliminará toda la configuración de la forma existente ¿Desea continuar de todos modos?",
+                                icon: "warning",
+                                buttons: true,
+                                dangerMode: true,
+                            }).then((confirmResult) => {
+
+                                if (confirmResult) {
+
+                                    CambioForma();
+                                    //guardarCobertura();
+                                }
+
+                            });
+                        } else {
+                            guardarCobertura();
+                        }
+
+                    },
+                    error: function (response) {
+                        hideLoading();
+                    }
+                });
+                    //swal({
+                    //    title: '',
+                    //    text: "¿Desea guardar los cambios?",
+                    //    icon: "warning",
+                    //    buttons: true,
+                    //    dangerMode: true,
+                    //}).then((willDelete) => {
+
+                    //    if (willDelete != null) {
+                    //        var regla = $("#frmCobertura").serializeArray()
+                    //            .filter(function (elem) {
+                    //                return $.trim(elem.value);
+                    //            });
+
+                    //        showLoading();
+                    //        $.ajax({
+                    //            type: $("#frmCobertura").attr('method'),
+                    //            url: $("#frmCobertura").attr('action'),
+                    //            data: regla,
+                    //            success: function (response) {
+                    //                hideLoading();
+                    //                swal(response.Message, '', "success")
+                    //                    .then((value) => {
+                    //                        $("#btnConsultar").trigger("click");
+                    //                    });
+                    //            },
+                    //            error: function (response) {
+                    //                swal(response.Message, '', "warning");
+                    //            }
+                    //        });
+                    //    }
+                    //});
+                }
+            });
+            function CambioForma() {
+                 $.ajax({
+                     url: "@Url.Action("EliminarCambioForma", "ConfiguracionCobertura")",
+                type: "POST",
+                dataType: "json",
+                        data: { IdForma: String($("#forma").val()) },
+                     success: function (response) {
+                         if (response.Success) {
+
+                             swal("Cambio de forma", 'Se Aplicó el cambio de forma', "success").then((value) => {
+                                 guardarCobertura();
+                             });
+                            
+
+
+                         } else {
+                             swall("Error", "Ocurrió un Error al cambiar la forma, intente de nuevo", "error");
+                         }
+
+                     },
+                     error: function (response) {
+                         hideLoading();
+                        
+                     }
+                 });
+            }
+
+            function guardarCobertura(){
+                swal({
+                    title: '',
+                    text: "¿Desea guardar los cambios?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                }).then((willDelete) => {
+
+                    if (willDelete != null) {
+                        var regla = $("#frmCobertura").serializeArray()
+                            .filter(function (elem) {
+                                return $.trim(elem.value);
+                            });
+
+                        showLoading();
+                        $.ajax({
+                            type: $("#frmCobertura").attr('method'),
+                            url: $("#frmCobertura").attr('action'),
+                            data: regla,
+                            success: function (response) {
+                                hideLoading();
+                                swal(response.Message, '', "success")
+                                    .then((value) => {
+                                        $("#btnConsultar").trigger("click");
+                                    });
+                            },
+                            error: function (response) {
+                                swal(response.Message, '', "warning");
+                            }
+                        });
+                    }
+                });
+            }
+
+
+            function ValidacionForm() {
+
+                var forma, tipo, clasificacionMonto, montod, montoh, clasificacionpza, pzad, pzah, porc_grupo, porc_division, diasm, diasc, diapc, frecuencia;
+                var avanza = false;
+                forma = $("#forma").val();
+                tipo = $("#Tipo").val();
+                clasificacionMonto = $("#ClasficacionMonto").val();
+                montod = $("#MontoDe").val();
+                montoh = $("#MontoHasta").val();
+                clasificacionpza = $("#ClasficacionPieza").val();
+                pzad = $("#PiezasDe").val();
+                pzah = $("#PiezasHasta").val();
+                porc_grupo = $("#ParticipacionGrupo").val();
+                porc_division = $("#ParticipacionDivision").val();
+                diasm = $("#DiasCoberturaMay").val();
+                diasc = $("#DiasCoberturaCed").val();
+                diapc = $("#DiasCoberturaPieCam").val();
+                frecuencia = $("#Periodicidad").val();
+
+                if (forma == "0")
+                {
+                    swal("seleccione una forma", '', "warning");
+                } else if (forma == "1")
+                {
+                    if (tipo == "0") {
+                        swal("seleccione un tipo", '', "warning");
+                    } else if (tipo == "1") {
+                        if (clasificacionMonto == "0") {
+                            swal("seleccione una clasificación de monto", '', "warning");
+                        } else {
+                            if (montod == "" || montoh == "") {
+                                swal("No se asignado el rango de montos", '', "warning");
+                            } else if (parseInt(montoh) < parseInt(montod)) {
+                                swal("Montos min y max incorrectos", '', "warning");
+                            }
+                            else {
+                                if (diasm == "" && diasc == "" && diapc == "") {
+                                    swal("No se asignado el días de inventario", '', "warning");
+                                } else {
+                                    if (frecuencia == "0") {
+                                        swal("No ha seleccionado la frecuencia", '', "warning");
+                                    } else {
+                                        avanza = true;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                    else if (tipo == "2") {
+                        if (clasificacionpza == "0") {
+                            swal("seleccione una clasificación de piezas", '', "warning");
+                        } else {
+                            if (pzad == "" || pzah == "") {
+                                swal("No se asignado el rango de piezas", '', "warning");
+                            } else if (parseInt(pzah) < parseInt(pzad)) {
+                                swal("piezas min y max incorrectas", '', "warning");
+                            } else {
+                                if (diasm == "" && diasc == "" && diapc == "") {
+                                    swal("No se asignado el días de inventario", '', "warning");
+                                } else {
+                                    if (frecuencia == "0") {
+                                        swal("No ha seleccionado la frecuencia", '', "warning");
+                                    } else {
+                                        avanza = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if (tipo == "3") {
+                        if (clasificacionMonto == "0") {
+                            swal("seleccione una clasificación de monto", '', "warning");
+                        } else {
+                            if (montod == "" || montoh == "") {
+                                swal("No se asignado el rango de montos", '', "warning");
+                            } else if (parseInt(montoh) < parseInt(montod)) {
+                                swal("Montos min y max incorrectos", '', "warning");
+                            } else {
+                                if (clasificacionpza == "0") {
+                                    swal("seleccione una clasificación de piezas", '', "warning");
+                                } else {
+                                    if (pzad == "" || pzah == "") {
+                                        swal("No se asignado el rango de piezas", '', "warning");
+                                    } else if (parseInt(pzah) < parseInt(pzad)) {
+                                        swal("piezas min y max incorrectas", '', "warning");
+                                    } else {
+                                        if (diasm == "" && diasc == "" && diapc == "") {
+                                            swal("No se asignado el días de inventario", '', "warning");
+                                        } else {
+                                            if (frecuencia == "0") {
+                                                swal("No ha seleccionado la frecuencia", '', "warning");
+                                            } else {
+                                                avanza = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (forma == "2") {
+                    if (tipo == "0") {
+                        swal("seleccione un tipo", '', "warning");
+                    } else if (tipo == "1") {
+                        if (clasificacionMonto == "0") {
+                            swal("seleccione una clasificación de monto", '', "warning");
+                        } else {
+                            if (montod == "" || montoh == "") {
+                                swal("No se asignado el rango de montos", '', "warning");
+                            } else {
+                                if (parseInt(montod) > 100 || parseInt(montoh) > 100) {
+                                    swal("Ha excedido el porcentaje en monto ", '', "warning");
+                                } else if (parseInt(montoh) < parseInt(montod)) {
+                                    swal("Montos min y max incorrectos", '', "warning");
+                                } else {
+                                    if (diasm == "" && diasc == "" && diapc == "") {
+                                        swal("No se asignado el días de inventario", '', "warning");
+                                    } else {
+                                        if (frecuencia == "0") {
+                                            swal("No ha seleccionado la frecuencia", '', "warning");
+                                        } else {
+                                            avanza = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (tipo == "2") {
+                        if (clasificacionpza == "0") {
+                            swal("seleccione una clasificación de piezas", '', "warning");
+                        } else {
+                            if (pzad == "" || pzah == "") {
+                                swal("No se asignado el rango de piezas", '', "warning");
+                            } else {
+                                if (parseInt(pzad) > 100 || parseInt(pzah) > 100) {
+                                    swal("Ha excedido el porcentaje en piezas ", '', "warning");
+                                } else if (parseInt(pzah) < parseInt(pzad)) {
+                                    swal("piezas min y max incorrectas", '', "warning");
+                                }else {
+                                    if (diasm == "" && diasc == "" && diapc == "") {
+                                        swal("No se asignado el días de inventario", '', "warning");
+                                    } else {
+                                        if (frecuencia == "0") {
+                                            swal("No ha seleccionado la frecuencia", '', "warning");
+                                        } else {
+                                            avanza = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if (tipo == "3") {
+                        if (clasificacionMonto == "0") {
+                            swal("seleccione una clasificación de monto", '', "warning");
+                        } else {
+                            if (montod == "" || montoh == "") {
+                                swal("No se asignado el rango de montos", '', "warning");
+                            } else {
+                                if (parseInt(montod) > 100 || parseInt(montoh) > 100) {
+                                    swal("Ha excedido el porcentaje en monto ", '', "warning");
+                                } else if (parseInt(montoh) < parseInt(montod)) {
+                                    swal("Montos min y max incorrectos", '', "warning");
+                                } else {
+                                    if (clasificacionpza == "0") {
+                                        swal("seleccione una clasificación de piezas", '', "warning");
+                                    } else {
+                                        if (pzad == "" || pzah == "") {
+                                            swal("No se asignado el rango de piezas", '', "warning");
+                                        } else {
+                                            if (parseInt(pzad) > 100 || parseInt(pzah) > 100) {
+                                                swal("Ha excedido el porcentaje en monto ", '', "warning");
+                                            } else if (parseInt(pzah) < parseInt(pzad)) {
+                                                swal("piezas min y max incorrectas", '', "warning");
+                                            }else {
+                                                if (diasm == "" && diasc == "" && diapc == "") {
+                                                    swal("No se asignado el días de inventario", '', "warning");
+                                                } else {
+                                                    if (frecuencia == "0") {
+                                                        swal("No ha seleccionado la frecuencia", '', "warning");
+                                                    } else {
+                                                        avanza = true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return avanza;
+            }
+
+            $("#btnConsultar").click(function () {
+                if (ValidacionBusqueda()) {
+                    var regla = $("#frmCobertura").serializeArray()
+                        .filter(function (elem) {
+                            return $.trim(elem.value);
+                        });
+                    forma = $("#forma").val();
+                    tipo = $("#Tipo").val();
+
+                    showLoading();
+                    $.ajax({
+                        type: "Post",
+                        url: "/ConfiguracionCobertura/ConsultarCobertura",
+                        dataType: "json",
+                        data: regla,
+                        success: function (response) {
+                            hideLoading();
+                            if (response.Success) {
+                                showCobertura(response.Result);
+
+                            } else {
+                                swal(response.Message, '', "error").then((value) => {
+                                    showCobertura(response.Result);
+                                });
+                            }
+                        },
+                        error: function (response) {
+                            hideLoading();
+                            swal(response.Message, '', "warning");
+                        }
+                    });
+                }
+            });
+
+            function ValidacionBusqueda() {
+
+                var forma, tipo, clasificacionMonto, montod, montoh, clasificacionpza, pzad, pzah, porc_grupo, porc_division, diasm, diasc, diapc, frecuencia;
+                var avanza = false;
+                forma = $("#forma").val();
+                tipo = $("#Tipo").val();
+                clasificacionMonto = $("#ClasficacionMonto").val();
+                clasificacionpza = $("#ClasficacionPieza").val();
+
+
+                if (forma == "0") {
+                    swal("seleccione una forma", '', "warning");
+                } else {
+                    if (tipo == "0") {
+                        swal("seleccione un tipo", '', "warning");
+                    } else if (tipo == "1") {
+                        if (clasificacionMonto == "0") {
+                            swal("seleccione una clasificación de monto", '', "warning");
+                        } else {
+                            avanza = true;
+                        }
+                    } else if (tipo == "2") {
+                        if (clasificacionpza == "0") {
+                            swal("seleccione una clasificación de piezas", '', "warning");
+                        } else {
+                            avanza = true;
+                        }
+                    }
+                    else if (tipo == "3") {
+                        if (clasificacionMonto == "0") {
+                            swal("seleccione una clasificación de monto", '', "warning");
+                        } else {
+                            if (clasificacionpza == "0") {
+                                swal("seleccione una clasificación de piezas", '', "warning");
+                            } else {
+                                avanza = true;
+                            }
+                        }
+                    }
+                }
+                return avanza;
+            }
+
+
+            function showCobertura(dataRes) {
+                tblCobertura.destroy();
+                if ($("#forma").val() == "1") {
+                    if ($("#Tipo").val() == "1")//montos
+                    {
+                        tblCobertura = $('#tblCobertura').DataTable({
+                            data: dataRes,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "LetraMonto", title: 'Clasificación Monto' },
+                                { data: "MontoDe", title: "De" },
+                                { data: "MontoHasta", title: "Hasta" },
+                                { data: "LetraPza", title: 'Clasificación Pieza', visible: false },
+                                { data: "PiezasDe", title: "De", visible: false },
+                                { data: "PiezasHasta", title: "Hasta", visible: false },
+                                { data: "DiasCoberturaMay", title: "Días cobertura Mayorista" },
+                                { data: "DiasCoberturaCed", title: 'Días Cobertura Cedis' },
+                                { data: "DiasCoberturaPieCam", title: 'Días Cobertura Pie Camión' },
+                                {
+                                    data: null,
+                                    title: 'Eliminar',
+                                    render: function (data, type, row) {
+                                        var boton = '';
+                                        boton = '<button onclick="Eliminar(' + data.Forma + ',' + data.Tipo + ',' + data.ClasficacionMonto + ',' + data.ClasficacionPieza + ')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+
+                                        return boton;
+                                    }
+                                }
+                            ],
+                            select: true,
+                            scrollCollapse: false,
+                            info: false,
+                            paging: false,
+                            //responsive: true,
+                            searching: false
+
+                        });
+                    } else
+                        if ($("#Tipo").val() == "2")//montos
+                        {
+                            tblCobertura = $('#tblCobertura').DataTable({
+                                data: dataRes,
+                                "destroy": true,
+                                "processing": true,
+                                dom: 'Bfrtip',
+                                columns: [
+                                    { data: "LetraMonto", title: 'Clasificación Monto', visible: false },
+                                    { data: "MontoDe", title: "De", visible: false },
+                                    { data: "MontoHasta", title: "Hasta", visible: false },
+                                    { data: "LetraPza", title: 'Clasificación Pieza' },
+                                    { data: "PiezasDe", title: "De" },
+                                    { data: "PiezasHasta", title: "Hasta" },
+                                    { data: "DiasCoberturaMay", title: "Días cobertura Mayorista" },
+                                    { data: "DiasCoberturaCed", title: 'Días Cobertura Cedis' },
+                                    { data: "DiasCoberturaPieCam", title: 'Días Cobertura Pie Camión' },
+                                    {
+                                        data: null,
+                                        title: 'Eliminar',
+                                        render: function (data, type, row) {
+                                            var boton = '';
+                                            boton = '<button onclick="Eliminar(' + data.Forma + ',' + data.Tipo + ',' + data.ClasficacionMonto + ',' + data.ClasficacionPieza + ')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+
+                                            return boton;
+                                        }
+                                    }
+                                ],
+                                select: true,
+                                scrollCollapse: false,
+                                info: false,
+                                paging: false,
+                                //responsive: true,
+                                searching: false
+
+                            });
+                        } else if ($("#Tipo").val() == "3")//montos
+                        {
+                            tblCobertura = $('#tblCobertura').DataTable({
+                                data: dataRes,
+                                "destroy": true,
+                                "processing": true,
+                                dom: 'Bfrtip',
+                                columns: [
+                                    { data: "LetraMonto", title: 'Clasificación Monto' },
+                                    { data: "MontoDe", title: "De" },
+                                    { data: "MontoHasta", title: "Hasta" },
+                                    { data: "LetraPza", title: 'Clasificación Pieza' },
+                                    { data: "PiezasDe", title: "De" },
+                                    { data: "PiezasHasta", title: "Hasta" },
+                                    { data: "DiasCoberturaMay", title: "Días cobertura Mayorista" },
+                                    { data: "DiasCoberturaCed", title: 'Días Cobertura Cedis' },
+                                    { data: "DiasCoberturaPieCam", title: 'Días Cobertura Pie Camión' },
+                                    {
+                                        data: null,
+                                        title: 'Eliminar',
+                                        render: function (data, type, row) {
+                                            var boton = '';
+                                            boton = '<button onclick="Eliminar(' + data.Forma + ',' + data.Tipo + ',' + data.ClasficacionMonto + ',' + data.ClasficacionPieza + ')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+
+                                            return boton;
+                                        }
+                                    }
+                                ],
+                                select: true,
+                                scrollCollapse: false,
+                                info: false,
+                                paging: false,
+                                searching: false
+
+                            });
+                        }
+                } else if ($("#forma").val() == "2") {
+                    if ($("#Tipo").val() == "1")//montos
+                    {
+                        tblCobertura = $('#tblCobertura').DataTable({
+                            data: dataRes,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "LetraMonto", title: 'Clasificación Monto' },
+                                { data: "MontoDe", title: "De" },
+                                { data: "MontoHasta", title: "Hasta" },
+                                { data: "LetraPza", title: 'Clasificación Pieza', visible: false },
+                                { data: "PiezasDe", title: "De", visible: false },
+                                { data: "PiezasHasta", title: "Hasta", visible: false },
+                                { data: "DiasCoberturaMay", title: "Días cobertura Mayorista" },
+                                { data: "DiasCoberturaCed", title: 'Días Cobertura Cedis' },
+                                { data: "DiasCoberturaPieCam", title: 'Días Cobertura Pie Camión' },
+                                {
+                                    data: null,
+                                    title: 'Eliminar',
+                                    render: function (data, type, row) {
+                                        var boton = '';
+                                        boton = '<button onclick="Eliminar(' + data.Forma + ',' + data.Tipo + ',' + data.ClasficacionMonto + ',' + data.ClasficacionPieza + ')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+
+                                        return boton;
+                                    }
+                                }
+                            ],
+                            select: true,
+                            scrollCollapse: false,
+                            info: false,
+                            paging: false,
+                            //responsive: true,
+                            searching: false
+
+                        });
+                    } else
+                        if ($("#Tipo").val() == "2")//montos
+                        {
+                            tblCobertura = $('#tblCobertura').DataTable({
+                                data: dataRes,
+                                "destroy": true,
+                                "processing": true,
+                                dom: 'Bfrtip',
+                                columns: [
+                                    { data: "LetraMonto", title: 'Clasificación Monto', visible: false },
+                                    { data: "MontoDe", title: "De", visible: false },
+                                    { data: "MontoHasta", title: "Hasta", visible: false },
+                                    { data: "LetraPza", title: 'Clasificación Pieza' },
+                                    { data: "PiezasDe", title: "De" },
+                                    { data: "PiezasHasta", title: "Hasta" },
+                                    { data: "DiasCoberturaMay", title: "Días cobertura Mayorista" },
+                                    { data: "DiasCoberturaCed", title: 'Días Cobertura Cedis' },
+                                    { data: "DiasCoberturaPieCam", title: 'Días Cobertura Pie Camión' },
+                                    {
+                                        data: null,
+                                        title: 'Eliminar',
+                                        render: function (data, type, row) {
+                                            var boton = '';
+                                            boton = '<button onclick="Eliminar(' + data.Forma + ',' + data.Tipo + ',' + data.ClasficacionMonto + ',' + data.ClasficacionPieza + ')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+
+                                            return boton;
+                                        }
+                                    }
+                                ],
+                                select: true,
+                                scrollCollapse: false,
+                                info: false,
+                                paging: false,
+                                //responsive: true,
+                                searching: false
+
+                            });
+                        } else if ($("#Tipo").val() == "3")//montos
+                        {
+                            tblCobertura = $('#tblCobertura').DataTable({
+                                data: dataRes,
+                                "destroy": true,
+                                "processing": true,
+                                dom: 'Bfrtip',
+                                columns: [
+                                    { data: "LetraMonto", title: 'Clasificación Monto' },
+                                    { data: "MontoDe", title: "De" },
+                                    { data: "MontoHasta", title: "Hasta" },
+                                    { data: "LetraPza", title: 'Clasificación Pieza' },
+                                    { data: "PiezasDe", title: "De" },
+                                    { data: "PiezasHasta", title: "Hasta" },
+                                    { data: "DiasCoberturaMay", title: "Días cobertura Mayorista" },
+                                    { data: "DiasCoberturaCed", title: 'Días Cobertura Cedis' },
+                                    { data: "DiasCoberturaPieCam", title: 'Días Cobertura Pie Camión' },
+                                    {
+                                        data: null,
+                                        title: 'Eliminar',
+                                        render: function (data, type, row) {
+                                            var boton = '';
+                                            boton = '<button onclick="Eliminar(' + data.Forma + ',' + data.Tipo + ',' + data.ClasficacionMonto + ',' + data.ClasficacionPieza + ')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+
+                                            return boton;
+                                        }
+                                    }
+                                ],
+                                select: true,
+                                scrollCollapse: false,
+                                info: false,
+                                paging: false,
+                                //responsive: true,
+                                searching: false
+                            });
+                        }
+                }
+            }
+
+            tblCobertura.on('select', function (e, dt, type, indexes) {
+                var rowData = tblCobertura.rows(['.selected']).data().toArray();
+
+                $("#forma").val(rowData[0].Forma);
+                $("#Tipo").val(rowData[0].Tipo);
+                if ($("#Tipo").val() == "1")//montos
+                {
+                    $("#ClasficacionMonto").val(rowData[0].ClasficacionMonto);
+                    $("#MontoDe").val(rowData[0].MontoDe);
+                    $("#MontoHasta").val(rowData[0].MontoHasta);
+                } else if ($("#Tipo").val() == "2")//piezas
+                {
+                    $("#ClasficacionPieza").val(rowData[0].ClasficacionPieza);
+                    $("#PiezasDe").val(rowData[0].PiezasDe);
+                    $("#PiezasHasta").val(rowData[0].PiezasHasta);
+                }
+                else if ($("#Tipo").val() == "3")//piezas
+                {
+                    $("#ClasficacionMonto").val(rowData[0].ClasficacionMonto);
+                    $("#MontoDe").val(rowData[0].MontoDe);
+                    $("#MontoHasta").val(rowData[0].MontoHasta);
+                    $("#ClasficacionPieza").val(rowData[0].ClasficacionPieza);
+                    $("#PiezasDe").val(rowData[0].PiezasDe);
+                    $("#PiezasHasta").val(rowData[0].PiezasHasta);
+                }
+                if ($("#forma").val() == "2") {
+                    if (rowData[0].ParticipacionGrupo) {
+                        $("#ParticipacionGrupo").val(rowData[0].ParticipacionGrupo);
+                        $("#ParticipacionGrupo").prop("checked", true);
+                    }
+
+                    if (rowData[0].ParticipacionDivision) {
+                        $("#ParticipacionDivision").val(rowData[0].ParticipacionDivision);
+                        $("#ParticipacionDivision").prop("checked", true);
+                    }
+                }
+
+                $("#DiasCoberturaMay").val(rowData[0].DiasCoberturaMay);
+                $("#DiasCoberturaCed").val(rowData[0].DiasCoberturaCed);
+                $("#DiasCoberturaPieCam").val(rowData[0].DiasCoberturaPieCam);
+
+                $("#Periodicidad").val(rowData[0].Periodicidad);
+
+            }).on('deselect', function (e, dt, type, indexes) {
+                $("#frmCobertura").trigger("reset");
+            });
+
+            $("#Tipo").change(function () {
+                if ($("#forma").val() != "0") {
+                    if ($("#Tipo").val() == "1")//Montos
+                    {
+                        $('div[data-group="montos"]').css("display", "block");
+                        $('div[data-group="piezas"]').css("display", "none");
+                    } else if ($("#Tipo").val() == "2")//piezas
+                    {
+                        $('div[data-group="montos"]').css("display", "none");
+                        $('div[data-group="piezas"]').css("display", "block");
+                    } else if ($("#Tipo").val() == "3")//piezas
+                    {
+                        $('div[data-group="montos"]').css("display", "block");
+                        $('div[data-group="piezas"]').css("display", "block");
+                    }
+                    if ($("#forma").val() == "2") {
+                        $('div[data-group="porcentaje"]').css("display", "block");
+                        $('#MontosPorcentaje').text("Rango Montos %");
+                        $('#PiezasPorcentaje').text("Rango de Piezas %");
+                    } else {
+                        $('div[data-group="porcentaje"]').css("display", "none");
+                        $('#MontosPorcentaje').text("Rango Montos");
+                        $('#PiezasPorcentaje').text("Rango de Piezas");
+                    }
+                    $('div[data-group="diasInv"]').css("display", "block");
+                    $('div[data-group="frec"]').css("display", "block");
+
+
+                } else {
+                    $("#Tipo").val("0");
+                    swal("Seleccione una forma", '', "warning");
+                }
+            });
+
+            $("#forma").change(function () {
+                $("#Tipo").val("0");
+                $('div[data-group="montos"]').css("display", "none");
+                $('div[data-group="piezas"]').css("display", "none");
+                $('div[data-group="diasInv"]').css("display", "none");
+                $('div[data-group="frec"]').css("display", "none");
+
+
+            });
+
+
+
+        });
+
+        function Eliminar(idForma, IdTipo, IdClasificacionMonto, IdClasificacioPza) {
+            swal({
+                title: 'Eliminar Cobertura',
+                text: "¿Seguro de Eliminar la cobertura seleccionada?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Eliminar",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+                if (resp) {
+                    showLoading();
+                    var llavesCob = new FormData();
+                    llavesCob.append("forma", idForma);
+                    llavesCob.append("tipo", IdTipo);
+                    llavesCob.append("ClasifMonto", IdClasificacionMonto);
+                    llavesCob.append("ClasifPza", IdClasificacioPza);
+                    var param = 'f=' + idForma + '&t=' + IdTipo + '&m=' + IdClasificacionMonto + '&p=' + IdClasificacioPza;
+
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            hideLoading();
+                            var myObj = JSON.parse(this.response);
+                            swal('',myObj.Message , "success").then((value) => {
+                                window.location.href = "/ConfiguracionCobertura/Index";
+                            });
+                        } else {
+                            hideLoading();
+                            var myObj = JSON.parse(this.response);
+                            swal('', myObj.Message,  "warning");
+                        }
+                    };
+                    xhttp.open("POST", '/ConfiguracionCobertura/EliminarCobertura?' + param, true);
+                    xhttp.send();
+
+
+                    @*$.ajax({
+                    url: '@Url.Action("EliminarCobertura", "ConfiguracionCobertura")',
+                    type: "POST",
+                    dataType: "json",
+                        data: llavesCob,
+                        success: function (response) {
+                            hideLoading();
+                            tblCobertura.destroy();
+                            $("#frmCobertura").trigger("reset");
+                            swal('', response.Message, "Success");
+                        },
+                        error: function (response) {
+                            hideLoading();
+                            swal('', response.Message, "warning");
+                        }
+
+                    });*@
+                }
+            });
+        }
+
+    </script>
+
+}

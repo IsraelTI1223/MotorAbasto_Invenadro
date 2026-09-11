@@ -1,0 +1,386 @@
+﻿@*@model PortalGRFP.Entities.Response.ResponseList<PortalGRFP.Entities.Common.ConsultaArticuloSucursalModel>
+    @using PortalGRFP.Entities.Common
+    @using PortalGRFP.Extensions
+
+
+
+    @{
+        ViewBag.Title = "";
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+
+    @section Breadcrumbs{
+        <li class="breadcrumb-item active"><a>REPORTES</a></li>
+        <li class="breadcrumb-item"><a>CONSULTA ARTICULO SUCURSAL</a></li>
+    }
+
+
+    @section Actions{
+        <a href='@Url.Action("DescargarExcel",new {})' class="btn btn-success btn-lg" title="Descargar Reporte">
+            Descargar Reporte
+            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-box-arrow-in-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1h-2z" />
+                <path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+            </svg>
+        </a>
+
+
+    }
+
+
+
+
+
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-striped" id="dtDataProd">
+                    <thead class="thead-primary">
+                        <tr>
+
+
+                            <th scope="col">IDSUC</th>
+                            <th scope="col">SKU</th>
+                            <th scope="col">DESCRIPCION</th>
+                            <th scope="col">GRUPO</th>
+                            <th scope="col">FAMILIA</th>
+                            <th scope="col">EXISTENCIA</th>
+                            <th scope="col">PVD</th>
+                            <th scope="col">FECHA VENTA</th>
+                            <th scope="col">VENTA30DIAS</th>
+
+
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var d in Model.Result)
+                        {
+                            <tr>
+
+                                <td>
+
+
+                                    @d.ID_Sucursal
+                                </td>
+                                <td>
+                                    @d.SKU
+                                </td>
+                                <td>
+                                    @d.DESCRIPCION_CORTA
+                                </td>
+
+
+                                <td>
+                                    @d.GRUPO
+                                </td>
+
+                                <td>
+                                    @d.FAMILIA
+                                </td>
+                                <td>
+                                    @d.Existencia
+                                </td>
+                                <td>
+                                    @d.PVD
+                                </td>
+                                <td>
+                                    @d.Fecha_Venta
+                                </td>
+                                <td>
+                                    @d.piezas_total
+                                </td>
+
+
+
+
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    @section scripts{
+
+        <script>
+
+                $(function () {
+                    'use strict'
+
+                    $('#dtDataProd').dataTable({
+                        language: {
+                            url: 'https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+                            searchPlaceholder: "Buscar",
+                            sSearch: '',
+                            lengthMenu: '_MENU_ filas / paginas'
+                        }
+                    });
+                });
+
+
+               $("#btnDownload").click(function () {
+
+                   $.post('@Url.Action("DescargarExcel", "ConsultaProductos")', { flag: "prod" }, function (data) {
+
+                   });
+               });
+
+        </script>
+    }
+
+    }*@
+
+@using PortalGRFP.Entities.Common
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>CONSULTA</a></li>
+    <li class="breadcrumb-item active"><a>REPORTES</a></li>
+    <li class="breadcrumb-item"><a>CONSULTA ARTICULO SUCURSAL</a></li>
+}
+<div class="card" style="width:100%">
+    <div class="card-header">
+        <div class="row" style="margin-top:1%">
+            <div class="col-auto">
+                <label for="cbGrupos">Seleccionar Grupos:</label><br />
+                <select class="form-control" id="cbGrupos" min="1" multiple required>
+                    <!--<option value="0">Seleccione Grupo</option>-->
+                    @foreach (var item in TempData["gruposArticuloSuc"] as List<ComboGenerico>)
+                    {
+                        <option value="@item.Id">@item.Valor</option>
+                    }
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="cbTiendas">Seleccionar Sucursal:</label><br />
+                <select class="form-control" id="cbTiendas" multiple required>
+                    <option disabled selected>Seleccione Sucursal:</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="cbStatus">Seleccionar Estatus:</label><br />
+                <select class="form-control" id="cbStatus" min="1" required>
+                    <option disabled selected>Estatus Producto</option>
+                    @*<option>Vigente</option>
+                        <option>Descontinuado</option>*@
+                    <option>Activo</option>
+                    <option>Inactivo</option>
+                    <option>Todos</option>
+                </select>
+            </div>
+            <div class="col-auto" style="margin-top:2.3%">
+                <button type="submit" class="btn btn-sm pd-x-15 btn-primary btn-lg" id="btnBuscar" onclick="getArticulosList()">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<table id="DTArticulos" class="display compact cell-border" width="100%"></table>
+
+@section scripts{
+
+
+    <script>
+        $('#cbGrupos').multiselect({
+            nonSelectedText: 'Lista de Grupos',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todos",
+            allSelectedText: "Todas Seleccionados",
+            nSelectedText: "Grupos"
+        });
+        $('#cbTiendas').multiselect({
+            nonSelectedText: 'Lista de Sucursales',
+            enableFiltering: true,
+            includeSelectAllOption: true,
+            maxHeight: 400,
+            buttonWidth: '150px',
+            buttonTextAlignment: 'left',
+            selectAllText: "Marcar Todas",
+            allSelectedText: "Todas Seleccionados",
+            nSelectedText: "Sucursales"
+        });
+         $("#cbGrupos").on("change", function () {
+
+             if ($("#cbGrupos").val() == '') {
+                 $("#cbTiendas").html("");
+                 $("#cbTiendas").append('<option disabled selected>Seleccione Sucursal:</option>');
+                 return;
+             }
+                getSucursalesCadenas($("#cbGrupos").val());
+         });
+
+        $("#cbTiendas").on("change", function () {
+
+            console.log($("#cbTiendas").val())
+        });
+
+
+
+            function getSucursalesCadenas(data) {
+
+                console.log(data)
+                showLoading();
+                $('#cbTiendas').empty();
+                $.ajax({
+                     url: "@Url.Action("GetSucursalesXGrupo", "ConsultaArticulosSucursal")",
+                    type: "POST",
+                    dataType: "json",
+                    data: { search: String(data) },
+                    success: function (response) {
+                        hideLoading();
+                        var sucursales = "";
+
+                        console.log(response)
+
+                        if (response.data != null) {
+
+                            for (var i = 0; i < response.data.length; i++) {
+                                sucursales = sucursales + '<option value=' + response.data[i].Id + '>' + response.data[i].Valor + '</option>';
+                            }
+                            sucursales = sucursales;// + '<option disabled selected>Seleccione Sucursal:</option>'
+                        }
+
+                        $("#cbTiendas").append(sucursales);
+
+                        $('#cbTiendas').multiselect('rebuild');
+                    },
+                    error: function (response) {
+                        hideLoading();
+                    }
+                });
+
+        }
+        var table = $('#DTArticulos').DataTable({
+
+            "destroy": true,
+            "processing": true,
+            dom: 'Bfrtip',
+            columns: [
+                { title: 'Sucursal' },
+                { title: 'SKU' },
+                { title: 'Descripción' },
+                { title: 'Grupo' },
+                { title: 'Familia' },
+                { title: 'Estatus' },
+                { title: 'Existencia' },
+                { title: 'Transito' },
+                { title: 'PVD' },
+                { title: 'Invenadro' },
+                { title: 'Capacity' },
+                { title: 'Motivo' },
+                { title: 'Tipo de Proveedor' },
+                { title: 'RotABC' },
+                { title: 'Politica Dias' },
+                { title: 'Fecha Activo' },
+                { title: 'Fecha Inactivo' },
+                { title: 'Venta30Dias' }
+
+
+            ],
+            select: true,
+            scrollCollapse: true,
+            info: false,
+            paging: true,
+            responsive: true,
+            searching: true
+        });
+
+        function getArticulosList() {
+
+
+
+           // console.log('tabla:'+table)
+
+            ////clear datatable
+            //table.clear().draw();
+
+            ////destroy datatable
+            //table.destroy();
+            if ($("#cbTiendas").val() == null || $("#cbStatus").val() == null) {
+                alert("Seleccionar Todos los filtros");
+                return;
+            }
+            showLoading();
+
+            table.clear();
+            //table.fnDraw();
+            //dataTable.fnDestroy();
+
+
+
+                $.ajax({
+                    url: "@Url.Action("ConsultarProductosXSuc", "ConsultaArticulosSucursal")",
+                    type: "POST",
+                    dataType: "json",
+                    data: { storeId: String($("#cbTiendas").val()), estatus: String($("#cbStatus").val()) },
+                    success: function (data) {
+                        //console.log(data)
+                        hideLoading();
+
+                        $('#DTArticulos').DataTable({
+                            data: data,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "ID_Sucursal", title: 'Sucursal' },
+                                { data: "SKU", title: 'SKU' },
+                                { data: "DESCRIPCION_CORTA", title: 'Descripción' },
+                                { data: "GRUPO", title: 'Grupo' },
+                                { data: "FAMILIA", title: 'Familia' },
+                                { data: "Estatus", title: 'Estatus' },
+                                { data: "Existencia", title: 'Existencia' },
+                                { data: "Transito", title: 'Transito' },
+                                { data: "PVD", title: 'PVD' },
+                                { data: "Invenadro", title: 'Invenadro' },
+                                { data: "Capacity", title: 'Capacity'},
+                                { data: "Motivo", title: 'Motivo' },
+                                { data: "TipoProveedor", title: 'Tipo de Proveedor' },
+                                { data: "RotABC", title: 'RotABC' },
+                                { data: "PoliticaDias", title: 'Politica Dias' },
+                                { data: "FechaActivo", title: 'Fecha Activo' },
+                                { data: "FechaInactivo", title: 'Fecha Inactivo' },
+                                { data: "piezas_total", title: 'Venta30Dias' }
+
+
+                            ],
+                            select: true,
+                            scrollCollapse: true,
+                            info: false,
+                            paging: true,
+                            responsive: true,
+                            searching: true
+                        });
+
+
+
+
+
+                    },
+                    error: function (response) {
+                        hideLoading();
+                    }
+                });
+            table.draw();
+
+            }
+
+
+
+
+
+    </script>
+}
+
+
+

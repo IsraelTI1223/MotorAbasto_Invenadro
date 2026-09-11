@@ -1,0 +1,214 @@
+﻿
+@{
+    ViewBag.Title = "Reportes/Consulta y Generación de Reportes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+
+<body>
+
+    <div class="btn-group">
+        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Tipos de Reporte
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <button class="dropdown-item" type="button" id="btnProd">Prod. Nuevos</button>
+            <button class="dropdown-item" type="button" id="btnSuc">Suc. Nuevas</button>
+            <button class="dropdown-item" type="button" id="btnCat">Cat. de Articulos</button>
+            <button class="dropdown-item" type="button" id="btnInv">Invenadro</button>
+        </div>
+    </div>
+
+    <div class="col-lg-12" style="margin-top:5%">
+        <div class="row">
+            <div class="table-responsive" id="dtDivProd">
+                <table class="table table-striped" id="dtDataProd">
+                    <thead class="thead-primary">
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th scope="col">Sku</th>
+                            <th scope="col">Descripcion</th>
+                            <th scope="col">Grupo</th>
+                            <th scope="col">Familia</th>
+                            <th scope="col">Categoria</th>
+                            <th scope="col">Clasificacion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var d in Model)
+                        {
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>
+                                    @d.Sku
+                                </td>
+                                <td>
+                                    @d.Descripcion
+                                </td>
+                                <td>
+                                    @d.Grupo
+                                </td>
+                                <td>
+                                    @d.Familia
+                                </td>
+                                <td>
+                                    @d.Categoria
+                                </td>
+                                <td>
+                                    @d.Clasificacion
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12" style="margin-top:5%">
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-striped" id="dtDataSuc">
+                    <thead class="thead-primary">
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th scope="col">Sku</th>
+                            <th scope="col">Descripcion</th>
+                            <th scope="col">Grupo</th>
+                            <th scope="col">Familia</th>
+                            <th scope="col">Categoria</th>
+                            <th scope="col">Clasificacion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var d in Model)
+                        {
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>
+                                    @d.Sku
+                                </td>
+                                <td>
+                                    @d.Descripcion
+                                </td>
+                                <td>
+                                    @d.Grupo
+                                </td>
+                                <td>
+                                    @d.Familia
+                                </td>
+                                <td>
+                                    @d.Categoria
+                                </td>
+                                <td>
+                                    @d.Clasificacion
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+    <button id="btnDownload" type="button" class="btn btn-success btn-lg">Descargar Reporte</button>
+</body>
+
+@section scripts{
+    <script>
+
+            $(function () {
+                'use strict'
+
+                $('#dtDataProd').dataTable({
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+                        searchPlaceholder: "Buscar",
+                        sSearch: '',
+                        lengthMenu: '_MENU_ filas / paginas'
+                    }
+                });
+            });
+
+
+
+
+            $("#btnProd").click(function () {
+
+               $.post('@Url.Action("DescargarExcel", "Reportes")', { flag: "prod" }, function (data) {
+
+               });
+
+                $("#dtDivProd").show();
+                $("#dtDivSuc").hide();
+                $("#dtDivCat").hide();
+                $("#dtDivInv").hide();
+
+
+            });
+
+            $("#btnSuc").click(function () {
+
+               $.post('@Url.Action("DescargarExcel", "Reportes")', { flag: "prod" }, function (data) {
+
+               });
+
+                $('#dtDataSuc').dataTable({
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+                        searchPlaceholder: "Buscar",
+                        sSearch: '',
+                        lengthMenu: '_MENU_ filas / paginas'
+                    }
+                });
+
+                $("#dtDivProd").hide();
+                $("#dtDivSuc").show();
+                $("#dtDivCat").hide();
+                $("#dtDivInv").hide();
+
+            });
+
+            $("#btnCat").click(function () {
+
+               $.post('@Url.Action("DescargarExcel", "Reportes")', { flag: "prod" }, function (data) {
+
+               });
+
+                $("#dtDivProd").hide();
+                $("#dtDivSuc").hide();
+                $("#dtDivCat").show();
+                $("#dtDivInv").hide();
+
+            });
+
+            $("#btnInv").click(function () {
+
+               $.post('@Url.Action("DescargarExcel", "Reportes")', { flag: "prod" }, function (data) {
+
+               });
+
+                $("#dtDivProd").hide();
+                $("#dtDivSuc").hide();
+                $("#dtDivCat").hide();
+                $("#dtDivInv").show();
+
+            });
+
+
+         $("#btnDownload").click(function () {
+
+               $.post('@Url.Action("DescargarExcel", "Reportes")', { flag: "prod" }, function (data) {
+
+               });
+            });
+
+
+    </script>
+}
+

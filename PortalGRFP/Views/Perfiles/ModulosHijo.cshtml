@@ -1,0 +1,53 @@
+﻿@model List<PortalGRFP.Models.Modulo>
+<table class="table table-striped" id="tblModulosHijo">
+    <thead class="thead-primary">
+        <tr>
+            <!--<th scope="col">ID</th>-->
+            <!--<th scope="col">Modulo</th>-->
+            <!--<th scope="col">Actualizar</th>-->
+            <!--<th scope="col">Consultar</th>-->
+            <!--<th scope="col">Cargar</th>-->
+            <!--<th scope="col">Eliminar</th>-->
+            <!--<th scope="col">Insertar</th>-->
+            <!--<th scope="col">Descargar</th>-->
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+                var checkBoxActualizar = "chk1" + @item.IdModulo;
+                var checkBoxConsultar = "chk2" + @item.IdModulo;
+                var checkBoxCargar = "chk3" + @item.IdModulo;
+                var checkBoxEliminar = "chk4" + @item.IdModulo;
+                var checkBoxInsertar = "chk5" + @item.IdModulo;
+                var checkBoxDescargar = "chk6" + @item.IdModulo;
+
+        <tr ContieneModulo="1">
+            <td></td>
+            <td>@item.IdModulo</td>
+            <td>@item.NombreModulo</td>
+            <td style="text-align:center">
+                @Html.CheckBox(@checkBoxActualizar, item.Actualizar == true ? true : false)
+            </td>
+            <td style="text-align:center">
+                @Html.CheckBox(@checkBoxConsultar, item.Consultar == true ? true : false)
+            </td>
+            <td style="text-align:center">
+                @Html.CheckBox(@checkBoxCargar, item.Cargar == true ? true : false)
+            </td>
+            <td style="text-align:center">
+                @Html.CheckBox(@checkBoxEliminar, item.Eliminar == true ? true : false)
+            </td>
+            <td style="text-align:center">
+                @Html.CheckBox(@checkBoxInsertar, item.Insertar == true ? true : false)
+            </td>
+            <td style="text-align:center">
+                @Html.CheckBox(@checkBoxDescargar, item.Descargar == true ? true : false)
+            </td>
+        </tr>
+            }
+        }
+    </tbody>
+</table>

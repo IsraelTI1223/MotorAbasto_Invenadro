@@ -1,0 +1,576 @@
+﻿@model PortalGRFP.Entities.Common.SucursalProveedor
+@using PortalGRFP.Entities.Common
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Mantenimiento</a></li>
+    <li class="breadcrumb-item"><a>Sucursal por Proveedores </a></li>
+}
+<div class="container-fluid">
+    @section Actions{
+        <button type="button" id="btnExcel" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" data-toggle="modal" data-target="#modalExcel" data-placement="top" title="Subir Archivo de Excel">
+            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-cloud-upload" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z" />
+                <path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z" />
+            </svg> Carga Masiva
+        </button>
+    }
+    <div class="row">
+        <div class="btn-group float-right" role="group" aria-label="Basic example">
+            <a href="@Url.Action("MantenimientoSuc","MantenimientoSucursal")" class="btn btn-secondary">Sucursal</a>
+            <a href="@Url.Action("SucursalProveedor","MantenimientoSucursal")" class="btn btn-secondary">Sucursal por Proveedor</a>
+        </div>
+    </div>
+    <div class="row">
+        @using (Html.BeginForm("GuardarSucursalProveedor", "MantenimientoSucursal", FormMethod.Post, new { role = "form", id = "frmSucursalProveedor" }))
+        {
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="control-label col-md-2">Sucursal</label>
+                    <div class="col-md-10">
+                        <select id="IdSucursal" name="IdSucursal" class="form-control">
+                            <option value="0">Seleccione</option>
+                            @foreach (var item in TempData["Sucursales"] as List<ComboGenerico>)
+                            {
+                                <option value="@item.Id">@item.Valor</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Proveedor</label>
+                        <div class="col-md-10">
+                            <select id="IdProveedor" name="IdProveedor" class="form-control">
+                                <option value="0">Seleccione</option>
+                                @foreach (var item in TempData["Proveedores"] as List<Autocomplete>)
+                                {
+                                    <option value="@item.Id">@item.Valor</option>
+                                }
+                            </select>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-3">
+                    <label class="control-label col-md-2">Agencia</label>
+                    <div class="col-md-10">
+                        <select id="IdAgencia" name="IdAgencia" class="form-control">
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        N° Cliente Proveedor
+                        <div class="col-md-8">
+                            @Html.EditorFor(model => model.ClienteProveedor, new { htmlAttributes = new { @class = "form-control", min = "0", max = "2147483647", oninput = "validity.valid||(value='')" } })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-1">
+                    Lead Time
+                    <div>
+                        @Html.EditorFor(model => model.LeadTime, new { htmlAttributes = new { @class = "form-control", min = "0", max = "2147483647",  oninput = "validity.valid||(value='')" } })
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    Días Cobertura
+                    <div class="col-md-7">
+                        @Html.EditorFor(model => model.DiasCobertura, new { htmlAttributes = new { @class = "form-control" , min = "0", max = "2147483647",  oninput = "validity.valid||(value='')" } })
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="form-inline">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Lunes, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="Lunes" name="Lunes" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Martes, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="Martes" name="Martes" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Miercoles, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="Miercoles" name="Miercoles" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Jueves, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="Jueves" name="Jueves" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Viernes, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="Viernes" name="Viernes" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Sabado, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="Sabado" name="Sabado" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Domingo, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="Domingo" name="Domingo" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="btn-group">
+                                <input type="button" value="Consultar" id="btnConsultar" name="btnConsultar" class="btn btn-warning" />
+                                <input type="submit" value="Agregar" class="btn btn-primary" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <hr />
+
+</div>
+<div class="container-fluid">
+    <table id="tblSucProv" class="table-striped" width="100%"></table>
+</div>
+
+<div class="modal fade" id="modalExcel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form id="frmExcel" enctype="multipart/form-data" method="post">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalExcel-label">CARGAR UN EXCEL</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="fileExcel" name="fileExcel" multiple data-show-upload="false">
+                        <label id="lblFileName" class="custom-file-label" for="customFile">Seleccionar archivo</label>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="EnviarExcel">Iniciar Carga</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            'use strict';
+            var tblSucProv = $('#tblSucProv').DataTable({
+                data: "",
+                "destroy": true,
+                "processing": true,
+                dom: 'Bfrtip',
+                columns: [
+                    { data: "NomProveedor", title: 'Proveedor' },
+                    { data: "LeadTime", title: "Lead Time" },
+                    { data: "DiasCobertura", title: "Días Cobertura" },
+                    { data: "NomAgencia", title: 'Agencia' },
+                    { data: "ClienteProveedor", title: "Cliente Proveedor" },
+                    { data: "Calendario", title: "Calendario" },
+                    { data: "IdProveedor", title: 'IdProveedor', visible: false },
+                    { data: "IdSucursal", title: "IdSucursal", visible: false },
+                    { data: "IdAgencia", title: "IdAgencia", visible: false },
+                    { data: "Lunes", title: 'Lunes', visible: false },
+                    { data: "Martes", title: "Martes", visible: false },
+                    { data: "Miercoles", title: "Miercoles", visible: false },
+                    { data: "Jueves", title: "Jueves", visible: false },
+                    { data: "Viernes", title: 'Viernes', visible: false },
+                    { data: "Sabado", title: "Sabado", visible: false },
+                    { data: "Domingo", title: "Domingo", visible: false }
+                ],
+                select: true
+            });
+
+            $("#IdProveedor").on("change",function () {
+                var datos = new FormData();
+                datos.append("idProveedor", $("#IdProveedor").val());
+                ObtenerAgencias(datos);
+            });
+
+            var agenciasvariable;
+
+            function ObtenerAgencias(datos) {
+                showLoading();
+                $('#IdAgencia').empty();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ObtenerAgencias", "MantenimientoSucursal")",
+                    data: datos,
+                    dataType: "json",
+                    processData: false,  // tell jQuery not to process the data
+                    contentType: false,
+                    success: function (response) {
+                        hideLoading();
+                        $("#ClienteProveedor").val("");
+                        agenciasvariable=response;
+                        var agencias = '<option value="0">Seleccione</option>';
+                        for (var i = 0; i < response.length; i++) {
+                            agencias = agencias + '<option value=' + response[i].IdAgencia + '>' + response[i].Agencia + '</option>';
+                        }
+                        $('#IdAgencia').append(agencias)
+                    },
+                    error: function (response) {
+                    }
+                });
+            }
+
+            //$("#IdAgencia").on("change", function () {
+            //    for (var i = 0; i <   agenciasvariable.length; i++) {
+            //        if (agenciasvariable[i].IdAgencia == $("#IdAgencia").val()) {
+            //            //$("#ClienteProveedor").val(agenciasvariable[i].IdCliente);
+            //        }
+            //    }
+            //});
+
+            $('#IdSucursal').multiselect({
+                nonSelectedText: 'Seleccione un grupo',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                enableClickableOptGroups: true,
+                enableCollapsibleOptGroups: true,
+                maxHeight: 400,
+                buttonWidth: '250px',
+                enableCaseInsensitiveFiltering: true,
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Grupos Seleccionados"
+            });
+
+            $("#frmSucursalProveedor").on("submit", function (event) {
+                event.preventDefault();
+                if (ValidacionForm()) {
+                    $("#ClienteProveedor").prop("disabled", false);
+                    $("#IdSucursal").prop("disabled", false);
+                    $("#IdProveedor").prop("disabled", false);
+                    $("#IdAgencia").prop("disabled", false);
+                    var sucProv = $("#frmSucursalProveedor").serializeArray()
+                        .filter(function (elem) {
+                            return $.trim(elem.value);
+                        });
+
+                    showLoading();
+                    $.ajax({
+                        type: $("#frmSucursalProveedor").attr('method'),
+                        url: $("#frmSucursalProveedor").attr('action'),
+                        data: sucProv,
+                        success: function (response) {
+                            hideLoading();
+                            if (response.Success) {
+                                swal(response.Message, '', "success").then((value) => {
+                                   // $("#frmSucursalProveedor").trigger("reset");
+                                    Consulta();
+                                    //$("#ClienteProveedor").prop("disabled", true);
+                                    $('#IdAgencia').empty();
+                                    $("#frmSucursalProveedor").trigger("reset");
+                                });
+                            } else {
+                                swal(response.Message, '', "error").then((value) => {
+                                    Consulta();
+                                });
+                            }
+                        },
+                        error: function (response) {
+                            hideLoading();
+                            swal("Ocurrio un error de comunicación", '', "warning");
+                        }
+                    });
+                }
+            });
+
+            $("#btnConsultar").click(function () {
+                var sucursal = $("#IdSucursal").val();
+                if (sucursal == "0") {
+                    swal("Seleccione una sucursal", '', "warning");
+                } else {
+                    //$("#IdSucursal").prop("disabled", false);
+                    //$("#IdProveedor").prop("disabled", false);
+                    //$("#IdAgencia").prop("disabled", false);
+                    Consulta();
+                }
+            });
+
+            function Consulta() {
+                var sucProv = $("#frmSucursalProveedor").serializeArray()
+                    .filter(function (elem) {
+                        return $.trim(elem.value);
+                    });
+              showLoading();
+              $.ajax({
+                  type: "Post",
+                  url: "@Url.Action("ConsultarSucursalProv", "MantenimientoSucursal")",
+                  dataType: "json",
+                  data: sucProv,
+                  success: function (response) {
+                      if (response.Success) {
+                          tblSucProv = $('#tblSucProv').DataTable({
+                              data: response.Result,
+                              "destroy": true,
+                              "processing": true,
+                              dom: 'Bfrtip',
+                              columns: [
+                                  { data: "NomProveedor", title: 'Proveedor' },
+                                  { data: "LeadTime", title: "Lead Time" },
+                                  { data: "DiasCobertura", title: "Días Cobertura" },
+                                  { data: "NomAgencia", title: 'Agencia' },
+                                  { data: "ClienteProveedor", title: "Cliente Proveedor" },
+                                  { data: "Calendario", title: "Calendario" },
+                                  { data: "IdProveedor", title: 'IdProveedor', visible:false },
+                                  { data: "IdSucursal", title: "IdSucursal", visible: false },
+                                  { data: "IdAgencia", title: "IdAgencia", visible: false },
+                                  { data: "Lunes", title: 'Lunes', visible: false },
+                                  { data: "Martes", title: "Martes", visible: false },
+                                  { data: "Miercoles", title: "Miercoles", visible: false },
+                                  { data: "Jueves", title: "Jueves", visible: false },
+                                  { data: "Viernes", title: 'Viernes', visible: false },
+                                  { data: "Sabado", title: "Sabado", visible: false },
+                                  { data: "Domingo", title: "Domingo", visible: false }
+                              ],
+                              select: true
+
+                          });
+                      } else {
+                          swal(response.Message, '', "error");
+                      }
+                      hideLoading();
+              },
+                  error: function (response) {
+                      hideLoading();
+                      swal(response.Message, '', "warning");
+                  }
+              });
+        }
+
+            tblSucProv.on('select', function (e, dt, type, indexes) {
+                var rowData = tblSucProv.rows(['.selected']).data().toArray();
+                var datos = new FormData();
+                datos.append("idProveedor", rowData[0].IdProveedor);
+              
+
+                $("#IdSucursal").val(rowData[0].IdSucursal);
+                $("#IdSucursal").prop("disabled",true)
+                $("#IdProveedor").val(rowData[0].IdProveedor);
+                $("#IdProveedor").prop("disabled", true)
+                
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ObtenerAgencias", "MantenimientoSucursal")",
+                    data: datos,
+                    dataType: "json",
+                    processData: false,  // tell jQuery not to process the data
+                    contentType: false,
+                    success: function (response) {
+                        hideLoading();
+                        $('#IdAgencia').empty();
+                        var agencias = '';
+                        for (var i = 0; i < response.length; i++) {
+                            agencias = agencias + '<option value=' + response[i].IdAgencia + '>' + response[i].Agencia + '</option>';
+                        }
+                        $('#IdAgencia').append(agencias);
+                        //$("#IdAgencia").multiselect('rebuild');
+                        $("#IdAgencia").val(rowData[0].IdAgencia);
+                    },
+                    error: function (response) {
+                    }
+                });
+                $("#IdAgencia").prop("disabled", true);
+
+                $("#ClienteProveedor").val(rowData[0].ClienteProveedor);
+                $("#LeadTime").val(rowData[0].LeadTime);
+                $("#DiasCobertura").val(rowData[0].DiasCobertura);
+                if (rowData[0].Lunes == "1") {
+                    $("#Lunes").val(true);
+                    $("#Lunes").prop("checked", true);
+                }
+                if (rowData[0].Martes == "1") {
+                    $("#Martes").val(true);
+                    $("#Martes").prop("checked", true);
+                }
+                if (rowData[0].Miercoles == "1") {
+                    $("#Miercoles").val(true);
+                    $("#Miercoles").prop("checked", true);
+                }
+                if (rowData[0].Jueves == "1") {
+                    $("#Jueves").val(true);
+                    $("#Jueves").prop("checked", true);
+                }
+                if (rowData[0].Viernes == "1") {
+                    $("#Viernes").val(true);
+                    $("#Viernes").prop("checked", true);
+                }
+                if (rowData[0].Sabado == "1") {
+                    $("#Sabado").val(true);
+                    $("#Sabado").prop("checked", true);
+                }
+                if (rowData[0].Domingo == "1") {
+                    $("#Domingo").val(true);
+                    $("#Domingo").prop("checked", true);
+                }
+
+
+            }).on('deselect', function (e, dt, type, indexes) {
+                $("#frmSucursalProveedor").trigger("reset");
+                $("#IdSucursal").prop("disabled", false);
+                $("#IdProveedor").prop("disabled", false);
+                $("#IdAgencia").prop("disabled", false);
+                $("#frmSucursalProveedor").trigger("reset");
+            });
+
+            function ValidacionForm() {
+                var avanza = false, proveedor, agencia, sucursal, cliente, LeadTime, DiasCobertura;
+                proveedor = $("#IdProveedor").val();
+                agencia = $("#IdAgencia").val();
+                sucursal = $("#IdSucursal").val();
+                cliente = $("#ClienteProveedor").val();
+                LeadTime = $("#LeadTime").val();
+                DiasCobertura = $("#DiasCobertura").val();
+
+                if(sucursal == "0"){
+                    swal("Seleccione una sucursal", '', "warning");
+                }else {
+                    if (proveedor == "0") {
+                        swal("Seleccione un proveedor", '', "warning");
+                    } else {
+                        if (agencia == "0") {
+                            swal("Seleccione una agencia", '', "warning");
+                        } else {
+                            if (cliente == "") {
+                                swal("La agencia no tiene asignado un cliente", '', "warning");
+                            } else {
+                                if (LeadTime == "") {
+                                    swal("El campo leadtime está vacío", '', "warning");
+                                } else {
+                                    if (DiasCobertura == "") {
+                                        swal("El campo Días Cobertura está vacío", '', "warning");
+                                    } else {
+                                        avanza = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return avanza;
+            }
+
+            var $lblFileName = $('#lblFileName');
+
+
+            $('#fileExcel').change(function (e) {
+                $lblFileName.text((e.target.files.length > 0) ? e.target.files[0].name : 'Seleccionar archivo');
+            });
+
+            $("#EnviarExcel").click(function () {
+                var formulario = document.getElementById('frmExcel');
+                var archivo = $("#fileExcel").val();
+                if (archivo != "") {
+                    showLoading();
+                    var formData = new FormData(formulario);
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("CargaMasiva", "MantenimientoSucursal")",
+                        processData: false,
+                        contentType: false,
+                        data: formData,
+                        success: function (response) {
+                         hideLoading();
+                         if (response.Success) {
+                               $("#modalExcel").modal('hide');
+                             swal(response.Message, '', "success").then((value) => {
+                                 ConsultaMasiva();
+                             });
+                         } else {
+                             swal(response.Message, '', "error");
+                         }
+                        },
+                        error: function (e) {
+                       hideLoading();
+                        swal("¡Error inesperado en la carga!", '', "error");
+                          }
+
+                        })
+                } else {
+                    swal("¡No se ha seleccionado un archivo!", '', "error");
+                }
+            });
+
+            function ConsultaMasiva() {
+              showLoading();
+                tblSucProv = $('#tblSucProv').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("ConsultaMasiva", "MantenimientoSucursal")",
+                    "dataSrc": "",
+                },//response.Result,
+                "destroy": true,
+                           "processing": true,
+                            dom: 'Bfrtip',
+                     columns: [
+                         { data: "NomProveedor", title: 'Proveedor' },
+                         { data: "LeadTime", title: "Lead Time" },
+                         { data: "DiasCobertura", title: "Días Cobertura" },
+                         { data: "NomAgencia", title: 'Agencia' },
+                         { data: "ClienteProveedor", title: "Cliente Proveedor" },
+                         { data: "Calendario", title: "Calendario" },
+                         { data: "IdProveedor", title: 'IdProveedor', visible: false },
+                         { data: "IdSucursal", title: "IdSucursal", visible: false },
+                         { data: "IdAgencia", title: "IdAgencia", visible: false },
+                         { data: "Lunes", title: 'Lunes', visible: false },
+                         { data: "Martes", title: "Martes", visible: false },
+                         { data: "Miercoles", title: "Miercoles", visible: false },
+                         { data: "Jueves", title: "Jueves", visible: false },
+                         { data: "Viernes", title: 'Viernes', visible: false },
+                         { data: "Sabado", title: "Sabado", visible: false },
+                         { data: "Domingo", title: "Domingo", visible: false }
+                     ],
+                     select: true
+
+                       });
+
+
+                      hideLoading();
+
+                     }
+
+        });
+    </script>
+}

@@ -1,0 +1,354 @@
+﻿@model PortalGRFP.Entities.Common.AlgoritmoCompraViewModel
+
+
+
+@{
+    ViewBag.Title = "Algoritmo de Compra";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+    <li class="breadcrumb-item"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Generales de Abasto</a></li>
+    <li class="breadcrumb-item"><a>Algoritmo de Compra</a></li>
+}
+
+<div class="col-md-12 offset-md-1">
+    <span class="anchor" id="formComplex"></span>
+
+    @using (Html.BeginForm("AlgoritmoCompra", "ConfGeneralesAbasto", FormMethod.Post, new { role = "form", @class = "form-row mt-4", id = "frmAlgoritmo" }))
+    {
+        @Html.TextBoxFor(d => d.Id, new { style = "display: none;" })
+        <div class="col-sm-4 pb-3">
+            <label for="groupBtn"><strong>% Variación del Pedido por Sucursal:</strong></label>
+            <div class="card mb-4" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-6 pb-1">
+                            @Html.LabelFor(d => d.MinPorcentajeVariacionPedidoSucursal, new { @for = "MinPorcentajeVariacionPedidoSucursal" })
+                            <div class="input-group">
+                                @*<input class="form-control"   id="MinPorcentajeVariacionPedidoSucursal"  name="MinPorcentajeVariacionPedidoSucursal" onkeypress="return validateFloatKeyPress(this,event);" placeholder="-10" type="text" required>*@
+                                @*@Html.TextBoxFor(d => d.MinPorcentajeVariacionPedidoSucursal, new { onkeypress = "return validateFloatKeyPress(this,event);", @class = "form-control", @placeholder = "-10", @type = "number", @id = "MinPorcentajeVariacionPedidoSucursal", max = 100, min = 0 })*@
+                                @*, oninput = "validity.valid||(value='')"*@
+                                @*@Html.ValidationMessage("MinPorcentajeVariacionPedidoSucursal", new { @class = "text-danger" })*@
+
+                                @Html.TextBoxFor(d => d.MinPorcentajeVariacionPedidoSucursal, new { required = true, @class = "form-control", @placeholder = "-100", @type = "number", @id = "MinPorcentajeVariacionPedidoSucursal", max = 100, min = -100, oninput = "validity.valid||(value='')" })
+                                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 pb-1">
+                            @Html.LabelFor(d => d.MaxPorcentajeVariacionPedidoSucursal, new { @for = "MaxPorcentajeVariacionPedidoSucursal" })
+                            <div class="input-group">
+                                @Html.TextBoxFor(d => d.MaxPorcentajeVariacionPedidoSucursal, new { required = true, @class = "form-control", @placeholder = "10", @type = "number", @id = "MaxPorcentajeVariacionPedidoSucursal", max = 100, min = 0, oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("MaxPorcentajeVariacionPedidoSucursal", new { @class = "text-danger" })
+                                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                            </div>
+                        </div>
+                        <span style="color: darkgray">Para usar negativos utilice las flechas del input</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 pb-3">
+            <label for="groupBtn"><strong>Existencia en Cedis con permiso de compra a Mayorista:</strong></label>
+            <div class="card mb-4" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-8 pb-1">
+                            @Html.LabelFor(d => d.ExistenciaCedisPermisoMayorista, new { @for = "ExistenciaCedisPermisoMayorista" })
+                            @Html.TextBoxFor(d => d.ExistenciaCedisPermisoMayorista, new { required = true, @class = "form-control", @placeholder = "2", @type = "number", @id = "ExistenciaCedisPermisoMayorista", min = 0, oninput = "validity.valid||(value='')" })
+                            @Html.ValidationMessage("ExistenciaCedisPermisoMayorista", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 pb-3">
+            <label for="groupBtn"><strong>% Redondeo de Empaques / Fracción de Redondeo:</strong></label>
+            <div class="card mb-4" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-6 pb-1">
+                            @Html.LabelFor(d => d.RedondeoEmpaque, new { @for = "RedondeoEmpaque" })
+                            <div class="input-group">
+                                @Html.TextBoxFor(d => d.RedondeoEmpaque, new { required = true, @class = "form-control", @placeholder = "50", @type = "number", @id = "RedondeoEmpaque", min = 0,max=100, oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("RedondeoEmpaque", new { @class = "text-danger" })
+                                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 pb-1">
+                            @Html.LabelFor(d => d.FraccionRedondeo, new { @for = "FraccionRedondeo" })
+                            @Html.TextBoxFor(d => d.FraccionRedondeo, new { required = true, @class = "form-control", @placeholder = "0.1", @type = "number", @id = "FraccionRedondeo", step = "0.1", min = 0.1, max = 0.9,  oninput = "validity.valid||(value='')" })
+                            @*<input class="form-control"  id="FraccionRedondeo" name="FraccionRedondeo" onkeypress="return filterFloat(event,this);" placeholder="0.5" type="text" required>*@
+                            @*@Html.TextBoxFor(d => d.FraccionRedondeo, new { onkeypress = "return filterFloat(event,this);", @class = "form-control", @placeholder = "0.5", @type = "number", @id = "FraccionRedondeo" })*@
+                            @*, oninput = "validity.valid||(value='')"*@
+                            @*@Html.ValidationMessage("FraccionRedondeo", new { @class = "text-danger" })*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <label for="groupBtn"><strong>% Redondeo de Empaques por Existencia:</strong></label>
+            <div class="card mb-4" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-6 pb-1">
+                            @Html.LabelFor(d => d.RedondeoEmpRes, new { @for = "RedondeoEmpaqueRes" })
+                            <div class="input-group">
+                                @Html.TextBoxFor(d => d.RedondeoEmpRes, new { required = true, @class = "form-control", @placeholder = "50", @type = "number", @id = "RedondeoEmpRes", min = 0, max = 100, oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("RedondeoEmpRes", new { @class = "text-danger" })
+                                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 pb-1">
+                            @Html.LabelFor(d => d.RedondeoEmpInv, new { @for = "RedondeoEmpaqueInv" })
+                            <div class="input-group">
+                                @Html.TextBoxFor(d => d.RedondeoEmpInv, new { required = true, @class = "form-control", @placeholder = "50", @type = "number", @id = "RedondeoEmpInv", min = 0, max = 100, oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("RedondeoEmpInve", new { @class = "text-danger" })
+                                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 pb-3">
+            <label for="groupBtn"><strong>Días de Vigencia por tipo de Proveedor:</strong></label>
+            <div class="card mb-4" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-5 pb-3">
+                            @Html.LabelFor(d => d.DiasCalculo, new { @for = "DiasCalculo" })
+                            @Html.TextBoxFor(d => d.DiasCalculo, new { required = true, @class = "form-control", @placeholder = "28", @type = "number", @id = "DiasCalculo", min = 0, oninput = "validity.valid||(value='')" })
+                            @Html.ValidationMessage("DiasCalculo", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-2 pb-3">
+                            @Html.LabelFor(d => d.PicosVenta, new { @for = "DiasCalculo" })
+                            @Html.CheckBoxFor(m => m.PicosVenta, new { @class = "form-control" })
+                        </div>
+                        <div class="col-md-5 pb-3">
+                            @Html.LabelFor(d => d.Desviaciones, new { @for = "Desviaciones" })
+                            @Html.TextBoxFor(d => d.Desviaciones, new { required = true, @class = "form-control", @type = "number", @id = "Desviaciones", min = 0, oninput = "validity.valid||(value='')" })
+                            @Html.ValidationMessage("Desviaciones", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8 pb-3">
+            <label for="groupBtn"><strong>Días de Vigencia por tipo de Proveedor:</strong></label>
+            <div class="card mb-4" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-3 pb-1">
+
+                            @Html.LabelFor(d => d.PonderacionSemana1, new { @for = "PonderacionSemana1" })
+                            <div class="input-group">
+                                @Html.TextBoxFor(d => d.PonderacionSemana1, new { required = true, @class = "form-control", @placeholder = "20", @type = "number", @id = "PonderacionSemana1", min = 0, oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("PonderacionSemana1", new { @class = "text-danger" })
+                                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 pb-1">
+                            @Html.LabelFor(d => d.PonderacionSemana2, new { @for = "PonderacionSemana2" })
+                            <div class="input-group">
+
+                                @Html.TextBoxFor(d => d.PonderacionSemana2, new { required = true, @class = "form-control", @placeholder = "30", @type = "number", @id = "PonderacionSemana2", min = 0, oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("PonderacionSemana2", new { @class = "text-danger" })
+                                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 pb-1">
+                            @Html.LabelFor(d => d.PonderacionSemana3, new { @for = "PonderacionSemana3" })
+                            <div class="input-group">
+
+                                @Html.TextBoxFor(d => d.PonderacionSemana3, new { required = true, @class = "form-control", @placeholder = "20", @type = "number", @id = "PonderacionSemana3", min = 0, oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("PonderacionSemana3", new { @class = "text-danger" })
+                                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 pb-1">
+                            @Html.LabelFor(d => d.PonderacionSemana4, new { @for = "PonderacionSemana4" })
+                            <div class="input-group">
+
+                                @Html.TextBoxFor(d => d.PonderacionSemana4, new { required = true, @class = "form-control", @placeholder = "30", @type = "number", @id = "PonderacionSemana4", min = 0, oninput = "validity.valid||(value='')" })
+                                @Html.ValidationMessage("PonderacionSemana4", new { @class = "text-danger" })
+                                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                            </div>
+                        </div>
+
+                        @Html.ValidationMessage("TotalPonderacion", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="col-sm-2 pb-3">
+            <label for="groupBtn"><strong>Almacén Virtual Nadro:</strong></label>
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-5 pb-3">
+                            @Html.CheckBoxFor(m => m.AlmacenVirtualN, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        
+        <div style="text-align: right">
+            <input type="submit" class="btn btn-success" value="Guardar Algoritmo" />
+        </div>
+    }
+
+</div>
+
+
+
+
+
+@section scripts{
+    <script>
+        $("#frmAlgoritmo").on("submit", function (event) {
+            event.preventDefault();
+            var sum = parseInt($("#PonderacionSemana1").val()) + parseInt($("#PonderacionSemana2").val()) + parseInt($("#PonderacionSemana3").val()) + parseInt($("#PonderacionSemana4").val());
+            if (sum == 100) {
+
+                swal({
+                    title: '',
+                    text: "¿Desea guardar los cambios?",
+                    icon: "warning",
+                    buttons: {
+                        cancel: "Cancelar",
+                        catch: {
+                            text: "Guardar",
+                            value: true
+                        }
+                    },
+                }).then((resp) => {
+
+                    if (resp) {
+
+                        var sucProv = $("#frmAlgoritmo").serializeArray()
+                            .filter(function (elem) {
+
+                                return $.trim(elem.value);
+                            });
+
+
+
+                        showLoading();
+                        $.ajax({
+                            type: $("#frmAlgoritmo").attr('method'),
+                            url: $("#frmAlgoritmo").attr('action'),
+                            data: sucProv,
+                            success: function (response) {
+                                hideLoading();
+                                if (response != undefined) {
+
+                                    swal("¡Cambios Guardados!", '', "success").then((value) => {
+                                        // window.location.reload();
+                                    });
+                                } else {
+                                    swal(response, '', "error").then((value) => {
+
+                                    });
+                                }
+                            },
+                            error: function (response) {
+                                swal("Ocurrio un error de comunicación", '', "warning");
+                                hideLoading();
+                            }
+                        });
+                    }
+
+                });
+            } else {
+                if (sum > 100) {
+                    swal("Error", 'La ponderación no debe ser mayor a 100', "error")
+                } else {
+                    swal("Error", 'La ponderación no debe ser menor a 100', "error")
+                }
+            }
+  
+        });
+
+        function filterFloat(evt, input) {
+            // Backspace = 8, Enter = 13, ‘0′ = 48, ‘9′ = 57, ‘.’ = 46, ‘-’ = 43
+            var key = window.Event ? evt.which : evt.keyCode;
+            var chark = String.fromCharCode(key);
+            var tempValue = input.value + chark;
+            if (key >= 48 && key <= 57) {
+                if (filter(tempValue) === false) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                if (key == 8 || key == 13 || key == 0) {
+                    return true;
+                } else if (key == 46) {
+                    if (filter(tempValue) === false) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+        function filter(__val__) {
+            var preg = /^([0-9]+\.?[0-9]{0,2})$/;
+            if (preg.test(__val__) === true) {
+                return true;
+            } else {
+                return false;
+            }
+
+        }
+
+        function validateFloatKeyPress(el, evt) {
+
+            var charCode = (evt.which) ? evt.which : event.keyCode;
+            var number = el.value.split(',');
+            // permitir el signo de - (45)
+            if (charCode != 45 && charCode != 44 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                return false;
+            }
+            //just one dot
+            if (number.length > 1 && charCode == 44) {
+                return false;
+            }
+            //get the carat position
+            var caratPos = getSelectionStart(el);
+            // no permitir que se ponega el - en una posicion diferente de la inicial
+            if (caratPos > 0 && charCode == 45) {
+                return false;
+            }
+            // no permtir mas de un - en el numero
+            if (charCode == 45 && el.value.charAt(0) == "-") {
+                return false;
+            }
+            var dotPos = el.value.indexOf(",");
+            if (caratPos > dotPos && dotPos > -1 && (number[1].length > 1)) {
+                return false;
+            }
+            return true;
+        }
+
+        function getSelectionStart(o) {
+            if (o.createTextRange) {
+                var r = document.selection.createRange().duplicate()
+                r.moveEnd('character', o.value.length)
+                if (r.text == '') return o.value.length
+                return o.value.lastIndexOf(r.text)
+            } else { return o.selectionStart }
+        }
+    </script>
+}
+
+

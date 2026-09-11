@@ -1,0 +1,400 @@
+﻿@model List<PortalGRFP.Entities.Common.ConfProveedoresModel>
+@{
+    ViewBag.Title = "Configuración de Proveedores";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<span class="anchor" id="formComplex"></span>
+@section Breadcrumbs{
+    <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+    <li class="breadcrumb-item"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Proveedores</a></li>
+    <li class="breadcrumb-item"><a>Generales</a></li>
+    <li class="breadcrumb-item"><a>Modificar</a></li>
+}
+
+
+
+<div class="col-md-12 offset-md-1">
+
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a href='@Url.Action("EditarProveedores")' class="btn btn-secondary active">Generarl Proveedores</a>
+        <a href='@Url.Action("Agencias")' class="btn btn-secondary">Agencias</a>
+        <a href='@Url.Action("Ftp")' class="btn btn-secondary">FTP</a>
+        <a href='@Url.Action("Exclusiones")' class="btn btn-secondary ">Exclusiones</a>
+    </div>
+
+    <div class="col-md-12" style="text-align: right">
+        <button title="Configurar Nuevo Proveedor" class="btn btn-primary" onclick="document.location.href='@Url.Content("~/ConfiguracionesProveedores/RegistrarProveedores/")'">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        </button>
+    </div><br />
+    <form id="frmSendData">
+        <div class="col-sm-12 pb-1">
+            <div class="card mb-12" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-2">
+                            <label for="txtId" class="form-label">ID</label>
+                            <input type="text" class="form-control" id="txtId" placeholder="#ID" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="txtNombre" class="form-label">Nombre Proveedor</label>
+                            <input type="text" class="form-control" id="txtNombre" placeholder="Proveedor Nombre" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="txtDias" class="form-label">Dias Vig. OC.</label>
+                            <input type="number" class="form-control" id="txtDias" required min=0 oninput="validity.valid||(value='')">
+                        </div>
+                        <div class="col-md-4" style="margin-top: 2.5%">
+                            <div class="custom-control custom-checkbox form-group">
+                                <input type="checkbox" class="custom-control-input" id="cbAgencia">
+                                <label class="custom-control-label" for="cbAgencia">¿Aplica Agencia del Proveedor?</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12 pb-1">
+            <div class="card mb-12" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-2" style="margin-top: 2.5%">
+                            <div class="custom-control custom-checkbox form-group">
+                                <input type="checkbox" class="custom-control-input" id="cbMinimoCompra">
+                                <label class="custom-control-label" for="cbMinimoCompra">¿Aplica minimo de compra?</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="minimoMonto">Monto minimo</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                                <input type="number" class="form-control" id="minimoMonto" placeholder="0.0000" min=0 step="0.0001" oninput="validity.valid||(value='')">
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="minimoMonto">Minimo Piezas</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text">#</span></div>
+                                <input type="number" class="form-control" id="minimoPiezas" placeholder="0" min=0 oninput="validity.valid||(value='')">
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="minimoSurtido">Minimo Surtido</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                                <input type="number" class="form-control" id="minimoSurtido" placeholder="0" min=0 max="100" oninput="validity.valid||(value='')" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-1" style="margin-top: 2.5%">
+                            <button title="Guardar Cambios" class="btn btn-primary" type="submit">
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <h4>Proveedores Configurados</h4>
+    <div class="col-sm-12" style="margin-top: 1%">
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-striped" id="DTProv">
+                    <thead class="thead-primary">
+                        <tr>
+                            <th>#Id</th>
+                            @*<th>ID Emp EERP</th>*@
+                            <th>ID MTA</th>
+                            @*<th>ID Prov POS</th>*@
+                            <th>Nombre Prov</th>
+                            <th>RFC</th>
+                            <th>Aplica Agencia</th>
+                            <th>Aplica Minimo</th>
+                            <th>Monto minimo</th>
+                            <th>Minimo piezas</th>
+                            <th>Dias vigencia OC</th>
+                            <th>% Mínimo Surtido</th>
+                            <th></th>
+
+                        </tr>
+                    </thead>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            @*<td>@item.IdEmpresaERP</td>*@
+                            <td>@item.IdProveedorERP</td>
+                            @*<td>@item.IdProveedorPos</td>*@
+                            <td>@item.Nombre</td>
+                            <th>@item.RFC</th>
+                            <td>@item.AplicaAgencia</td>
+                            <td>@item.AplicaMinimo</td>
+                            <td>@item.MinimoMonto</td>
+                            <td>@item.minimoPiezas</td>
+                            <td>@item.DiasVigenciaOC</td>
+                            <td>@item.MinimoSurtido</td>
+                            <td>
+                                <button onclick="deletePedido(@item.Id)" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" title="Borrar Proveedor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                                    </svg>
+                                </button>
+                            </td>
+
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section scripts{
+    <script>
+
+        function deletePedido(Id) {
+
+            console.log(Id)
+
+            swal({
+                title: '',
+                text: "¿Eliminar Proveedor?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Eliminar",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+
+
+                if (resp) {
+
+                var formData = new FormData();
+
+                formData.append("Id", Id);
+
+                showLoading();
+                $.ajax({
+                    type: "POST",
+                    url: "/ConfiguracionesProveedores/EliminarProveedor",
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function (response) {
+                        hideLoading();
+                        if (response == "ok") {
+
+                            swal("Proveedor eliminado correctamente", '', "success").then((value) => {
+                                window.location.reload();
+
+                            });
+                        } else {
+                            swal("Error al eliminar", '', "error");
+                        }
+                    },
+                    error: function (e) {
+                        hideLoading();
+                        swal("¡Error inesperado en la carga!", '', "error");
+                    }
+                });
+                }
+            });
+        }
+
+        $(document).ready(function () {
+
+
+
+            $(function () {
+                'use strict'
+
+                $('#DTProv').dataTable({
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+                        searchPlaceholder: "Buscar",
+                        sSearch: '',
+                        lengthMenu: '_MENU_ filas / paginas'
+                    }
+                });
+            });
+
+
+            $("#frmSendData").submit(function (e) {
+                e.preventDefault();
+
+
+
+                if ($('#cbMinimoCompra').prop('checked') && ($("#minimoMonto").val() < 1 || $("#minimoPiezas").val() < 1)) {
+                    alert("Ingrese Monto y Piezas de Minimo de compra");
+                } else {
+
+
+                if (confirm("Vas guardar información, ¿Seguro de continuar?")) {
+
+
+                    var formData = new FormData();
+
+                    formData.append("Id", $("#txtId").val());
+                    //formData.append("IdEmpresaERP", $("#LBIdEmpresaERP").val());
+                    formData.append("IdProveedorERP", $("#LBIdProveedorERP").val());
+                    //formData.append("IdProveedorPos", $("#LBIdProveedorPos").val());
+                    formData.append("Nombre", $("#txtNombre").val());
+                    formData.append("RFC", $("#txtRFC").val());
+                    formData.append("AplicaAgencia", $("#cbAgencia").prop('checked'));
+                    formData.append("AplicaMinimo", $("#cbMinimoCompra").prop('checked'));
+                    formData.append("MinimoMonto", $("#minimoMonto").val());
+                    formData.append("minimoPiezas", $("#minimoPiezas").val());
+                    formData.append("DiasVigenciaOC", $("#txtDias").val());
+                    formData.append("MinimoSurtido", $("#minimoSurtido").val());
+
+
+
+                    $.ajax({
+                        url: "/ConfiguracionesProveedores/GuardarProveedores",
+                        type: 'POST',
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        data: formData,
+
+                        success: function (response) {
+                            if (response == "1") {
+                                //alert("TIPO DE COMPRA SE GUARDO CORRECTAMENTE");
+                                document.location.href = "@Url.Content("~/ConfiguracionesProveedores/EditarProveedores")";
+                            } else {
+                                alert("ERROR AL REGISTRAR " + response);
+                            }
+                        }
+                    });
+
+
+
+                }
+            }
+                //} else {
+                //    alert("Nombre es obligatorio")
+                //}
+
+
+            });
+
+            $("#DTProv tbody").on('click', 'tr', function () {
+
+                var rowData = $(this).children("td").map(function () {
+                    return $(this).text();
+                }).get();
+
+
+
+                $("#txtId").val(rowData[0]);
+                $("#txtNombre").val(rowData[2]);
+                $("#txtDias").val(rowData[7]);
+                $("#minimoMonto").val(rowData[5]);
+                $("#minimoPiezas").val(rowData[6]);
+                $("#minimoSurtido").val(rowData[8]);
+
+                //rowData[5] == true ? $("#cbAgencia").prop('checked', true) : $("#cbAgencia").prop('checked', false);
+                //rowData[6] == true ? $("#cbMinimoCompra").prop('checked', true) : $("#cbMinimoCompra").prop('checked', false);
+
+
+                if (rowData[3] == "True") {
+                    $("#cbAgencia").prop('checked', true);
+                    $("#btnAgencias").prop("disabled", false);
+                    $("#btnFTP").prop("disabled", false);
+
+
+
+                } else {
+                    $("#cbAgencia").prop('checked', false);
+                    $("#btnAgencias").prop("disabled", true);
+                    $("#btnFTP").prop("disabled", true);
+
+
+                }
+
+                if (rowData[4] == "True") {
+                    $("#cbMinimoCompra").prop('checked', true)
+                    $("#minimoMonto").prop("disabled", false);
+                    $("#minimoPiezas").prop("disabled", false);
+                } else {
+                    $("#cbMinimoCompra").prop('checked', false)
+                    $("#minimoMonto").prop("disabled", true);
+                    $("#minimoPiezas").prop("disabled", true);
+                }
+
+                //console.log(rowData);
+
+                //console.log(rowData[0] + ", " +
+                //    rowData[1] + ", " +
+                //    rowData[2] + ", " +
+                //    rowData[3] + ", " +
+                //    rowData[4] + ", " +
+                //    rowData[5] + ", " +
+                //    rowData[6] + ", " +
+                //    rowData[7] + ", " +
+                //    rowData[8]
+                //    //rowData[9]
+                //);
+            });
+
+
+            $("#cbMinimoCompra").change(function () {
+                if ($(this).is(':checked')) {
+                    $("#minimoMonto").prop("disabled", false);
+                    $("#minimoPiezas").prop("disabled", false);
+
+                } else {
+                    $("#minimoMonto").prop("disabled", true);
+                    $("#minimoPiezas").prop("disabled", true);
+
+                    $("#minimoMonto").val("");
+                    $("#minimoPiezas").val("");
+
+
+                }
+            });
+
+            $("#cbAgencia").change(function () {
+                if ($(this).is(':checked')) {
+                    $("#btnAgencias").prop("disabled", false);
+                    $("#btnFTP").prop("disabled", false);
+
+
+                } else {
+                    $("#btnAgencias").prop("disabled", true);
+                    $("#btnFTP").prop("disabled", true);
+
+
+
+                }
+            });
+
+            /*window.onbeforeunload
+
+            window.onbeforeunload = function (event) {
+                var e = e || window.event;
+                if (e) {
+                    e.returnValue = message;
+                }
+                return message;
+            };*/
+
+    })
+    </script>
+}

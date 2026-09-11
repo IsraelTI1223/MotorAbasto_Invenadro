@@ -1,0 +1,301 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8B17383C-4810-479C-8C2E-548501385A1E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PortalGRFP.Entities</RootNamespace>
+    <AssemblyName>PortalGRFP.Entities</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Identity.Client, Version=4.82.1.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Identity.Client.4.82.1\lib\net472\Microsoft.Identity.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Abstractions, Version=8.14.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Abstractions.8.14.0\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common, Version=5.0.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\EnterpriseLibrary.Common.5.0.505.0\lib\NET35\Microsoft.Practices.EnterpriseLibrary.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Data, Version=5.0.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\EnterpriseLibrary.Data.5.0.505.0\lib\NET35\Microsoft.Practices.EnterpriseLibrary.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommonServiceLocator.1.0\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity, Version=2.1.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.2.1.505.0\lib\NET35\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration, Version=2.1.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.2.1.505.0\lib\NET35\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception, Version=2.1.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.Interception.2.1.505.0\lib\NET35\Microsoft.Practices.Unity.Interception.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Interception.Configuration, Version=2.1.505.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.Interception.2.1.505.0\lib\NET35\Microsoft.Practices.Unity.Interception.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp, Version=112.1.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.112.1.0\lib\net471\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.6.0\lib\net462\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.8.0.1\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Formats.Asn1, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Formats.Asn1.8.0.1\lib\net462\System.Formats.Asn1.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.6.0\lib\net462\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=8.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.8.0.5\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attributes\DatLayoutAttribute.cs" />
+    <Compile Include="Common\ApiPedidosModel.cs" />
+    <Compile Include="Common\Capacity\ComboCapacity.cs" />
+    <Compile Include="Common\ABC.cs" />
+    <Compile Include="Common\Accion.cs" />
+    <Compile Include="Common\AgenciaProveedor.cs" />
+    <Compile Include="Common\AlgoritmoCompraViewModel.cs" />
+    <Compile Include="Common\AlmacenVirtual\AlmacenVirtualModel.cs" />
+    <Compile Include="Common\AlmacenVirtual\ResponseAVM.cs" />
+    <Compile Include="Common\AlmacenVirtual\ResponseAV.cs" />
+    <Compile Include="Common\Autocomplete.cs" />
+    <Compile Include="Common\BusquedaTipoPerfil.cs" />
+    <Compile Include="Common\BusquedaTipoPerfilPopsae.cs" />
+    <Compile Include="Common\Capacity\CapacityModel.cs" />
+    <Compile Include="Common\CatalogoGenerico_Conf.cs" />
+    <Compile Include="Common\CatSubEstatusModel.cs" />
+    <Compile Include="Common\CoberturaMontoPza.cs" />
+    <Compile Include="Common\ComboGenerico.cs" />
+    <Compile Include="Common\ComboGenericoProv.cs" />
+    <Compile Include="Common\ComboGenericoProveedorCompra.cs" />
+    <Compile Include="Common\ComboProveedor.cs" />
+    <Compile Include="Common\ComboSucursalesProveedor.cs" />
+    <Compile Include="Common\ComprasEspecialesBean.cs" />
+    <Compile Include="Common\ComprasEspecialesCargas.cs" />
+    <Compile Include="Common\ComprasEspeciales\ConsultaPedidosModel.cs" />
+    <Compile Include="Common\ComprasEspeciales\PedidosEspecialesDeleteModel.cs" />
+    <Compile Include="Common\ConciliacionVentaRappi.cs" />
+    <Compile Include="Common\ConfiguracionCarga.cs" />
+    <Compile Include="Common\ConfiguracionProveedorGeneral.cs" />
+    <Compile Include="Common\ConsultaArticuloModel.cs" />
+    <Compile Include="Common\ConsultaArticuloSucursalModel.cs" />
+    <Compile Include="Common\ConsultaInvenadro.cs" />
+    <Compile Include="Common\ConsultaProductosModel.cs" />
+    <Compile Include="Common\ConsultaSucursales.cs" />
+    <Compile Include="Common\CtrlPerfil.cs" />
+    <Compile Include="Common\Descuento.cs" />
+    <Compile Include="Common\DetalleInput.cs" />
+    <Compile Include="Common\DetalleInputInvenadro.cs" />
+    <Compile Include="Common\DetalleInputLista.cs" />
+    <Compile Include="Common\DetalleInputNegado.cs" />
+    <Compile Include="Common\DetalleInputTransitt.cs" />
+    <Compile Include="Common\DetalleInputVenta.cs" />
+    <Compile Include="Common\EliminarSugeridoSKU.cs" />
+    <Compile Include="Common\EstadisticaBean.cs" />
+    <Compile Include="Common\EstadisticaCompras.cs" />
+    <Compile Include="Common\ExcepcionesInvenadroModel.cs" />
+    <Compile Include="Common\FTPParametersModel.cs" />
+    <Compile Include="Common\GruposModel.cs" />
+    <Compile Include="Common\GrupoUsuarioModel.cs" />
+    <Compile Include="Common\InsertFTP.cs" />
+    <Compile Include="Common\InsertProveedor.cs" />
+    <Compile Include="Common\Invenadro.cs" />
+    <Compile Include="Common\Invenadro_Carga.cs" />
+    <Compile Include="Common\JDataTable.cs" />
+    <Compile Include="Common\ListadoSugerido.cs" />
+    <Compile Include="Common\LogExclusiones.cs" />
+    <Compile Include="Common\LogInvenadro.cs" />
+    <Compile Include="Common\ListSucursalesGeneralesSugeridoValidarModel.cs" />
+    <Compile Include="Common\LogRanking.cs" />
+    <Compile Include="Common\MantenimientoArticulo\ArticuloPermisoCompraModel.cs" />
+    <Compile Include="Common\MantenimientoArticulo\ArticuloTipoCompraModel.cs" />
+    <Compile Include="Common\MantenimientoArticulo\PermisoArticuloSucursalModel.cs" />
+    <Compile Include="Common\MantenimientoSucursal.cs" />
+    <Compile Include="Common\Modulo.cs" />
+    <Compile Include="Common\ModuloAccion.cs" />
+    <Compile Include="Common\MultiselectAgrupado.cs" />
+    <Compile Include="Common\NegadosViewModel.cs" />
+    <Compile Include="Common\OCSugerido.cs" />
+    <Compile Include="Common\ParametrosPVDpredictivo.cs" />
+    <Compile Include="Common\PedidosCompEspecialesViewModel.cs" />
+    <Compile Include="Common\Perfil.cs" />
+    <Compile Include="Common\PerfilModuloAccion.cs" />
+    <Compile Include="Common\PorcentajeProv.cs" />
+    <Compile Include="Common\ProveedorAgencia.cs" />
+    <Compile Include="Common\ProveedoresAgenciaFTP.cs" />
+    <Compile Include="Common\ProveedoresAgenciaFTPCompleto.cs" />
+    <Compile Include="Common\Ranking_Carga.cs" />
+    <Compile Include="Common\ReporteArticulosProveedorModel.cs" />
+    <Compile Include="Common\ReporteArticulosSucursalModel.cs" />
+    <Compile Include="Common\ReporteCatProductosModel.cs" />
+    <Compile Include="Common\ReporteInvenadroAutModel.cs" />
+    <Compile Include="Common\ReporteInvenadroModel.cs" />
+    <Compile Include="Common\ReporteNegados.cs" />
+    <Compile Include="Common\ReporteSucursalesNuevasModel.cs" />
+    <Compile Include="Common\ResumenCargaRappi.cs" />
+    <Compile Include="Common\ResumenEnt.cs" />
+    <Compile Include="Common\ResumenRechazos.cs" />
+    <Compile Include="Common\SucursalProveedor.cs" />
+    <Compile Include="Common\SugeridoCuenta.cs" />
+    <Compile Include="Common\SugeridoFiltros.cs" />
+    <Compile Include="Common\SugeridoLogErrorModel.cs" />
+    <Compile Include="Common\Sugerido\GenerarOrdenModel.cs" />
+    <Compile Include="Common\Sugerido\ListaSugeridoModel.cs" />
+    <Compile Include="Common\Sugerido\OrdenCompraModel.cs" />
+    <Compile Include="Common\Sugerido\SugeridoAplicadoModel.cs" />
+    <Compile Include="Common\Sugerido\ValidacionMontoSugeridoModel.cs" />
+    <Compile Include="Common\Sugerido\ValidarMontosModel.cs" />
+    <Compile Include="Common\TicketVenta.cs" />
+    <Compile Include="Common\TopeDeCompraModel.cs" />
+    <Compile Include="Enums\Acciones.cs" />
+    <Compile Include="Enums\LayoutTypes.cs" />
+    <Compile Include="Common\DescuentoHdr.cs" />
+    <Compile Include="Enums\TipoCargas.cs" />
+    <Compile Include="Enums\TipoDescuento.cs" />
+    <Compile Include="Models\AccionModel.cs" />
+    <Compile Include="Models\CatUsersModel.cs" />
+    <Compile Include="Models\CtrlCarga.cs" />
+    <Compile Include="Models\DatLayouts\FR\FARMACOS\FARMACOS1.cs" />
+    <Compile Include="Models\DatLayouts\FR\MARZAM\MARZAM1.cs" />
+    <Compile Include="Models\DatLayouts\FR\NANDRO\NANDRO1.cs" />
+    <Compile Include="Models\DatLayouts\IDatLayout.cs" />
+    <Compile Include="Models\DatLayouts\POPSAE\POPSAE1.cs" />
+    <Compile Include="Models\DatLayouts\LayoutBase.cs" />
+    <Compile Include="Models\DatLayouts\LDCOM\LDCOM1.cs" />
+    <Compile Include="Models\ModuloBaseModel.cs" />
+    <Compile Include="Models\ModuloModel.cs" />
+    <Compile Include="Models\Perfil.cs" />
+    <Compile Include="Models\PerfilModuloAccionModel.cs" />
+    <Compile Include="Models\PerfilModuloModel.cs" />
+    <Compile Include="Common\SincronizacionInput.cs" />
+    <Compile Include="Models\SubModuloModel.cs" />
+    <Compile Include="Models\UsuarioModel.cs" />
+    <Compile Include="Parameters\DiscountGetListParameter.cs" />
+    <Compile Include="Parameters\PerfilParameter.cs" />
+    <Compile Include="Parameters\UpdLoadDiscoutParameter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Request\Request.cs" />
+    <Compile Include="Response\Response.cs" />
+    <Compile Include="Response\ResponseItem.cs" />
+    <Compile Include="Response\ResponseList.cs" />
+    <Compile Include="ValidaSugeridoBean.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

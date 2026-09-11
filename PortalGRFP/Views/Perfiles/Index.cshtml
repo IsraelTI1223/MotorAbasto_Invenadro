@@ -1,0 +1,95 @@
+﻿@model IEnumerable<PortalGRFP.Models.Perfil>
+
+@{
+    ViewBag.Title = "Perfiles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>CONFIGURACION</a></li>
+    <li class="breadcrumb-item active"><a>Perfiles</a></li>
+}
+
+@section Actions{
+    @if (Session["PerfilRegistrar"].ToString() == "Registrar")
+    {
+        <button class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" id="btnNuevoPerfil" data-toggle="modal" data-target="#nuevoPerfil" onclick="redireccionar()">
+            @*<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z" />
+                </svg>*@
+            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-stickies" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M0 1.5A1.5 1.5 0 0 1 1.5 0H13a1 1 0 0 1 1 1H1.5a.5.5 0 0 0-.5.5V14a1 1 0 0 1-1-1V1.5z" />
+                <path fill-rule="evenodd" d="M2 3.5A1.5 1.5 0 0 1 3.5 2h11A1.5 1.5 0 0 1 16 3.5v6.086a1.5 1.5 0 0 1-.44 1.06l-4.914 4.915a1.5 1.5 0 0 1-1.06.439H3.5A1.5 1.5 0 0 1 2 14.5v-11zM3.5 3a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h6.086a.5.5 0 0 0 .353-.146l4.915-4.915A.5.5 0 0 0 15 9.586V3.5a.5.5 0 0 0-.5-.5h-11z" />
+                <path fill-rule="evenodd" d="M10.5 10a.5.5 0 0 0-.5.5v5H9v-5A1.5 1.5 0 0 1 10.5 9h5v1h-5z" />
+            </svg> Nuevo
+        </button>
+    }
+}
+
+@if (ViewBag.PermisoConsultaPerfil == "Consultar")
+{
+    <div class="col-lg-12">
+            <div class="dataTables_wrapper no-footer" style="width:80%; margin-left:10%">
+                <table class="table table-responsive-md" role="grid" id="tblperfiles" style="width:100%;">
+                    <thead class="thead-primary">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Perfil</th>
+                            <th scope="col">Estatus</th>
+                            @if (Session["PerfilActualizar"].ToString() == "Actualizar")
+                            {
+                                <th scope="col"></th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null)
+                        {
+                            foreach (var d in Model)
+                            {
+                                <tr>
+                                    <th scope="row">@d.IdPerfil</th>
+                                    <td>@d.Nombre</td>
+                                    <td>
+                                        @Html.CheckBox("Estatus", @d.Activo == true ? true : false, new { onclick = "return false" })
+                                    </td>
+                                    @if (Session["PerfilActualizar"].ToString() == "Actualizar")
+                                    {
+                                        <td>
+                                            <a class="editConfiguration" style="cursor:pointer" href="~/Perfiles/ActualizaPerfil?IdPerfil= @d.IdPerfil">
+                                                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                                                </svg>
+                                            </a>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+    </div>
+}
+else
+{
+    <h3 class="text-xl-center text-danger">Sin permisos para consultar, consulte a su administrador.</h3>
+}
+
+@section scripts{
+    <script>
+        $('#tblperfiles').DataTable({
+            responsive: true,
+            language: {
+                searchPlaceholder: 'Buscar',
+                url: 'https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json'
+            }
+        });
+
+        function redireccionar() {
+            var url = "/Perfiles/NuevoPerfil";
+            window.location.href = url;
+        }
+    </script>
+}

@@ -1,0 +1,80 @@
+﻿@{
+    ViewBag.Title = "Reportes/Catálogo de Articulos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<table id="example" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>SKU</th>
+            <th>Descripcion</th>
+            <th>Grupo</th>
+            <th>Familia</th>
+            <th>Categoria</th>
+            <th>Clasificación</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>SKU</th>
+            <th>Descripcion</th>
+            <th>Grupo</th>
+            <th>Familia</th>
+            <th>Categoria</th>
+            <th>Clasificación</th>
+        </tr>
+    </tfoot>
+</table>
+
+@section scripts{
+    <script>
+    $(document).ready(function () {
+        $("#example").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "@Url.Content("~/CatArticulos/Json")",
+                "type": "POST",
+                "datatype":"json"
+            },
+            "pageLength": 10,
+            "filter": true,
+            "responsivePriority": 1,
+            "data": null,
+            "columns": [
+                { "data": "Sku", "name": "Sku", "autoWidth": true },
+                { "data": "Descripcion", "name": "Descripcion", "autoWidth": true },
+                { "data": "Grupo", "name": "Grupo", "autoWidth": true },
+                { "data": "Familia", "name": "Familia", "autoWidth": true },
+                { "data": "Categoria", "name": "Categoria", "autoWidth": true },
+                { "data": "Clasificacion", "name": "Clasificacion", "autoWidth": true }
+
+            ]
+
+        });
+    })
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

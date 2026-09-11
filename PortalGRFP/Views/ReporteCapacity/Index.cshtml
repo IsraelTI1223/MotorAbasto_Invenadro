@@ -1,0 +1,162 @@
+﻿@using PortalGRFP.Entities.Common.Capacity
+
+@{
+    ViewBag.Title = "Reporte del Capacity";
+}
+@{
+    var lstTipoCapacity = TempData["lstTipoCapacity"] as List<tblCatCapacity>;
+
+}
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Consulta</a></li>
+    <li class="breadcrumb-item"><a>Generales</a></li>
+    <li class="breadcrumb-item"><a>Capacity</a></li>
+}
+<div class="container">
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="nav-item"><a class="nav-link active" href="#CAPACITY" data-toggle="tab">CAPACITY</a></li>
+    </ul>
+    <dsiv class="tab-content my-tab">
+        <div class="tab-pane active" id="CAPACITY">
+            <div class="card" id="card_compra" style="width:100%">
+                <div class="card-header">
+                    <h5>Carga Manual</h5>
+                    <form id="FrmReporteCapacity">
+                        <div class="row">
+                            <div class="col-md-3" id="Combo">
+                                Selecciona Tipo Capacity:
+                               
+                                <select id="tipoCapacity" name="tipoCapacity" multiple="multiple" class="form-control col-md-10" required>
+                                    @{
+                                        foreach (var lista in lstTipoCapacity)
+                                        {
+                                            <option value="@lista.Id"> @lista.TipoCapacity</option>
+                                        }
+                                    }
+
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                Selecciona fecha inicio:
+                                <div class="form-inline">
+                                    <div class="col-md-2">
+                                        <input type="date" id="txtFini" name="txtFini" class="form-control" placeholder="Fecha inicio capacity" required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                Selecciona fecha fin:
+                                <div class="form-inline">
+                                    <div class="col-md-2">
+                                        <input type="date" id="txtFfin" name="txtFfin" class="form-control" placeholder="Fecha fin capacity" required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                &nbsp;
+                                <div class="form-inline">
+                                    <div class="col-md-2">
+                                        <button id="btnProcesar" type="submit" class="btn btn-danger">Procesar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-body">
+                    @*<table id="dtCAPACITY" class="display compact cell-border" width="100%"></table>*@
+                        <table id="tblReporteCapacity" class="display compact" width="99%"></table>
+                </div>
+            </div>
+        </div>
+
+
+        
+</div>
+
+@section scripts{
+    <script>
+        function llenaDtable(dataSet) {
+            var tblReporteCapacity = $('#tblReporteCapacity').DataTable({
+                data: dataSet,
+                "destroy": true,
+                "processing": true,
+                dom: 'Bfrtip',
+                columns: [
+                    { data: "IdSucrusal", title: 'Id Sucursal' },
+                    { data: "SKU", title: 'Sku' },
+                    { data: "Capacity", title: "Capacity" },
+                    { data: "FechaIni", title: "Fecha inicio Capacity" },
+                    { data: "FechaFin", title: "Fecha Fin Capacity" },
+                    { data: "idMotivo", title: "ID Motivo" },
+                ],
+                select: true,
+                buttons: false
+            });
+        }
+        $(document).ready(function () {
+
+            $('#tipoCapacity').multiselect({
+                nonSelectedText: 'Seleccione un grupo',
+                enableFiltering: true,
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                buttonWidth: '150px',
+                buttonTextAlignment: 'left',
+                selectAllText: "Marcar Todos",
+                allSelectedText: "Todos Seleccionados",
+                nSelectedText: "Grupos Seleccionados"
+            });
+
+            $("#FrmReporteCapacity").submit(function (e) {
+                e.preventDefault();
+                var formulario = document.getElementById('FrmReporteCapacity');
+                var formData = new FormData(formulario);
+                var flag = 4;
+                formData.append("Flags", flag);
+
+                if ($("#tipoCapacity").val() != "" && $("#txtFini").val() != "" && $("#txtFfin").val() != "") {
+                    
+                    
+                    showLoading();
+                    $.ajax({
+                        url: "/ReporteCapacity/RepCapacity",
+                        type: 'POST',
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        data: formData,
+                        success: function (response) {
+                            hideLoading();
+
+                            if (response.Success) {
+                                llenaDtable(response.Resp);
+                            } else {
+                                swal(response.Message, '', "error");
+                            }
+                        },
+                        error: function (e) {
+                            hideLoading();
+                            swal("hubo un problema del lado del servidor", '', "error");
+                        }
+                    });
+                } else {
+                    var error = "";
+                    if ($("#tipoCapacity").val() == "")
+                        error += "\n\rHaca Falta capturar el tipo de Capacity";
+                    if ($("#txtFini").val() == "")
+                        error += "\n\rHaca Falta capturar la fecha de inicio";
+                    if ($("#txtFfin").val() == "")
+                        error += "\n\rHaca Falta capturar la fecha de Fin";
+                    swal("Hacen Falta Capturar Valores:", error, "error");
+                }
+            });
+        });
+
+        
+
+    </script>
+}
+

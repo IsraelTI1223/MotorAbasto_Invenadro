@@ -1,0 +1,337 @@
+﻿@model List<PortalGRFP.Entities.Common.ConfProveedoresModel>
+
+@{
+    ViewBag.Title = "Configuración de Proveedores";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<span class="anchor" id="formComplex"></span>
+@section Breadcrumbs{
+    <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+    <li class="breadcrumb-item"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Proveedores</a></li>
+    <li class="breadcrumb-item"><a>Generales</a></li>
+    <li class="breadcrumb-item"><a>Nuevo Proveedor</a></li>
+}
+
+<div class="col-md-12 offset-md-1">
+    <div class="btn-group" role="group" aria-label="Basic example" style="text-align: left">
+        <button id="btnAgencias" type="button" onclick="document.location.href='@Url.Content("~/ConfiguracionesProveedores/Agencias/")'" class="btn btn-primary">Agencias de Proveedor</button>
+        <button id="btnFTP" type="button" onclick="document.location.href='@Url.Content("~/ConfiguracionesProveedores/Ftp/")'" class="btn btn-primary">FTP</button>
+    </div>
+    <form id="frmSendData">
+
+
+        <div style="display: none">
+            @*<label style="dis" id="LBIdEmpresaERP"></label>*@
+            <label style="" id="LBIdProveedorERP"></label>
+            <label style="" id="LBRFC"></label>
+            @*<label style="" id="LBIdProveedorPos"></label>*@
+        </div>
+
+
+        <div class="col-sm-12 pb-3">
+            <div class="card mb-12" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-2">
+                            <label for="txtId" class="form-label">ID</label>
+                            <input type="text" class="form-control" id="txtId" placeholder="#ID" readonly required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="txtNombre" class="form-label">Nombre Proveedor</label>
+                            <input type="text" class="form-control" id="txtNombre" placeholder="Proveedor Nombre" readonly required>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="txtDias" class="form-label">Dias Vig. OC.</label>
+                            <input type="number" class="form-control" id="txtDias" placeholder="0" required min = 0  oninput = "validity.valid||(value='')" >
+                        </div>
+                        <div class="col-md-4" style="margin-top: 2.5%">
+                            <div class="custom-control custom-checkbox form-group">
+                                <input type="checkbox" class="custom-control-input" id="cbAgencia">
+                                <label class="custom-control-label" for="cbAgencia">¿Aplica Agencia del Proveedor?</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-12 pb-3">
+            <div class="card mb-12" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-3" style="margin-top: 2.5%">
+                            <div class="custom-control custom-checkbox form-group">
+                                <input type="checkbox" class="custom-control-input" id="cbMinimoCompra">
+                                <label class="custom-control-label" for="cbMinimoCompra">¿Aplica minimo de compra?</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="minimoMonto">Monto minimo</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                                <input type="number" class="form-control" id="minimoMonto" placeholder="0.0000" min = 0 step = "0.0001" oninput = "validity.valid||(value='')" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="minimoMonto">Minimo Piezas</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text">#</span></div>
+                                <input type="number" class="form-control" id="minimoPiezas" placeholder="0" min = 0 oninput = "validity.valid||(value='')" required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3" style="margin-top: 2.5%">
+                            <button class="btn btn-success" type="submit">Guardar Cambios</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+
+    <div class="col-sm-12" style="margin-top: 1%">
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-striped" id="DTProv">
+                    <thead class="thead-primary">
+                        <tr>
+                            <th>#Id</th>
+                            @*<th>ID Emp EERP</th>*@
+                            <th>ID MTA</th>
+                            @*<th>ID Prov POS</th>*@
+                            <th>Nombre Prov</th>
+                            <th>RFC</th>
+                            <th>Aplica Agencia</th>
+                            <th>Aplica Minimo</th>
+                            <th>Monto minimo</th>
+                            <th>Minimo piezas</th>
+                            <th>Dias vigencia OC</th>
+                        </tr>
+                    </thead>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            @*<td>@item.IdEmpresaERP</td>*@
+                            <td>@item.IdProveedorERP</td>
+                            @*<td>@item.IdProveedorPos</td>*@
+                            <td>@item.Nombre</td>
+                            <td>@item.RFC</td>
+                            <td>@item.AplicaAgencia</td>
+                            <td>@item.AplicaMinimo</td>
+                            <td>@item.MinimoMonto</td>
+                            <td>@item.minimoPiezas</td>
+                            <td>@item.DiasVigenciaOC</td>
+                            <!--<td>
+                                <button type="button" onclick="setTypePed(@item.Id,@item.Nombre);" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" title="Editar tipo de Pedido">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
+                                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
+                                    </svg>
+                                </button>
+                                <input onclick="setTypePed((' + popup.Nombre + ', this))" type="button" value="Editar" class="btn btn-danger" />
+                                <input onclick="document.location.href='@Url.Content("~/ConfGeneralesAbastoController/PedidosCompEspeciales/"+item.Id)'" type="button" value="Editar" class="btn btn-default" />
+                            </td>-->
+
+                        </tr>
+
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+
+
+
+
+            $(function () {
+                'use strict'
+
+                $('#DTProv').dataTable({
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+                        searchPlaceholder: "Buscar",
+                        sSearch: '',
+                        lengthMenu: '_MENU_ filas / paginas'
+                    }
+                });
+            });
+
+
+            $("#frmSendData").submit(function (e) {
+                e.preventDefault();
+
+
+                //console.log($("#nombreInput").val())
+                //if ($("#nombreInput").val() != "") {
+
+                //console.log("1 "+$("#cbAgencia").val());
+                //console.log("2 "+$("#cbMinimoCompra").val());
+                //console.log("3 " + $('#cbMinimoCompra').prop('checked'));
+
+                if ($("#txtId").val() == '') {
+                    alert('Sin Proveedor Valido para Guardar');
+                    return;
+                }
+
+                if ($('#cbMinimoCompra').prop('checked') && ($("#minimoMonto").val() < 1 || $("#minimoPiezas").val() < 1)) {
+                    alert("Ingrese Monto y Piezas de Minimo de compra");
+                } else {
+                if (confirm("Vas guardar información, ¿Seguro de continuar?")) {
+
+
+                    var formData = new FormData();
+
+                    formData.append("Id", $("#txtId").val());
+                    formData.append("IdProveedorERP", $("#LBIdProveedorERP").text());
+                    formData.append("Nombre", $("#txtNombre").val());
+                    formData.append("RFC", $("#LBRFC").text());
+                    formData.append("AplicaAgencia", $("#cbAgencia").prop('checked'));
+                    formData.append("AplicaMinimo", $("#cbMinimoCompra").prop('checked'));
+                    formData.append("MinimoMonto", $("#minimoMonto").val());
+                    formData.append("minimoPiezas", $("#minimoPiezas").val());
+                    formData.append("DiasVigenciaOC", $("#txtDias").val());
+
+
+
+                    $.ajax({
+                        url: "/ConfiguracionesProveedores/GuardarProveedores",
+                        type: 'POST',
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        data: formData,
+
+                        success: function (response) {
+                            if (response == "1") {
+                                //alert("TIPO DE COMPRA SE GUARDO CORRECTAMENTE");
+                                document.location.href = "@Url.Content("~/ConfiguracionesProveedores/EditarProveedores")";
+                            } else {
+                                alert("ERROR AL REGISTRAR " + response);
+                            }
+                        }
+                    });
+
+
+
+                }
+            }
+
+            });
+
+            $("#DTProv tbody").on('click', 'tr', function () {
+
+                var rowData = $(this).children("td").map(function () {
+                    return $(this).text();
+                }).get();
+
+
+
+                $("#txtId").val(rowData[0]);
+                $("#LBIdProveedorERP").text(rowData[1]);
+                $("#txtNombre").val(rowData[2]);
+                $("#LBRFC").text(rowData[3]);
+                $("#txtDias").val(rowData[8]);
+                $("#minimoMonto").val(rowData[6]);
+                $("#minimoPiezas").val(rowData[7]);
+
+                //$("#LBIdEmpresaERP").text(rowData[1]);
+                
+                //$("#LBIdProveedorPos").text(rowData[3]);
+
+                //rowData[5] == true ? $("#cbAgencia").prop('checked', true) : $("#cbAgencia").prop('checked', false);
+                //rowData[6] == true ? $("#cbMinimoCompra").prop('checked', true) : $("#cbMinimoCompra").prop('checked', false);
+
+                //console.log(rowData[5] + rowData[6])
+                console.log(rowData[6] + rowData[7])
+
+                if (rowData[6] == "True") {
+                    $("#cbAgencia").prop('checked', true)
+                    $("#btnAgencias").prop("disabled", false);
+                    $("#btnFTP").prop("disabled", false);
+                } else {
+                    $("#cbAgencia").prop('checked', false)
+                    $("#btnAgencias").prop("disabled", true);
+                    $("#btnFTP").prop("disabled", true);
+                }
+
+                if (rowData[7] == "True") {
+                    $("#cbMinimoCompra").prop('checked', true)
+                    $("#minimoMonto").prop("disabled", false);
+                    $("#minimoPiezas").prop("disabled", false);
+                } else {
+                    $("#cbMinimoCompra").prop('checked', false)
+                    $("#minimoMonto").prop("disabled", true);
+                    $("#minimoPiezas").prop("disabled", true);
+                }
+
+
+
+
+
+                console.log(
+                    rowData[0] + ", " +
+                    rowData[1] + ", " +
+                    rowData[2] + ", " +
+                    rowData[3] + ", " +
+                    rowData[4] + ", " +
+                    rowData[5] + ", " +
+                    rowData[6] + ", " +
+                    rowData[7] + ", " +
+                    rowData[8]
+                    //rowData[9]
+                );
+            });
+
+            $("#cbMinimoCompra").change(function () {
+                if ($(this).is(':checked')) {
+                    $("#minimoMonto").prop("disabled", false);
+                    $("#minimoPiezas").prop("disabled", false);
+
+                } else {
+                    $("#minimoMonto").prop("disabled", true);
+                    $("#minimoPiezas").prop("disabled", true);
+
+                    $("#minimoMonto").val("");
+                    $("#minimoPiezas").val("");
+
+
+                }
+            });
+
+            $("#cbAgencia").change(function () {
+                if ($(this).is(':checked')) {
+                    $("#btnAgencias").prop("disabled", false);
+                    $("#btnFTP").prop("disabled", false);
+
+
+                } else {
+                    $("#btnAgencias").prop("disabled", true);
+                    $("#btnFTP").prop("disabled", true);
+
+
+
+                }
+            });
+
+    })
+    </script>
+}

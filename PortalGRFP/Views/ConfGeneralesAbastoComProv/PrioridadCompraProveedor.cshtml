@@ -1,0 +1,339 @@
+﻿@model PortalGRFP.Entities.Response.ResponseList<PortalGRFP.Entities.Common.PorcentajeProv>
+
+@using PortalGRFP.Entities.Common
+
+@{
+    ViewBag.Title = "";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>CONNFIGURACIÓN</a></li>
+    <li class="breadcrumb-item"><a>Prioridad de Compra por Proveedor</a></li>
+}
+
+
+<form method="post" class="form-group col-md-12">
+    <div class="form-row">
+
+
+        <div class="form-group col-md-4">
+            <label for="ddlProv">Nombre Proveedor </label>
+            <select id="ddlProv" min="1" class="form-control" name="Proveedor">
+                <option selected>Seleccionar...</option>
+                @foreach (var item in TempData["Proveedor"] as List<ComboGenericoProveedorCompra>)
+                {
+                    <option value="@item.Id">@item.Valor</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group col-md-2">
+            <label for="ddlIdProv">Id Proveedor </label>
+            <select id="ddlIdProv" class="form-control" name="Id">
+            </select>
+        </div>
+
+        <div class="form-group col-md-4">
+            <label for="ddlDescr">Descripción </label>
+            <select id="ddlDescr" class="form-control" name="Descr">
+            </select>
+        </div>
+
+    </div>
+
+
+    <br>
+    <button type="submit" class="btn btn-primary">Agregar</button>
+
+</form>
+<br />
+<br />
+<br />
+<br />
+<div class="col-sm-12">
+    <label for="groupBtn"><strong>Tipo de Pedido de Compra Especial</strong></label>
+    <div class="card mb-12" style="height:7.3rem">
+        <form id="frm">
+            <div class="card-body">
+                <div class="row g-0">
+                    <div class="col-md-2 pb-1">
+                        <label for="idInput" class="visually-hidden">Id</label>
+                        <input readonly type="text" class="form-control" id="idInput" placeholder="ID">
+                    </div>
+                    <div class="col-md-2 pb-1">
+                        <label for="nombreInput" class="visually-hidden">Proveedor</label>
+                        <input readonly type="text" class="form-control" id="nombreInput" placeholder="Nombre Proveedor">
+                    </div>
+                    <div class="col-md-2 pb-1">
+                        <label for="Empates" class="visually-hidden">Empates</label>
+                        <input type="number" class="form-control" id="EmpatesInput" placeholder="0"  min = 0 max=100 oninput = "validity.valid||(value='')" required>
+                    </div>
+                    <div class="col-md-2 pb-1">
+                        <label for="ProteccionCosto" class="visually-hidden">ProteccionCosto</label>
+                        <input type="number" class="form-control" id="ProteccionCostoInput" placeholder="0"  min = 0 max=100  oninput = "validity.valid||(value='')" required>
+                    </div>
+                    <div class="col-md-2 pb-1">
+                        <label for="PlanCrecimiento" class="visually-hidden">PlanCrecimiento</label>
+                        <input type="number" class="form-control" id="PlanCrecimientoInput" placeholder="0"  min = 0 max=100  oninput = "validity.valid||(value='')" required>
+                    </div>
+                    <div class="col-md-2 pb-1">
+                        <label for="NumProductos" class="visually-hidden">NumProductos</label>
+                        <input type="number" class="form-control" id="NumProductosInput" placeholder="0"  min = 0  oninput = "validity.valid||(value='')" required>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="col-md-2 pb-1">
+                        <button id="btnContinuar" style="margin-top:17%" type="submit" class="btn btn-primary mb-3">Actualizar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+@*action="~/ConfGeneralesAbastoComProv/Guardar"*@
+<div class="col-lg-11">
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-striped" id="DTProv">
+                <thead class="thead-primary">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">PROVEEDOR</th>
+                        <th scope="col">EMPATES %</th>
+                        <th scope="col">PROTECCIÓN DE COSTO %</th>
+                        <th scope="col">PLAN DE CRECIMIENTO %</th>
+                        <th scope="col">PRODUCTOS</th>
+                        <th scope="col"></th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var d in Model.Result)
+                    {
+                        <tr>
+                            <td>
+                                @d.Id
+                            </td>
+                            <td>
+                                @d.Proveedor
+                            </td>
+                            <td>
+                                @d.Empates%
+                            </td>
+
+                            <td>
+                                @d.ProteccionCosto%
+                            </td>
+
+                            <td>
+                                @d.PlanCrecimiento%
+                            </td>
+                            <td>
+                                @d.NumProductos
+                            </td>
+                            <td>
+                                <!--<a href='@Url.Action("Eliminar",new { Id = d.Id})' class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" title="Borrar Proveedor">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+        </svg>
+    </a>-->
+                                <button onclick="deletePedido(@d.Id)" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" title="Borrar Proveedor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                                    </svg>
+                                </button>
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script type="text/javascript" src="~/Scripts/App/Views/AltaProveedor.js"></script>
+    <script type="text/javascript" src="~/Scripts/App/Views/AltaProveedorDescr.js"></script>
+    <script>
+
+        function deletePedido(Id) {
+
+
+
+            if (confirm("Vas eliminar información, ¿Seguro de continuar?")) {
+
+
+                var formData = new FormData();
+
+                formData.append("Id", Id);
+
+                showLoading();
+                $.ajax({
+                    type: "POST",
+                    url: "/ConfGeneralesAbastoComProv/Eliminar",
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function (response) {
+                        hideLoading();
+                        if (response == "ok") {
+
+                            swal("Proveedor eliminado correctamente", '', "success").then((value) => {
+                                window.location.reload();
+
+                            });
+                        } else {
+                            swal("Error al eliminar", '', "error");
+                        }
+                    },
+                    error: function (e) {
+                        hideLoading();
+                        swal("¡Error inesperado en la carga!", '', "error");
+                    }
+                });
+
+
+
+            }
+
+
+        }
+
+        $(document).ready(function () {
+
+            $(function () {
+                'use strict'
+
+                $('#DTProv').dataTable({
+                    /*language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+                        searchPlaceholder: "Buscar",
+                        sSearch: '',
+                        lengthMenu: '_MENU_ filas / paginas'
+                    }*/
+                });
+            });
+
+              $("#frm").submit(function (e) {
+                e.preventDefault();
+
+                  var totalEmpates = 0.0;
+                  var totalPC = 0.0;
+
+                  var _dataTB = $('#DTProv').DataTable().rows().data();
+                  //mData
+
+                  for (var i = 0; i < _dataTB.length; i++) {
+
+                      if (parseInt(_dataTB[i][0], 10) != parseInt($("#idInput").val(), 10)) {
+
+                          totalEmpates += parseInt(_dataTB[i][2], 10);
+                          totalPC += parseInt(_dataTB[i][3], 10);
+                      }
+                  }
+
+                  if ((parseInt($("#EmpatesInput").val(), 10) + totalEmpates) > 100) {
+                      swal("% de Empates mayor a 100", '', "warning");
+                      return;
+                  }
+
+                  if ((parseInt($("#ProteccionCostoInput").val(), 10) + totalPC) > 100) {
+                      swal("% de Protección de costo mayor a 100", '', "warning");
+                      return;
+                  }
+
+
+
+                  console.log(totalEmpates);
+                  console.log(totalPC);
+
+
+                  if ($("#EmpatesInput").val() != "") {
+
+
+
+                if (confirm("Vas guardar información, ¿Seguro de continuar?")) {
+
+
+                    var formData = new FormData();
+
+                    formData.append("Id", $("#idInput").val());
+                    formData.append("Proveedor", $("#nombreInput").val().trim());
+                        formData.append("Empates", $("#EmpatesInput").val());
+                        formData.append("ProteccionCosto", $("#ProteccionCostoInput").val());
+                        formData.append("PlanCrecimiento", $("#PlanCrecimientoInput").val());
+                        formData.append("NumProductos", $("#NumProductosInput").val());
+
+
+
+                    var url = "";
+
+                        $.ajax({
+                            url: "/ConfGeneralesAbastoComProv/Guardar",
+                            type: 'POST',
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            data: formData,
+
+                            success: function (response) {
+                                if (response == "ok") {
+                                    //swal("Cambios guardados", '', "success");
+                                    //alert("TIPO DE COMPRA SE GUARDO CORRECTAMENTE");
+
+                                    swal("¡Cambios Guardados!", '', "success").then((value) => {
+                                        document.location.reload();
+                                    });
+
+                                }
+                               
+                            }
+                        });
+
+                    }
+                } else {
+                      swal("Existen campos vacios", '', "warning");
+                }
+
+
+            });
+
+            $("#DTProv tbody").on('click', 'tr', function () {
+
+                var rowData = $(this).children("td").map(function () {
+                    return $(this).text().trimStart().trimEnd();
+                }).get();
+
+
+                $("#idInput").val(rowData[0].replace(/\\n/g, ''));
+                $("#nombreInput").val(rowData[1]);
+                $("#EmpatesInput").val(rowData[2].replace('%', ''));
+                $("#ProteccionCostoInput").val(rowData[3].replace('%', ''));
+                $("#PlanCrecimientoInput").val(rowData[4].replace('%', ''));
+                $("#NumProductosInput").val(rowData[5]);
+            });
+
+        })
+    </script>
+
+}

@@ -1,0 +1,242 @@
+﻿@{
+    //ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Sugerido de Compra</a></li>
+    <li class="breadcrumb-item"><a>Lista de Sugeridos</a></li>
+}
+
+<div class="card" style="width:100%">
+    <div class="card-header">
+        <div class="col-auto" style="margin-top:2.3%">
+            <button title="Nuevo Sugerido" class="btn btn-sm pd-x-15 btn-success btn-lg" onclick="document.location.href='@Url.Content("~/ValidaSugerido/Index/")'">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <table id="tbSugerido" class="display compact cell-border" width="100%"></table>
+    </div>
+</div>
+
+<div id="myModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body overflow-auto">
+                <table id="tbDetalle" class="display compact cell-border" width="100%"></table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+               'use strict';
+            $('#tbSugerido').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("GetListaSugerido", "Sugerido")",
+                    "dataSrc": "",
+                },//response.Result,
+                "destroy": true,
+                "processing": true,
+                dom: 'Bfrtip',
+                columns: [
+                    { data: "IDSugerido", title: 'Id Sugerido' },
+                    { data: "FechaCalculo", title: "Fecha Calculo" },
+                    { data: "Estatus", title: "Estatus" },
+                    {
+                        data: null,
+                        title:'Continuar',
+                        render: function (data, type, row) {
+                            var boton = '';
+                            if (data.Estatus == 'Generales' && data.Negado == true) {
+                                //boton = '<a href="/Sugerido/Accionar/?IdSugerido=' + data.IDSugerido + '&estatus=Negados" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-gavel" aria-hidden="true"></i>Validar Negados</a>';
+                                //boton = '<button onclick="Accionar(' + data.IDSugerido + ',\'Negados\')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-gavel" aria-hidden="true"></i>Validar Negados</button>';
+                                boton = '<button onclick="Accionar(' + data.IDSugerido + ',\'Calculado\')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-gavel" aria-hidden="true"></i>Calcular Sugerido</button>';
+                            } else if (data.Estatus == 'Generales' && data.Negado == false) {
+                                //boton = '<a href="/Sugerido/Accionar/?IdSugerido=' + data.IDSugerido + '&estatus=Calculo" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-gavel" aria-hidden="true"></i>Validar Negados</a>';
+                                boton = '<button onclick="Accionar(' + data.IDSugerido + ',\'Calculado\')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-gavel" aria-hidden="true"></i>Calcular Sugerido</button>';
+                            } else if (data.Estatus == 'Validación de Negados') {
+                                //boton = '<a href="/Sugerido/Accionar/?IdSugerido=' + data.IDSugerido + '&estatus=Calculo" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-calculator" aria-hidden="true"></i>Calcular Sugerido</a>';
+                                boton = '<button onclick="Accionar(' + data.IDSugerido + ',\'Calculado\')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-calculator" aria-hidden="true"></i>Calcular Sugerido</button>';
+                            } else if (data.Estatus == 'Calculado') {
+                                //boton = '<a href="/Sugerido/Accionar/?IdSugerido=' + data.IDSugerido + '&estatus=Asignacion" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-users" aria-hidden="true"></i>Asignación Proveedor</a>';
+                                boton = '<button onclick="Accionar(' + data.IDSugerido + ',\'Asignacion\')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-users" aria-hidden="true"></i>Asignación Proveedor</button>';
+                            } else if (data.Estatus == 'Asignado a Proveedores') {
+                                boton = '<a href="/Sugerido/Accionar/?IdSugerido=' + data.IDSugerido + '&estatus=' + 'Validado' +'"  class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-thumbs-up" aria-hidden="true"></i>Validado</a>';
+                                //boton = '<button onclick="Accionar(IdSugerido=' + data.IDSugerido + ',estatus=Validado)" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-thumbs-up" aria-hidden="true"></i>Validado</button>';
+
+                            } else if (data.Estatus == 'Validado') {
+                                //boton = '<a href="/Sugerido/Accionar/?IdSugerido=' + data.IDSugerido + '&estatus=Aplicado" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-graduation-cap" aria-hidden="true"></i>Aplicado</a>';
+                                boton = '<button onclick="Accionar(' + data.IDSugerido + ',\'Aplicado\')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-graduation-cap" aria-hidden="true"></i>Aplicado</button>';
+                            }
+                            else if (data.Estatus == 'Aplicado') {
+                                boton = '<a href="/OC/OrdenesCompra/" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-adjust" aria-hidden="true"></i>Ordenado</a>';
+                                //boton = '<button onclick="Accionar(' + data.IDSugerido + ',\'Ordenado\')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-adjust" aria-hidden="true"></i>Ordenado</button>';
+
+                            } else if (data.Estatus == 'Ordenado') {
+                                boton = '<a href="/OC/OrdenesCompra/" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-paper-plane" aria-hidden="true"></i>Enviado</a>';
+                                //boton = '<button onclick="Accionar(' + data.IDSugerido + ',\'Enviado\')" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-paper-plane" aria-hidden="true"></i>Enviado</button>';
+                            }
+                            return boton;
+                        }
+                    },
+                    {
+                        data: null,
+                        title: 'Detalle',
+                        render: function (data, type, row) {
+                            return '<button class="btn btn-sm pd-x-15 btn-primary" onclick="DetalleSugerido(' + data.IDSugerido +' )" > <i class="fa fa-bookmark" aria-hidden="true"></i></button>';
+                        }
+                    },
+                    {
+                        data: null,
+                        title: 'Eliminar',
+                        render: function (data, type, row) {
+                            var boton = '';
+                            if (data.Estatus != 'Ordenado' && data.Estatus != 'Enviado') {
+                               boton = '<button class="btn btn-sm pd-x-15 btn-danger" onclick="eliminarSugerido(' + data.IDSugerido + ' )" > <i class="fa fa-trash" aria-hidden="true"></i></button>';
+                             }
+                           return boton;
+                        }
+                    },
+                    {
+                        data: null,
+                        title: 'Consultar',
+                        render: function (data, type, row) {
+                            return '<a href="/ValidaSugerido/ConsultaSugerido?IdSugerido=' + data.IDSugerido+'" class="btn btn-sm pd-x-15 btn-warning"><i class="fa fa-eye" aria-hidden="true"></i>Ver</a>';
+                        }
+                    }
+                ],
+                select: true,
+                scrollCollapse: true,
+                info: false,
+                paging: true,
+                responsive: true,
+                searching: true
+            });
+
+        });
+
+        function Accionar(dsugerido, destatus) {
+
+            var param = 'IdSugerido=' + dsugerido + '&estatus=' + destatus;
+            showLoading();
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    hideLoading();
+                    var myObj = JSON.parse(this.response);
+                    if (myObj.Success) {
+                        swal('', myObj.Message, "success").then((value) => {
+                            window.location.href = "/Sugerido/ListaSugerido";
+                        });
+                    } else {
+                        swal('', myObj.Message, "error").then((value) => {
+                            window.location.href = "/Sugerido/ListaSugerido";
+                        });
+                    }
+                }
+            };
+            xhttp.open("POST", '/Sugerido/Accionar?' + param, true);
+            xhttp.send();
+        }
+
+        function eliminarSugerido(dsugerido) {
+            //var row = $('#tbSugerido').DataTable().row($(obj).parents('tr')).data();
+            //console.log(row)
+            //console.log(dataExchangeCheckColumnList)
+            swal({
+                title: 'Eliminar Pedido',
+                text: "¿Seguro de Eliminar el Pedido?",
+                icon: "warning",
+                buttons: {
+                    cancel: "Cancelar",
+                    catch: {
+                        text: "Eliminar",
+                        value: true
+                    }
+                },
+            }).then((resp) => {
+                if (resp) {
+
+                    var param = 'idsugerido=' + dsugerido;
+                    showLoading();
+
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            hideLoading();
+                            var myObj = JSON.parse(this.response);
+                            if (myObj.Success) {
+                                swal("", myObj.Message, "success").then((value) => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                hideLoading();
+                                swal("", myObj.Message, "error");
+                            }
+                        }
+                        //else {
+                        //    hideLoading();
+                        //    var myObj = JSON.parse(this.response);
+                        //    swal("Error al eliminar", myObj, "error: ");
+                        //}
+                    };
+                    xhttp.open("POST", '/Sugerido/EliminarSugerido?' + param, true);
+                    xhttp.send();
+                }
+            });
+        }
+
+        function DetalleSugerido(dsugerido) {
+            var param = 'idsugerido=' + dsugerido;
+
+            showLoading();
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    hideLoading();
+                    var myObj = JSON.parse(this.response);
+                    if (myObj.Success) {
+                        $('#tbDetalle').DataTable({
+                            data: myObj.Result,
+                            "destroy": true,
+                            "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "FechaSugerido", title: 'Fecha Creación' },
+                                { data: "IdSugerido", title: 'Id Sugerido' },
+                                { data: "IdSucursal", title: 'IdSucursal' },
+                                { data: "Sucursal", title: 'Sucursal' },
+                                { data: "Proveedor", title: 'Proveedor' },
+                                { data: "Articulo_Id", title: "SKU" },
+                                { data: "Producto", title: 'Descripción' },
+                                { data: "Cantidad", title: "Cantidad" },
+                                { data: "CostoNeto", title: "Costo" },
+                                { data: "TipoPedido", title: "Tipo" }
+                            ],
+                            select: true
+                        });
+                        $('#myModal').modal('show');
+                    } else {
+                        hideLoading();
+                        if (myObj.Message != null) {
+                            swal("", myObj.Message, "error");
+                        } 
+                       
+                    }
+                }            };
+            xhttp.open("POST", '/Sugerido/GetDetalladoSugerido?' + param, true);
+            xhttp.send();
+        }
+
+
+    </script>
+}
+

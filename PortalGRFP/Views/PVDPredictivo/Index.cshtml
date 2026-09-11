@@ -1,0 +1,153 @@
+﻿
+@model  PortalGRFP.Entities.Common.ParametrosPVDpredictivo
+
+
+@{
+    ViewBag.Title = "Configuración de Parámetros PVD Predictivo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="col-md-12 offset-md-1">
+    <span class="anchor" id="formComplex"></span>
+    @section Breadcrumbs{
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+        <li class="breadcrumb-item"><a>Configuraciones</a></li>
+        <li class="breadcrumb-item"><a>Generales de Abasto</a></li>
+        <li class="breadcrumb-item"><a>PVD Predictivo</a></li>
+
+    }
+
+    <!-- form complex example -->
+
+    @using (Html.BeginForm("GuardarConf", "PVDPredictivo", FormMethod.Post, new { role = "form", @class = "form-row mt-4", id = "frmPVD" }))
+    {
+        @Html.TextBoxFor(d => d.ID, new { style = "display: none;" })
+
+        <div class="col-sm-5 pb-3">
+            <label for="groupBtn"><strong>Límite de variación en % de Crecimiento - Decremento:</strong></label>
+            <div class="card mb-6" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-6 pb-1">
+                            @Html.LabelFor(d => d.PorcCrecimiento, new { @for = "PorcCrecimiento" })
+                            @Html.TextBoxFor(d => d.PorcCrecimiento, new { required = true, @class = "form-control", @placeholder = "Porcentaje Crecimiento", @type = "number", @id = "PorcCrecimiento", min = 100, max = 150, oninput = "validity.valid||(value='')" })
+                            @Html.ValidationMessage("PorcCrecimiento", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-6 pb-1">
+                            @Html.LabelFor(d => d.PorcDecremento, new { @for = "PorcDecremento" })
+                            @Html.TextBoxFor(d => d.PorcDecremento, new { required = true, @class = "form-control", @placeholder = "Porcentaje Decremento", @type = "number", @id = "PorcDecremento", min = 50, max = 100, oninput = "validity.valid||(value='')" })
+                            @Html.ValidationMessage("PorcDecremento", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-5 pb-3">
+            <label for="groupBtn"><strong>Prioridad de Participación en PVD:</strong></label>
+            <div class="card mb-6" style="height:7.3rem">
+                <div class="card-body">
+                    <div class="row g-0">
+                        <div class="col-md-6 pb-1">
+                            @Html.LabelFor(d => d.PVDHistorico, new { @for = "PVDHistorico" })
+                            @Html.TextBoxFor(d => d.PVDHistorico, new { required = true, @class = "form-control", @placeholder = "PVD Historico", @type = "number", @id = "PVDHistorico", min = 0, oninput = "validity.valid||(value='')" })
+                            @Html.ValidationMessage("PVDHistorico", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-6 pb-1">
+                            @Html.LabelFor(d => d.PVDActual, new { @for = "PVDActual" })
+                            @Html.TextBoxFor(d => d.PVDActual, new { required = true, @class = "form-control", @placeholder = "PVD Actual", @type = "number", @id = "PVDActual", min = 0, oninput = "validity.valid||(value='')" })
+                            @Html.ValidationMessage("PVDActual", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-2 pb-3">
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <div style="text-align: right" class="col-sm-6 pb-3">
+                <input type="submit" class="btn btn-success" value="Guardar" />
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts{
+    <script>
+
+
+        $("#frmPVD").on("submit", function (event) {
+            event.preventDefault();
+
+            if ($('#PorcCrecimiento').val() != null && $('#PorcDecremento').val() != null && $('#PVDHistorico').val() != null && $('#PVDActual').val() != null ) {
+                swal({
+                    title: '',
+                    text: "¿Desea guardar los cambios?",
+                    icon: "warning",
+                    buttons: {
+                        cancel: "Cancelar",
+                        catch: {
+                            text: "Guardar",
+                            value: true
+                        }
+                    },
+                }).then((resp) => {
+                    if (resp) {
+
+                        console.log($('#PVDHistorico').val())
+                        console.log($('#PVDActual').val())
+
+                        suma = parseInt($('#PVDHistorico').val()) + parseInt($('#PVDActual').val());
+
+                        console.log(suma)
+
+                        if (suma == 100) {
+
+                            var sucProv = $("#frmPVD").serializeArray()
+                                .filter(function (elem) {
+                                    return $.trim(elem.value);
+                                });
+
+                            showLoading();
+                            $.ajax({
+                                type: $("#frmPVD").attr('method'),
+                                url: $("#frmPVD").attr('action'),
+                                data: sucProv,
+                                success: function (response) {
+                                    hideLoading();
+                                    if (response != undefined) {
+
+                                        swal("¡Cambios Guardados!", '', "success").then((value) => {
+                                            //window.location.reload();
+                                        });
+                                    } else {
+                                        swal(response, '', "error").then((value) => {
+
+                                        });
+                                    }
+                                },
+                                error: function (response) {
+                                    swal("Ocurrio un error de comunicación", '', "warning");
+                                    hideLoading();
+                                }
+                            });
+                        }
+                        else {
+                            swal('Error', 'La suma de participación de PVDdebe ser igual a 100', "error").then((value) => {
+
+                            });
+                        }
+                    }
+
+                });
+
+            }
+        });
+
+    </script>
+}
+
+
+

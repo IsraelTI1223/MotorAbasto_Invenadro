@@ -1,0 +1,394 @@
+﻿@using PortalGRFP.Entities.Common
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Generales</a></li>
+    <li class="breadcrumb-item"><a>Invenadro</a></li>
+}
+<div class="container-fluid">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a href='@Url.Action("Index", "ConfiguracionInvenadro")' class="btn btn-secondary">Invenadro General</a>
+        <a href='@Url.Action("Exclusiones", "ConfiguracionInvenadro")' id="btnPestañaExcluidos" class="btn btn-secondary">Excluidos</a>
+        <a href='@Url.Action("ResumenInvenadro", "ConfiguracionInvenadro")' id="btnResumen" class="btn btn-secondary">Resumen Invenadro</a>
+        <a href='@Url.Action("BalanceoCDRs", "ConfiguracionInvenadro")' id="btnPestañaCDR active" class="btn btn-secondary">Balanceo</a>
+    </div>
+    <div class="card" style="width:100%; " id="SeccionCDRs">
+        @using (Html.BeginForm("ActualizaCDRs", "ConfiguracionInvenadro", FormMethod.Post, new { role = "form", id = "frmBalance" }))
+        {
+            <div class="col-sm-12" style="margin-top: 1%">
+                <br />
+                <div class="container-fluid" style="width:100%">
+                    <br />
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="label-primary">CDR: <span style="color:gray"></span></label>
+                                <select class="form-control" id="cmbCedis" name="cmbCedis" data-mdb-filter="true">
+                                    <option value="" selected>Seleccionar CDR</option>
+                                    @if (TempData["CDRs"] != null)
+                                    {
+                                        foreach (var item in TempData["CDRs"] as List<InfoCDR>)
+                                        {
+                                            <option value="@item.Id">@item.Nombre</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Monto CDR ($):</label>
+                                <input type="number" id="txtMontoPesos" name="txtMontoPesos" class="form-control" step="0.01" />
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <button id="btnBalanceo" class="btn btn-primary" type="button">Balancea CDR</button>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-1">
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>ID Agencia:</label>
+                                <input type="number" id="txtIdAgencia" name="txtIdAgencia" class="form-control" readonly />
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>% de Compra mayor:</label>
+                                <input type="number" id="txtCompraMayorPrcnt" name="txtCompraMayorPrcnt" class="form-control" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>% de Compra menor:</label>
+                                <input type="number" id="txtCompraMenorPrcnt" name="txtCompraMenorPrcnt" class="form-control" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Monto Compra mayor:</label>
+                                <input type="number" id="txtMontoMayor" name="txtMontoMayor" class="form-control" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Monto Compra menor:</label>
+                                <input type="number" id="txtMontoMenor" name="txtMontoMenor" class="form-control" readonly />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Pedidos a realizar:</label>
+                                <input type="number" id="txtPedidos" name="txtPedidos" class="form-control" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Monto Necesidad:</label>
+                                <input type="number" id="txtMontoNecesidad" name="txtMontoNecesidad" class="form-control" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Farmacias:</label>
+                                <input type="number" id="txtFarmacias" name="txtFarmacias" class="form-control" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-1" hidden>
+                            <div class="form-group">
+                                <label>Flag</label>
+                                <input type="text" id="txtoFlag" name="txtoFlag"  class="form-control"  />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="justify-content:right">
+                        <div class="col-md-2">
+                            <button id="btnExportarCSV" class="btn btn-success" type="button" disabled
+                                    title="Disponible cuando los campos de compra tienen datos">
+                                <i class="fa fa-file-csv"></i> Exportar Bloques
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button id="btnGuardarCDR" class="btn btn-primary" type="submit">Guardar CDR</button>
+                        </div>
+                    </div>
+                    <br />
+                </div>
+
+            </div>
+        }
+
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#cmbCedis').multiselect({
+        nonSelectedText: 'Lista de CDRs',
+        enableFiltering: true,
+        includeSelectAllOption: false,
+        maxHeight: 300,
+        buttonWidth: '250px',
+        buttonTextAlignment: 'left',
+        enableCaseInsensitiveFiltering: true,
+        nSelectedText: "CDRs Seleccionadas",
+
+            onChange: function (option, checked)
+            {
+
+                var agencia_id = $(option).val();
+                var MontoCDR = 0;
+                if ($("#txtMontoPesos").val("")) {
+                    MontoCDR = 0;
+                }
+                console.log("CDR seleccionado:", agencia_id);
+                console.log("Monto seleccionado:",  parseFloat(MontoCDR));
+
+
+                 if (!agencia_id || agencia_id == 0) {
+                     limpiarFormularioCDR();
+                     return;
+                 }
+
+                 showLoading();
+
+                 $.ajax({
+                     url: '@Url.Action("GetCDRsInfo", "ConfiguracionInvenadro")',
+                     type: 'GET',
+                     dataType: 'json',
+                     data: {
+                         agencia_id: agencia_id,
+                         MontoCDR: MontoCDR
+                     },
+                     success: function (response) {
+                         hideLoading();
+
+                         if (!response || !response.Result || response.Result.length === 0) {
+                             limpiarFormularioCDR();
+                             return;
+                         }
+
+                         var cdr = response.Result[0];
+                         
+                         $("#txtIdAgencia").val(cdr.Id);
+                         $("#txtCompraMayorPrcnt").val(cdr.PorcentajeCompraMayor);
+                         $("#txtCompraMenorPrcnt").val(cdr.PorcentajeCompraMenor);
+                         $("#txtMontoMayor").val(cdr.MontoCompraMayor);
+                         $("#txtMontoMenor").val(cdr.MontoCompraMenor);
+                         $("#txtPedidos").val(cdr.PedidosRealizar);
+                         $("#txtMontoNecesidad").val(cdr.MontoNecesidad);
+                         $("#txtFarmacias").val(cdr.Farmacias);
+                         $("#txtMontoPesos").val(cdr.MontoCDR);
+                         $("#txtoFlag").val(cdr.oFlag);
+                         actualizarBotonExportar();
+                         if (cdr.MontoCDR == 0 || cdr.MontoCDR == "0.00") {
+                             console.log(cdr.MontoCDR);
+                             limpiarFormularioCDR();
+                         }
+                     },
+                     error: function () {
+                         hideLoading();
+                         limpiarFormularioCDR();
+                         swal("Error al obtener información del CDR", "", "error");
+                     }
+                 });
+            }
+        });
+
+
+    });
+
+
+
+
+    $("#btnBalanceo").on("click", function () {
+
+    var agenciaId = $("#cmbCedis").val();
+    var monto = $("#txtMontoPesos").val();
+
+    if (!agenciaId || agenciaId == 0) {
+        swal("Seleccione un CDR", "", "warning");
+        return;
+    }
+
+    if (!monto || parseFloat(monto) <= 0) {
+        swal("Ingrese un monto válido", "", "warning");
+        return;
+    }
+
+    var data = {
+        Agencia_id: parseInt(agenciaId),
+        MontoCDR: parseFloat(monto)
+    };
+
+    showLoading();
+
+    $.ajax({
+        url: '@Url.Action("GetCDRsInfo", "ConfiguracionInvenadro")',
+        type: 'POST',
+        data: data,
+        success: function (response) {
+            hideLoading();
+
+            if (!response || !response.Result || response.Result.length === 0) {
+                swal("No se pudo balancear el CDR", "", "warning");
+                return;
+            }
+
+            var cdr = response.Result[0];
+
+            $("#txtIdAgencia").val(cdr.Id);
+            $("#txtCompraMayorPrcnt").val(cdr.PorcentajeCompraMayor);
+            $("#txtCompraMenorPrcnt").val(cdr.PorcentajeCompraMenor);
+            $("#txtMontoMayor").val(cdr.MontoCompraMayor);
+            $("#txtMontoMenor").val(cdr.MontoCompraMenor);
+            $("#txtPedidos").val(cdr.PedidosRealizar);
+            $("#txtMontoNecesidad").val(cdr.MontoNecesidad);
+            $("#txtFarmacias").val(cdr.Farmacias);
+            actualizarBotonExportar();
+        },
+        error: function () {
+            hideLoading();
+            swal("Error al balancear CDR", "", "error");
+        }
+    });
+});
+
+    $("#frmBalance").on("submit", function (event) {
+        console.log($("#txtoFlag").val());
+        event.preventDefault();
+        swal({
+            title: "Confirmación",
+            text: "¿Desea guardar los cambios?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true
+        }).then((confirmar) => {
+            if (!confirmar) return;
+            if ($("#txtoFlag").val() == "P") {
+                swal("Prorrateo de CDR en proceso", "Imposible actualizar información de balanceo", "warning");
+            }
+            else {
+                showLoading();
+                $.ajax({
+                    type: "POST",
+                    url: $("#frmBalance").attr("action"),
+                    data: $("#frmBalance").serialize(),
+                    success: function (response) {
+                        hideLoading();
+
+                        if (response && response.Success !== false) {
+                            swal("Actualizado con éxito", "", "success");
+                            location.reload();
+                        } else {
+                            swal("No fue posible actualizar", response.Message || "", "warning");
+                        }
+                    },
+                    error: function () {
+                        hideLoading();
+                        swal("Error al guardar la información", "", "error");
+                    }
+                });
+            }
+            
+
+        });
+    });
+
+
+
+
+
+
+
+    function limpiarFormularioCDR() {
+        $("#txtMontoPesos").val("");
+        $("#txtIdAgencia").val("");
+        $("#txtCompraMayorPrcnt").val("");
+        $("#txtCompraMenorPrcnt").val("");
+        $("#txtMontoMayor").val("");
+        $("#txtMontoMenor").val("");
+        $("#txtPedidos").val("");
+        $("#txtMontoNecesidad").val("");
+        $("#txtFarmacias").val("");
+        $("#txtoFlag").val("");
+        actualizarBotonExportar();
+    }
+
+    function actualizarBotonExportar() {
+        var mayor = $("#txtCompraMayorPrcnt").val();
+        var menor = $("#txtCompraMenorPrcnt").val();
+        var montoMayor = $("#txtMontoMayor").val();
+        var montoMenor = $("#txtMontoMenor").val();
+        var habilitado = mayor !== "" && menor !== "" && montoMayor !== "" && montoMenor !== "";
+        $("#btnExportarCSV").prop("disabled", !habilitado);
+    }
+
+    $("#btnExportarCSV").on("click", function () {
+        var agencia = $("#txtIdAgencia").val();
+        if (!agencia) {
+            swal("Seleccione un CDR", "", "warning");
+            return;
+        }
+        window.location.href = '@Url.Action("ExportarBloquesCDR", "ConfiguracionInvenadro")?agencia=' + agencia;
+    });
+
+    @* $("#cmbCedis").on("change", function () {
+
+        var agencia_id = $(this).val();
+
+        console.log(agencia_id);
+        if (!agencia_id || agencia_id == 0) {
+            limpiarFormularioCDR();
+            return;
+        }
+
+        showLoading();
+
+        $.ajax({
+            url: '@Url.Action("GetCDRsInfo", "ConfiguracionInvenadro")',
+            type: 'POST',
+            dataType: 'json',
+            data: { agencia_id },
+            success: function (response) {
+                hideLoading();
+
+                if (!response || !response.Result || response.Result.length === 0) {
+                    limpiarFormularioCDR();
+                    return;
+                }
+
+                var cdr = response.Result[0];
+
+                $("#txtIdAgencia").val(cdr.Agencia_id);
+                $("#txtCompraMayorPrcnt").val(cdr.PorcentajeCompraMayor);
+                $("#txtCompraMenorPrcnt").val(cdr.PorcentajeCompraMenor);
+                $("#txtMontoMayor").val(cdr.MontoCompraMayor);
+                $("#txtMontoMenor").val(cdr.MontoCompraMenor);
+                $("#txtPedidos").val(cdr.PedidosRealizar);
+                $("#txtMontoNecesidad").val(cdr.MontoNecesidad);
+                $("#txtFarmacias").val(cdr.Farmacias);
+                $("#txtMontoPesos").val(cdr.MontoCDR);
+                $("#txtoFlag").val(cdr.oFlag);
+            },
+            error: function () {
+                hideLoading();
+                limpiarFormularioCDR();
+                swal("Error al obtener información del CDR", "", "error");
+            }
+        });
+    });*@
+</script>

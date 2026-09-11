@@ -1,0 +1,128 @@
+﻿@model  PortalGRFP.Entities.Response.ResponseList<PortalGRFP.Entities.Common.OCSugerido>
+@using PortalGRFP.Entities.Common
+@{
+
+    ViewBag.Title = "GENERAR ORDER DE COMPRA AL PROVEEDOR";
+}
+
+<br>
+<br>
+
+<form method="post" class="form-group col-md-12">
+
+    <div class="form-row">
+
+        <div class="form-group col-md-3">
+
+
+
+            <label for="ddlProv">ID SUGERIDO </label>
+            <select id="ddlProv" class="form-control" name="id_sugerido">
+                <option selected>Selecciona...</option>
+                @if (TempData["IdSugerido"] != null)
+                {
+                    foreach (var item in TempData["IdSugerido"] as List<ComboGenerico>)
+                    {
+                        <option value="@item.Valor">@item.Valor</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" onclick="myFunction()">Generar Ordenes de Compra</button>
+</form>
+
+
+
+@if (Model.Result != null)
+{
+<form>
+    <br>
+    <br>
+
+    <hr>
+    <button type="submit" class="btn btn-primary">Enviar</button>
+    <button type="submit" class="btn btn-primary">Eliminar</button>
+    <hr>
+
+
+
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-striped" id="DTProv">
+                    <thead class="thead-primary">
+                        <tr>
+                            <th scope="col">idSugerido</th>
+                            <th scope="col">Orden Compra</th>
+                            <th scope="col">id_Sucursal</th>
+                            <th scope="col">Nombre Sucursal</th>
+                            <th scope="col">Nombre Proveedor</th>
+                            <th scope="col">Importe</th>
+                            <th scope="col">status</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+
+                        @foreach (var d in Model.Result)
+                        {
+                            <tr>
+
+                                <td>
+
+                                    @d.idSugerido
+                                </td>
+                                <td>
+                                    @d.Orden_Compra
+                                </td>
+                                <td>
+                                    @d.id_Sucursal
+                                </td>
+
+                                <td>
+                                    @d.Nombre_Sucursal
+                                </td>
+
+                                <td>
+                                    @d.Nombre_Proveedor
+                                </td>
+                                <td>
+                                    @d.Importe
+                                </td>
+                                <td>
+                                    @d.status
+                                </td>
+
+
+
+
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+</form>
+
+}
+
+<script>
+
+
+    function myFunction() {
+        if (confirm("Desea generar la orden de compra?")) {
+            alert("Orden generada exitosamente");
+        } else {
+            alert("Usted cancelo la acción para generar la orden ");
+        }
+    }
+
+</script>

@@ -1,0 +1,311 @@
+﻿@model List<PortalGRFP.Entities.Common.PedidosCompEspecialesViewModel>
+
+
+@{
+    ViewBag.Title = "Pedidos de Compras Especiales";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<span class="anchor" id="formComplex"></span>
+@section Breadcrumbs{
+    <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+    <li class="breadcrumb-item"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Generales de Abasto</a></li>
+    <li class="breadcrumb-item"><a>Pedidos de Compras Especiales</a></li>
+
+}
+
+
+
+<div class="col-sm-12">
+    <div class="row">
+        <div class="col-12">
+            <label for="groupBtn"><strong>Tipo de Pedido de Compra Especial</strong></label>
+        </div>
+        <div class="col-auto" style="display: none" id="btnCleanInputs">
+            <button title="Nuevo Tipo de Pedido" class="btn btn-sm pd-x-15 btn-success btn-lg" onclick="cleanInputs()">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card mb-12" style="height:8.7rem">
+
+        <form id="frm">
+            <div class="card-body">
+                <div class="row g-0">
+                    <div class="col-md-2 pb-1">
+                        <label for="idInput" class="visually-hidden">Id</label>
+                        <input readonly type="number" value="0" class="form-control" id="idInput" placeholder="0">
+                    </div>
+                    <div class="col-md-4 pb-1">
+                        <label for="nombreInput" class="visually-hidden">Nombre del Tipo de Pedido</label>
+                        <input type="text" class="form-control" id="nombreInput" placeholder="Nombre del tipo de pedido de compra especial" pattern="[A-Za-z0-9 áéíóúÁÉÍÓÚ]+" maxlength="45">
+                    </div>
+                    <div class="col-md-2" style="margin-top: 2.5%">
+                        <div class="custom-control custom-checkbox form-group">
+                            <input type="checkbox" class="custom-control-input" id="cbSuma">
+                            <label class="custom-control-label" for="cbSuma">Suma al Sugerido</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2" style="margin-top: 2.5%">
+                        <div class="custom-control custom-checkbox form-group">
+                            <input type="checkbox" class="custom-control-input" id="cbCompara">
+                            <label class="custom-control-label" for="cbCompara">Compra Mayor</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2" style="margin-top: 2.5%">
+                        <div class="custom-control custom-checkbox form-group">
+                            <input type="checkbox" class="custom-control-input" id="cbPie" title="Pie de camión Mayorista">
+                            <label class="custom-control-label" for="cbPie" title="Pie de camión Mayorista">Pie de camión M.</label>
+                        </div>
+                    </div>
+
+                </div>
+                <div style="text-align:right">
+                    <button id="btnContinuar" type="submit" class="btn btn-success mb-3">Continuar</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="col-sm-12" style="margin-top: 1%">
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-striped" id="DTPedEsp">
+                <thead class="thead-primary">
+                    <tr>
+                        <th style="width:10%">#Id</th>
+                        <th style="width:30%">Tipo de Pedido</th>
+                        <th style="width:10%">Suma Sugerido</th>
+                        <th style="width:20%">Compara con Mayor</th>
+                        <th style="width:20%">Pie de camión Mayoristas</th>
+                        <th style="width:10%"></th>
+
+                        <!--<th style="width:10%">Editar</th>-->
+                    </tr>
+                </thead>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Nombre</td>
+                        <td>@item.SumaSugerido</td>
+                        <td>@item.ComparaMayor</td>
+                        <td>@item.PieCamion</td>
+
+                        <td>
+                            <button onclick="deletePedido(@item.Id)" class="btn btn-sm pd-x-15 btn-primary btn-uppercase mg-l-5" title="Borrar Proveedor">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                                </svg>
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                }
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script>
+        function cleanInputs() {
+
+            $("#btnCleanInputs").hide();
+            $("#idInput").val('0');
+            $("#nombreInput").val('');
+            $("#cbSuma").prop('checked', false);
+            $("#cbCompara").prop('checked', false);
+            $("#cbPie").prop('checked', false);
+
+        }
+        function deletePedido(Id) {
+
+            console.log(Id )
+
+            if (confirm("Vas a eliminar información, ¿Seguro de continuar?")) {
+
+
+                var formData = new FormData();
+
+                formData.append("Id", Id);
+
+                showLoading();
+                $.ajax({
+                    type: "POST",
+                    url: "/ConfGeneralesAbasto/EliminarPedidoEspecial",
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    success: function (response) {
+                        hideLoading();
+                        if (response == "ok") {
+
+                            swal("Pedido eliminado correctamente", '', "success").then((value) => {
+                                window.location.reload();
+
+                            });
+                        } else {
+                            swal("Error al eliminar", '', "error");
+                        }
+                    },
+                    error: function (e) {
+                        hideLoading();
+                        swal("¡Error inesperado en la carga!", '', "error");
+                    }
+                });
+
+
+
+            }
+
+
+        }
+
+        $(document).ready(function () {
+
+
+            $(function () {
+                'use strict'
+
+                $('#DTPedEsp').dataTable({
+                    language: {
+                        url: 'https://cdn.datatables.net/plug-ins/1.10.15/i18n/Spanish.json',
+                        searchPlaceholder: "Buscar",
+                        sSearch: '',
+                        lengthMenu: '_MENU_ filas / paginas'
+                    }
+                });
+            });
+
+
+            $("#frm").submit(function (e) {
+                e.preventDefault();
+
+                if ($("#nombreInput").val() != "" ) {
+
+                if (confirm("Vas guardar información, ¿Seguro de continuar?")) {
+
+
+                    showLoading();
+
+                    var formData = new FormData();
+                    formData.append("Nombre", $("#nombreInput").val());
+                    formData.append("Id", $("#idInput").val());
+                    formData.append("Estatus", 1);
+                    formData.append("SumaSugerido", $("#cbSuma").prop('checked'));
+                    formData.append("ComparaMayor", $("#cbCompara").prop('checked'));
+                    formData.append("PieCamion", $("#cbPie").prop('checked'));
+
+
+                        $.ajax({
+                            url: "/ConfGeneralesAbasto/PedidosCompEspeciales",
+                            type: 'POST',
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            data: formData,
+
+                            success: function (response) {
+                                hideLoading();
+
+                                if (response.Success) {
+                                    //alert("TIPO DE COMPRA SE GUARDO CORRECTAMENTE");
+                                    //document.location.href = "@Url.Content("~/ConfGeneralesAbasto/PedidosCompEspeciales")";
+                                    swal(response.Message, '', "success").then((value) => {
+                                        window.location.reload();
+
+                                    });
+                                } else {
+                                    swal(response.Message, '', "error");
+                                }
+                            },
+                            error: function (e) {
+                                hideLoading();
+                                swal(response.Message, '', "error");
+                            }
+                        });
+
+                    }
+                    @*{
+                    document.location.href = "@Url.Content("~/ConfGeneralesAbasto/PedidosCompEspeciales")";
+                }*@
+                } else {
+                    swal("El campo Nombre es obligatorio", '', "error");
+                }
+
+
+            });
+
+
+
+
+
+            $("#DTPedEsp tbody").on('click', 'tr', function () {
+
+                $("#btnCleanInputs").show();
+
+                var rowData = $(this).children("td").map(function () {
+                    return $(this).text();
+                }).get();
+
+                $("#idInput").val(rowData[0]);
+                $("#nombreInput").val(rowData[1]);
+
+                if (rowData[2] == "True") {
+                    $("#cbSuma").prop('checked', true)
+                } else {
+                    $("#cbSuma").prop('checked', false)
+                }
+                if (rowData[3] == "True") {
+                    $("#cbCompara").prop('checked', true)
+                } else {
+                    $("#cbCompara").prop('checked', false)
+                }
+                if (rowData[4] == "True") {
+                    $("#cbPie").prop('checked', true)
+                } else {
+                    $("#cbPie").prop('checked', false)
+                }
+
+            });
+
+
+
+            $('#cbSuma').change(function () {
+                if (this.checked) {
+                    //var returnVal = confirm("Are you sure?");
+                    //$(this).prop("checked", returnVal);
+                    $("#cbCompara").prop('checked', false)
+                    $("#cbPie").prop('checked', false)
+                }
+                //$('#textbox1').val(this.checked);
+            });
+
+            $('#cbCompara').change(function () {
+                if (this.checked) {
+                    $("#cbSuma").prop('checked', false)
+                    $("#cbPie").prop('checked', false)
+                }
+            });
+
+            $('#cbPie').change(function () {
+                if (this.checked) {
+                    $("#cbCompara").prop('checked', false)
+                    $("#cbSuma").prop('checked', false)
+                }
+            });
+
+    })
+    </script>
+}
+
+

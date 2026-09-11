@@ -1,0 +1,285 @@
+﻿@model PortalGRFP.Entities.Common.AgenciaProveedor
+@using PortalGRFP.Entities.Common
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>Configuraciones</a></li>
+    <li class="breadcrumb-item"><a>Proveedores</a></li>
+    <li class="breadcrumb-item"><a>Agencias</a></li>
+}
+<div class="container-fluid">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <a href='@Url.Action("EditarProveedores")' class="btn btn-secondary ">Generarl Proveedores</a>
+        <a href='@Url.Action("Agencias")' class="btn btn-secondary active">Agencias</a>
+        <a href='@Url.Action("Ftp")' class="btn btn-secondary">FTP</a>
+        <a href='@Url.Action("Exclusiones")' class="btn btn-secondary ">Exclusiones</a>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            @using (Html.BeginForm("AgregarAgencia", "ConfiguracionesProveedores", FormMethod.Post, new { role = "form", id = "frmAgencia" }))
+            {<div class="row">
+                    <div class="col-md-6">
+                        <label class="control-label col-md-3">Proveedor</label>
+                        <input type="Text" class="form-control" id="IdProveedor" name="IdProveedor" placeholder="Buscar Proveedor" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="control-label col-md-2">Agencia</label>
+                        <div class="col-md-10">
+                            <select id="IdAgencia" name="IdAgencia" class="form-control">
+                                <option value="0">Seleccione</option>
+                                @foreach (var item in TempData["Agencia"] as List<Autocomplete>)
+                                {
+                                    <option value="@item.Id">@item.Valor</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="form-inline">
+                    <div class="row">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.OrdenCompraAutomatica, htmlAttributes: new { @class = "control-label col-md-8" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="OrdenCompraAutomatica" name="OrdenCompraAutomatica" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.FacturaAutomatica, htmlAttributes: new { @class = "control-label col-md-8" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="FacturaAutomatica" name="FacturaAutomatica" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.CatalogoAutomatico, htmlAttributes: new { @class = "control-label col-md-8" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="CatalogoAutomatico" name="CatalogoAutomatico" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PermiteRemisiones, htmlAttributes: new { @class = "control-label col-md-8" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="PermiteRemisiones" name="PermiteRemisiones" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.RespuestaFaltante, htmlAttributes: new { @class = "control-label col-md-8" })
+                            <div class="col-md-4">
+                                <div class="checkbox">
+                                    <input class="check-box" data-val="true" id="RespuestaFaltante" name="RespuestaFaltante" type="checkbox" value="true" />
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hProveedor" id="hProveedor" />
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <input type="submit" value="Agregar" class="btn btn-primary" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="card-body">
+            <table id="tblAgencia" class="display compact cell-border" width="100%"></table>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            'use strict';
+            var  agenciatbl=  $('#tblAgencia').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("ConsultarAgencias", "ConfiguracionesProveedores")",
+                    "dataSrc": "",
+                },//response.Result,
+                "destroy": true,
+                           "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "IdProveedor", title: 'Id Proveedor'},
+                                { data: "Proveedor", title: "Proveedor" },
+                                { data: "IdAgencia", title: "Id Agencia"},
+                                { data: "Agencia", title: "Agencia" },
+                                { data: "OrdenCompraAutomatica", title: 'OC_Aut' },
+                                { data: "FacturaAutomatica", title: 'Factura_Aut' },
+                                { data: "CatalogoAutomatico", title: 'Catálogo_Aut' },
+                                { data: "PermiteRemisiones", title: 'Permite_Remisiones' },
+                                { data: "RespuestaFaltante", title: 'Respuesta_Faltante' }
+                            ],
+                            select: true,
+                            scrollCollapse: false,
+                            info: false,
+                            paging: false,
+                            //responsive: true,
+                            searching: false
+
+                        });//$("#tblAgencia");
+
+
+            $("#IdProveedor").autocomplete({
+                source: function (request, response) {
+                    minLength: 2,
+                    $.ajax({
+                        url: "@Url.Action("Autocommplete", "ConfiguracionesProveedores")",
+                        type: "POST",
+                        dataType: "json",
+                        data: { texto: request.term },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return { label: item.Valor, value: item.Id+","+item.Valor };
+                            }))
+                        }
+                    })
+                },
+                select: function (event, ui) {
+                    $("#hProveedor").val(ui.item.value.split(',')[0]);
+                }
+            });
+
+
+            $("#frmAgencia").on("submit", function (event) {
+                event.preventDefault();
+                if (ValidacionForm()) {
+                    var regla = $("#frmAgencia").serializeArray()
+                        .filter(function (elem) {
+                            return $.trim(elem.value);
+                        });
+
+                    showLoading();
+                    $.ajax({
+                        type: $("#frmAgencia").attr('method'),
+                        url: $("#frmAgencia").attr('action'),
+                        data: regla,
+                        success: function (response) {
+                            hideLoading();
+                            if (response.Success) {
+                                swal(response.Message, '', "success").then((value) => {
+                                    $("#frmAgencia").trigger("reset");
+                                    ConsultarAgencias();
+                                });
+                            } else {
+                                swal(response.Message, '', "error").then((value) => {
+                                    ConsultarAgencias();
+                                });
+                            }
+                        },
+                        error: function (response) {
+                            swal("Ocurrio un error de comunicación", '', "warning");
+                        }
+                    });
+                }
+            });
+
+
+
+
+
+
+
+        function ConsultarAgencias() {
+            showLoading();
+           agenciatbl=  $('#tblAgencia').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("ConsultarAgencias", "ConfiguracionesProveedores")",
+                    "dataSrc": "",
+                },//response.Result,
+                "destroy": true,
+                           "processing": true,
+                            dom: 'Bfrtip',
+                            columns: [
+                                { data: "IdProveedor", title: 'Id Proveedor'},
+                                { data: "Proveedor", title: "Proveedor" },
+                                { data: "IdAgencia", title: "Id Agencia"},
+                                { data: "Agencia", title: "Agencia" },
+                                { data: "OrdenCompraAutomatica", title: 'OC_Aut' },
+                                { data: "FacturaAutomatica", title: 'Factura_Aut' },
+                                { data: "CatalogoAutomatico", title: 'Catálogo_Aut' },
+                                { data: "PermiteRemisiones", title: 'Permite_Remisiones' },
+                                { data: "RespuestaFaltante", title: 'Respuesta_Faltante' }
+                            ],
+                            select: true,
+                            scrollCollapse: false,
+                            info: false,
+                            paging: false,
+                            //responsive: true,
+                            searching: false
+
+           });//$("#tblAgencia");
+            hideLoading();
+        }
+
+
+            agenciatbl.on('select', function (e, dt, type, indexes) {
+                var rowData = agenciatbl.rows(['.selected']).data().toArray();
+
+                $("#hProveedor").val(rowData[0].IdProveedor);
+                $("#IdProveedor").val(rowData[0].IdProveedor+","+ rowData[0].Proveedor);
+                $("#IdAgencia").val(rowData[0].IdAgencia);
+                if (rowData[0].OrdenCompraAutomatica) {
+                    $("#OrdenCompraAutomatica").val(rowData[0].OrdenCompraAutomatica);
+                    $("#OrdenCompraAutomatica").prop("checked", true);
+                }
+                if (rowData[0].FacturaAutomatica) {
+                    $("#FacturaAutomatica").val(rowData[0].FacturaAutomatica);
+                    $("#FacturaAutomatica").prop("checked", true);
+                }
+                if (rowData[0].CatalogoAutomatico) {
+                    $("#CatalogoAutomatico").val(rowData[0].CatalogoAutomatico);
+                    $("#CatalogoAutomatico").prop("checked", true);
+                }
+                if (rowData[0].PermiteRemisiones) {
+                    $("#PermiteRemisiones").val(rowData[0].PermiteRemisiones);
+                    $("#PermiteRemisiones").prop("checked", true);
+                }
+                if (rowData[0].RespuestaFaltante) {
+                    $("#RespuestaFaltante").val(rowData[0].RespuestaFaltante);
+                    $("#RespuestaFaltante").prop("checked", true);
+                }
+
+            }).on('deselect', function (e, dt, type, indexes) {
+                var rowData = agenciatbl.rows(indexes).data().toArray();
+                $("#frmAgencia").trigger("reset");
+            });;
+
+        function ValidacionForm() {
+            var avanza = false, proveedor, agencia;
+            proveedor = $("#IdProveedor").val();
+            agencia = $("#IdAgencia").val();
+
+            if (proveedor == "") {
+                swal("Campo vacío", '', "warning");
+            } else if (proveedor - length < 3) {
+                swal("Información incorrecta", '', "warning");
+            } else {
+                if (agencia == "0")
+                {
+                    swal("Seleccione una agencia", '', "warning");
+                } else
+                {
+                    avanza = true;
+                }
+            }
+            return avanza;
+            }
+        });
+    </script>
+}

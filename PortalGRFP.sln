@@ -1,0 +1,107 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11520.95
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalGRFP", "PortalGRFP\PortalGRFP.csproj", "{10AB23E3-9AD2-4F15-ADB0-40E93298ABE9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalGRFP.Business", "PortalGRFP.Business\PortalGRFP.Business.csproj", "{38865C87-CFDD-430C-98F7-A61146C625AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalGRFP.Data", "PortalGRFP.Data\PortalGRFP.Data.csproj", "{23548EB0-7DCD-4970-B96A-D668B60C0669}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalGRFP.Entities", "PortalGRFP.Entities\PortalGRFP.Entities.csproj", "{8B17383C-4810-479C-8C2E-548501385A1E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalGRFP.Utilities", "PortalGRFP.Utilities\PortalGRFP.Utilities.csproj", "{FDCDAE22-AAC1-4734-BE4E-3BC36EE6A1FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PortalGRFP.Tests", "PortalGRFP.Tests\PortalGRFP.Tests.csproj", "{685F868E-4733-4800-9F34-1BF1B6C41B8B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{10AB23E3-9AD2-4F15-ADB0-40E93298ABE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10AB23E3-9AD2-4F15-ADB0-40E93298ABE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10AB23E3-9AD2-4F15-ADB0-40E93298ABE9}.Debug|x64.ActiveCfg = Debug|x64
+		{10AB23E3-9AD2-4F15-ADB0-40E93298ABE9}.Debug|x64.Build.0 = Debug|x64
+		{10AB23E3-9AD2-4F15-ADB0-40E93298ABE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10AB23E3-9AD2-4F15-ADB0-40E93298ABE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10AB23E3-9AD2-4F15-ADB0-40E93298ABE9}.Release|x64.ActiveCfg = Release|x64
+		{10AB23E3-9AD2-4F15-ADB0-40E93298ABE9}.Release|x64.Build.0 = Release|x64
+		{38865C87-CFDD-430C-98F7-A61146C625AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38865C87-CFDD-430C-98F7-A61146C625AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38865C87-CFDD-430C-98F7-A61146C625AD}.Debug|x64.ActiveCfg = Debug|x64
+		{38865C87-CFDD-430C-98F7-A61146C625AD}.Debug|x64.Build.0 = Debug|x64
+		{38865C87-CFDD-430C-98F7-A61146C625AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38865C87-CFDD-430C-98F7-A61146C625AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38865C87-CFDD-430C-98F7-A61146C625AD}.Release|x64.ActiveCfg = Release|x64
+		{38865C87-CFDD-430C-98F7-A61146C625AD}.Release|x64.Build.0 = Release|x64
+		{23548EB0-7DCD-4970-B96A-D668B60C0669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23548EB0-7DCD-4970-B96A-D668B60C0669}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23548EB0-7DCD-4970-B96A-D668B60C0669}.Debug|x64.ActiveCfg = Debug|x64
+		{23548EB0-7DCD-4970-B96A-D668B60C0669}.Debug|x64.Build.0 = Debug|x64
+		{23548EB0-7DCD-4970-B96A-D668B60C0669}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23548EB0-7DCD-4970-B96A-D668B60C0669}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23548EB0-7DCD-4970-B96A-D668B60C0669}.Release|x64.ActiveCfg = Release|x64
+		{23548EB0-7DCD-4970-B96A-D668B60C0669}.Release|x64.Build.0 = Release|x64
+		{8B17383C-4810-479C-8C2E-548501385A1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B17383C-4810-479C-8C2E-548501385A1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B17383C-4810-479C-8C2E-548501385A1E}.Debug|x64.ActiveCfg = Debug|x64
+		{8B17383C-4810-479C-8C2E-548501385A1E}.Debug|x64.Build.0 = Debug|x64
+		{8B17383C-4810-479C-8C2E-548501385A1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B17383C-4810-479C-8C2E-548501385A1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B17383C-4810-479C-8C2E-548501385A1E}.Release|x64.ActiveCfg = Release|x64
+		{8B17383C-4810-479C-8C2E-548501385A1E}.Release|x64.Build.0 = Release|x64
+		{FDCDAE22-AAC1-4734-BE4E-3BC36EE6A1FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDCDAE22-AAC1-4734-BE4E-3BC36EE6A1FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDCDAE22-AAC1-4734-BE4E-3BC36EE6A1FA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FDCDAE22-AAC1-4734-BE4E-3BC36EE6A1FA}.Debug|x64.Build.0 = Debug|Any CPU
+		{FDCDAE22-AAC1-4734-BE4E-3BC36EE6A1FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDCDAE22-AAC1-4734-BE4E-3BC36EE6A1FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDCDAE22-AAC1-4734-BE4E-3BC36EE6A1FA}.Release|x64.ActiveCfg = Release|Any CPU
+		{FDCDAE22-AAC1-4734-BE4E-3BC36EE6A1FA}.Release|x64.Build.0 = Release|Any CPU
+		{685F868E-4733-4800-9F34-1BF1B6C41B8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{685F868E-4733-4800-9F34-1BF1B6C41B8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{685F868E-4733-4800-9F34-1BF1B6C41B8B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{685F868E-4733-4800-9F34-1BF1B6C41B8B}.Debug|x64.Build.0 = Debug|Any CPU
+		{685F868E-4733-4800-9F34-1BF1B6C41B8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{685F868E-4733-4800-9F34-1BF1B6C41B8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{685F868E-4733-4800-9F34-1BF1B6C41B8B}.Release|x64.ActiveCfg = Release|Any CPU
+		{685F868E-4733-4800-9F34-1BF1B6C41B8B}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		EnterpriseLibraryConfigurationToolBinariesPath = packages\Unity.2.1.505.0\lib\NET35;packages\Unity.Interception.2.1.505.0\lib\NET35;packages\EnterpriseLibrary.Common.5.0.505.0\lib\NET35;packages\EnterpriseLibrary.Data.5.0.505.0\lib\NET35
+		SolutionGuid = {A008D1F4-2779-4B0A-82C6-68C80C02AD00}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Data.6.0.1304.0\lib\NET45
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 7
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://dev.azure.com/grfp
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = PortalGRFP.Business\\PortalGRFP.Business.csproj
+		SccProjectName1 = PortalGRFP.Business
+		SccLocalPath1 = PortalGRFP.Business
+		SccProjectUniqueName2 = PortalGRFP.Data\\PortalGRFP.Data.csproj
+		SccProjectName2 = PortalGRFP.Data
+		SccLocalPath2 = PortalGRFP.Data
+		SccProjectUniqueName3 = PortalGRFP.Entities\\PortalGRFP.Entities.csproj
+		SccProjectName3 = PortalGRFP.Entities
+		SccLocalPath3 = PortalGRFP.Entities
+		SccProjectUniqueName4 = PortalGRFP.Utilities\\PortalGRFP.Utilities.csproj
+		SccProjectName4 = PortalGRFP.Utilities
+		SccLocalPath4 = PortalGRFP.Utilities
+		SccProjectUniqueName5 = PortalGRFP\\PortalGRFP.csproj
+		SccProjectName5 = PortalGRFP
+		SccLocalPath5 = PortalGRFP
+		SccProjectUniqueName6 = PortalGRFP.Tests\\PortalGRFP.Tests.csproj
+		SccProjectName6 = PortalGRFP.Tests
+		SccLocalPath6 = PortalGRFP.Tests
+	EndGlobalSection
+EndGlobal

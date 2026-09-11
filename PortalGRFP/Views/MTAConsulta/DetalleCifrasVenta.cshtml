@@ -1,0 +1,91 @@
+﻿@model PortalGRFP.Entities.Response.ResponseList<PortalGRFP.Entities.Common.DetalleInputVenta>
+@using PortalGRFP.Entities.Common
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs{
+    <li class="breadcrumb-item active"><a>INFO</a></li>
+    <li class="breadcrumb-item"><a>DETALLE VENTA</a></li>
+}
+@*<form method="post" class="form-group col-md-12" action="~/MTAConsulta/DetalleConsulta">  *@
+
+<div class="col-lg-12" style="margin-top:5%">
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-striped" id="tblConciliacionVentasMensual">
+                <thead class="thead-primary">
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th scope="col">IDTIENDA</th>
+                        <th scope="col">TIENDA</th>
+                        <th scope="col">CADENA</th>
+                        <th scope="col">STATUS VENTA</th>
+                        <th scope="col">VENTA/PIEZAS</th>
+                        <th scope="col">VENTA/HISTORICO</th>
+                        <th scope="col">% DIFERENCIA VENTAS PIEZAS vs VENTA HISTÓRICO</th>
+                        <th scope="col">FECHA VENTA</th>
+                        <th scope="col">EXISTENCIAS</th>
+                        <th scope="col">FECHA EXISTENCIAS</th>
+                        <th>&nbsp;</th>
+
+                        @*<th scope="col" style="background-color:salmon">MOTIVO</th>*@
+
+
+
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    @foreach (var u in Model.Result)
+                    {
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>
+                            @u.IDTienda
+                        </td>
+                        <td>
+                            @u.Tienda
+                        </td>
+                        <td>
+                            @u.Cadena
+                        </td>
+                        <td>
+                            @u.Status_Venta
+                        </td>
+                        <td>
+                            @u.Venta_Piezas
+                        </td>
+                        <td>
+                            @u.Venta_Historica
+                        </td>
+                        <td>
+                            @u.Diferencia
+                        </td>
+                        <td>
+                            @u.Fecha_Venta
+                        </td>
+                        <td>
+                            @u.Existencia_Piezas
+                        </td>
+                        <td>
+                            @u.Fecha_Existencias
+                        </td>
+                        <td>&nbsp;</td>
+
+
+                    </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script type="text/javascript" src="~/Scripts/App/Views/IndexDetalle.js"></script>
+}
